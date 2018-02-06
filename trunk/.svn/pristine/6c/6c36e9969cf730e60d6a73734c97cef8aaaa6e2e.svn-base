@@ -1,0 +1,120 @@
+package com.payease.scfordermis.service.impl;
+
+
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.bo.requestBo.ReqLoginPCBean;
+import com.payease.scfordermis.bo.responseBo.RespLoginPCBean;
+import com.payease.scfordermis.dao.DepartmentInfoDao;
+import com.payease.scfordermis.dao.EmployeeInfoDao;
+import com.payease.scfordermis.dao.EmployeeRoleDao;
+import com.payease.scfordermis.dao.RoleInfoDao;
+import com.payease.scfordermis.entity.TDepartmentInfoEntity;
+import com.payease.scfordermis.entity.TEmployeeInfoEntity;
+import com.payease.scfordermis.entity.TEmployeeRoleEntity;
+import com.payease.scfordermis.entity.TRoleInfoEntity;
+import com.payease.scfordermis.service.LoginPCService;
+import com.payease.scfordermis.utils.MD5;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+
+import javax.servlet.http.HttpSession;
+import java.util.List;
+
+/**
+ * Created by admin on 2018/1/15.
+ */
+@Service
+public class LoginPCServiceImpl implements LoginPCService {
+    @Autowired
+    EmployeeInfoDao employeeInfoDao;
+    @Autowired
+    EmployeeRoleDao employeeRoleDao;
+    @Autowired
+    RoleInfoDao roleInfoDao;
+    @Autowired
+    DepartmentInfoDao departmentInfoDao;
+    @Override
+
+    public ResultBo login(HttpSession session,ReqLoginPCBean reqLoginPCBean) {
+        ResultBo result =ResultBo.build();
+
+        //判断是否是空值
+        if (reqLoginPCBean == null){
+            return  result.fail();
+        }
+        //判断账号是否是空值
+        if (StringUtils.isEmpty(reqLoginPCBean.getfAccount())){
+            return  result.fail();
+        }
+        //判断是密码否是空值
+        if (StringUtils.isEmpty(reqLoginPCBean.getfPassword())){
+            return result.fail();
+        }
+
+        ////根据用户名查询用户信息
+        List<TEmployeeInfoEntity> list = employeeInfoDao.findByFAccount(reqLoginPCBean.getfAccount());
+        if (list == null || list.size()==0){
+            return result.fail();
+        }
+        //获取数据库中对象
+        TEmployeeInfoEntity entity = list.get(0);
+        if (entity == null){
+            return result.fail();
+        }
+        RespLoginPCBean resp = new RespLoginPCBean();//出参对象
+
+        //              如果账号状态close-禁用                   是否删除 yes-删除
+        if("close".equals(resp.getfStatus()) && "yes".equals(resp.getfIsDelete())){
+            return result.fail();
+        }
+
+        //判断密码是否正确    入参pwd进行加密
+        if (!MD5.encode(reqLoginPCBean.getfPassword()).equals(entity.getfPassword())){
+            return result.fail();
+        }
+
+        resp.setfName(entity.getfName());
+        // 通过员工ID 查员工角色关系（t_employee_role）表中的角色ID  再通过角色ID查角色信息（t_role_info）表中的菜单权限
+        List<TEmployeeRoleEntity> byFEmployeeIdList = employeeRoleDao.findByFEmployeeId(entity.getfId());
+
+        TEmployeeRoleEntity tEmployeeRoleEntity = byFEmployeeIdList.get(0);//查找角色关系id
+
+        TRoleInfoEntity roleInfoEntity = roleInfoDao.findOne(tEmployeeRoleEntity.getfRoleId());//角色信息获取权限
+
+            resp.setfMenus(new String[]{roleInfoEntity.getfMenus()});
+
+
+        resp.setfAccount(entity.getfAccount());//账号
+        resp.setfDepartId(String.valueOf(entity.getfDepartIdTwo()));
+        //部门名称 通过部门id查询部门表(TDepartmentInfo)
+        TDepartmentInfoEntity departmentInfoEntity = departmentInfoDao.findOne(entity.getfDepartIdTwo());
+        resp.setfDepartName(departmentInfoEntity.getfName());
+        resp.setfPosition(entity.getfPosition());
+        resp.setfName(entity.getfName());
+        resp.setfMobile(entity.getfPosition());
+        resp.setfEmail(entity.getfEmail());
+        resp.setfQq(entity.getfQq());
+        resp.setfCompanyId(entity.getfCompanyId());
+        resp.setfId(entity.getfId());
+        session.setAttribute("userInfo",resp);
+        result.setResultBody(resp);
+        return result;
+    }
+
+    //==================================================================================================
+    /**
+     * 登出
+     * @return
+     */
+    @Override
+    public ResultBo logout(HttpSession session) {
+        ResultBo result=ResultBo.build();
+        session.removeAttribute("userInfo");
+        return result;
+    }
+}
+
+
+

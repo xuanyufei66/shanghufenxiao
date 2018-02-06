@@ -1,0 +1,130 @@
+package com.payease.scfordermis.controller.app.driver;
+
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.bo.responseBo.app.driver.AppGoodBean;
+import com.payease.scfordermis.bo.responseBo.app.driver.AppOrderBean;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.xml.transform.Result;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by zhangzhili on 2018/1/11.
+ */
+@RestController
+@RequestMapping("app/driver/order")
+@Api(tags = {"app司机端订单业务处理模块"})
+public class AppDriverOrderController {
+
+
+    @GetMapping("getorders")
+    @ApiOperation(value = "订单列表", response = AppOrderBean.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "token", value = "token标识", dataType = "string",
+        paramType = "query", required = true), @ApiImplicitParam(name = "orderStatus", value =
+        "1-待提货／不传-所有", dataType = "string", paramType = "query")})
+    public ResultBo getOrderList(String token, Long orderStatus) {
+        ResultBo resultBo = ResultBo.build();
+        AppOrderBean appOrderBean = new AppOrderBean();
+        appOrderBean.setOrderId(1L);
+        appOrderBean.setCustomerName("北京新发地水果商户");
+        appOrderBean.setOrderNum("DH-20171219-678219");
+        appOrderBean.setProductCategoryNum(2);
+        appOrderBean.setProductNum(2000);
+        appOrderBean.setStatus("待提货");
+        List<AppOrderBean> list = new ArrayList<>();
+        list.add(appOrderBean);
+        resultBo.setResultBody(list);
+        return resultBo;
+    }
+
+
+
+    @GetMapping("getorderdetail/{id}")
+    @ApiOperation(value = "订单详情", response = AppOrderBean.class)
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "token", value = "token标识", dataType = "string",
+        paramType = "query", required = true), @ApiImplicitParam(name = "id", value =
+        "订单id", dataType = "string", paramType = "path", required = true)})
+    public ResultBo getOrderDetail(String token, @PathVariable Long id) {
+        ResultBo resultBo = ResultBo.build();
+
+
+        AppOrderBean appOrderBean = new AppOrderBean();
+        appOrderBean.setOrderId(1L);
+        appOrderBean.setCustomerName("北京新发地水果商户");
+        appOrderBean.setOrderNum("DH-20171219-678219");
+        appOrderBean.setProductCategoryNum(2);
+        appOrderBean.setProductNum(2000);
+        appOrderBean.setStatus("待提货");
+        List<AppGoodBean> list = new ArrayList<>();
+        AppGoodBean appGoodBean = new AppGoodBean();
+        appGoodBean.setImgUrl("http://overseatesco.yizhifubj"
+            + ".com:8091/group1/M00/00/00/rBW07VpS2euAadb8AAAt8oApJbw968.jpg");
+        appGoodBean.setFormateName("A果");
+        appGoodBean.setGoodNum(1000);
+        appGoodBean.setUnitName("KG");
+        list.add(appGoodBean);
+        appOrderBean.setGoodBeanList(list);
+
+        resultBo.setResultBody(appOrderBean);
+        return resultBo;
+
+    }
+
+
+
+    @GetMapping("scanning/{orderscan}")
+    @ApiOperation(value = "二维码扫描请求接口／提货码请求接口", response = AppOrderBean.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "token", value = "token标识", dataType = "string",
+        paramType = "query", required = true), @ApiImplicitParam(name = "orderscan", value =
+        "提货码", dataType = "string", paramType = "path", required = true),})
+    public ResultBo getOrderScanning(String token, @PathVariable String orderscan) {
+        ResultBo resultBo = ResultBo.build();
+
+        AppOrderBean appOrderBean = new AppOrderBean();
+        appOrderBean.setOrderId(1L);
+        appOrderBean.setCustomerName("1北京新发地水果商户");
+        appOrderBean.setOrderNum("DH-20171219-678219");
+        appOrderBean.setProductCategoryNum(2);
+        appOrderBean.setProductNum(2000);
+        appOrderBean.setStatus("待提货");
+        List<AppGoodBean> list = new ArrayList<>();
+        AppGoodBean appGoodBean = new AppGoodBean();
+        appGoodBean.setImgUrl("http://overseatesco.yizhifubj"
+            + ".com:8091/group1/M00/00/00/rBW07VpS2euAadb8AAAt8oApJbw968.jpg");
+        appGoodBean.setFormateName("A果");
+        appGoodBean.setGoodNum(1000);
+        appGoodBean.setUnitName("KG");
+        list.add(appGoodBean);
+        appOrderBean.setGoodBeanList(list);
+
+        resultBo.setResultBody(appOrderBean);
+        return resultBo;
+    }
+
+
+    @GetMapping("getpickupgoods/{id}")
+    @ApiOperation(value = "确认提货")
+    @ApiImplicitParams({@ApiImplicitParam(name = "token", value = "token标识", dataType = "string",
+        paramType = "query", required = true), @ApiImplicitParam(name = "id", value =
+        "订单id", dataType = "string", paramType = "path", required = true)})
+    public ResultBo getPickUpGoods(String token, @PathVariable Long id) {
+        ResultBo resultBo = ResultBo.build();
+        Map<String, String> map = new HashMap<>();
+        map.put("orderNum", "DH-20171218-203010");
+        resultBo.setResultBody(map);
+        return resultBo;
+    }
+
+
+}

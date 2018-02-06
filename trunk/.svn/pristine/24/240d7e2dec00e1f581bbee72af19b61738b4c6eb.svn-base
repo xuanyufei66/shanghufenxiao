@@ -1,0 +1,33 @@
+package com.payease.scfordermis.bo.requestBo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+/**
+ * @Created By liuxiaoming
+ * @CreateTime 2018/1/10 上午10:45
+ **/
+@ApiModel(value = "员工账号列表查询实体类",description = "描述员工账号列表查询")
+public class ReqEmpAccNumBean extends PageBean{
+
+    @ApiModelProperty(value = "部门ID",dataType = "string")
+    private String departmentId;
+    @ApiModelProperty(value =  "员工姓名/账号/手机/职位",dataType = "string")
+    private String other;
+
+    public String getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(String departmentId) {
+        this.departmentId = departmentId;
+    }
+
+    public String getOther() {
+        return other;
+    }
+
+    public void setOther(String other) {
+        this.other = other;
+    }
+}

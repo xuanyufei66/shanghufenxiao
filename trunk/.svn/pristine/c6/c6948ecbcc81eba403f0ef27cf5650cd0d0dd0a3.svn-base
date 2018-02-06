@@ -1,0 +1,41 @@
+package com.payease.scfordermis.bo.requestBo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+/**
+ * Created by admin on 2018/1/11.
+ */
+@ApiModel(value = "客户管理实体类",description = "客户管理入参实体类")
+public class ReqCustomerBean extends  PageBean {
+    @ApiModelProperty(value = "客户级别",dataType = "string")
+    private String level;
+    @ApiModelProperty(value =  "全部地区",dataType = "string")
+    private String area;
+    @ApiModelProperty(value =  "客户名称/编码/订货号/联系人/手机",dataType = "string")
+    private String queryConditions;
+
+    public String getLevel() {
+        return level;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
+    }
+
+    public String getArea() {
+        return area;
+    }
+
+    public void setArea(String area) {
+        this.area = area;
+    }
+
+    public String getQueryConditions() {
+        return queryConditions;
+    }
+
+    public void setQueryConditions(String queryConditions) {
+        this.queryConditions = queryConditions;
+    }
+}

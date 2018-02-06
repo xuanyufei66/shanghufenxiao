@@ -1,0 +1,227 @@
+package com.payease.scfordermis.utils;
+
+import io.swagger.models.auth.In;
+import org.apache.commons.lang.time.DateUtils;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * 日期工具类
+ * Created by lch on 2018/1/4.
+ */
+public class DateUtil {
+
+	/**
+	 * 得到两个时间的间隔秒
+	 * @param d1
+	 * @param d2
+     * @return
+     */
+	public static long getBetweenSecond(Date d1, Date d2){
+		return Math.abs((d1.getTime() - d2.getTime())/1000);
+	}
+
+	/**
+	 * 把传入的时间设置为起始时间时间，把时分秒设置成0
+	 */
+	public static Date getBeginDate(Date current){
+		Calendar c = Calendar.getInstance();
+		c.setTime(current);
+		c.set(c.get(Calendar.YEAR),c.get(Calendar.MONTH),c.get(Calendar.DATE),0,0,0);
+		return c.getTime();
+	}
+
+	/**
+	 * 把传入的时间设置为结束时间
+	 * 把时分秒设置为0
+	 * 把天加1
+	 * 把秒减1
+	 */
+	public static Date getEndDate(Date current){
+		Calendar c = Calendar.getInstance();
+		c.setTime(current);
+		c.set(c.get(Calendar.YEAR),c.get(Calendar.MONTH),c.get(Calendar.DATE),0,0,0);
+		c.add(Calendar.DATE,1);
+		c.add(Calendar.SECOND,-1);
+		return c.getTime();
+	}
+
+	/**
+	 * 得到一天的最后一秒钟
+	 * 
+	 * @param d
+	 * @return
+	 */
+	public static Date endOfDay(Date d) {
+		return DateUtils.addSeconds(
+				DateUtils.addDays(DateUtils.truncate(d, Calendar.DATE), 1), -1);
+	}
+
+	/**
+	 * 将date类型转化为yyyy-MM-dd HH:mm:ss
+	 *
+	 * @param date
+	 * @return
+	 * @throws ParseException
+	 */
+	public static String formatNewDatetoString(Date date){
+		DateFormat fmt =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		return fmt.format(date);
+	}
+
+	/**
+	 * 将当前时间转化为yyyyMMddHHmmss
+	 *
+	 * @return
+	 * @throws ParseException
+	 */
+	public static String formatNow(){
+		DateFormat fmt =new SimpleDateFormat("yyyyMMddHHmmss");
+		return fmt.format(new Date());
+	}
+
+
+
+	/**
+	 * @Author zhangwen
+	 * @MethodName getLastMonthFirst
+	 * @Params []
+	 * @Return java.lang.String
+	 * @Date 2018/1/16 上午10:56
+	 * @Desp 获取前月的第一天
+	 */
+	public static String getLastMonthFirstDay(){
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		//获取前月的第一天
+		Calendar   cal_1=Calendar.getInstance();//获取当前日期
+		cal_1.add(Calendar.MONTH, -1);
+		cal_1.set(Calendar.DAY_OF_MONTH,1);//设置为1号,当前日期既为本月第一天
+		String firstDay = format.format(cal_1.getTime());
+		return firstDay;
+	}
+
+
+	/**
+	 * @Author zhangwen
+	 * @MethodName getLastMonthLastDay
+	 * @Params []
+	 * @Return java.lang.String
+	 * @Date 2018/1/16 上午11:00
+	 * @Desp 获取前月最后一天
+	 */
+	public static String getLastMonthLastDay(){
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		//获取前月的最后一天
+		Calendar cale = Calendar.getInstance();
+		cale.set(Calendar.DAY_OF_MONTH,0);//设置为1号,当前日期既为本月第一天
+		String lastDay = format.format(cale.getTime());
+		return lastDay;
+	}
+
+	/**
+	 * @Author zhangwen
+	 * @MethodName getThisMonthFirstDay
+	 * @Params []
+	 * @Return java.lang.String
+	 * @Date 2018/1/16 上午11:02
+	 * @Desp 获取当前月第一天
+	 */
+	public static String getThisMonthFirstDay(){
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		//获取当前月第一天：
+		Calendar c = Calendar.getInstance();
+		c.add(Calendar.MONTH, 0);
+		c.set(Calendar.DAY_OF_MONTH,1);//设置为1号,当前日期既为本月第一天
+		String first = format.format(c.getTime());
+		return first;
+	}
+
+	/**
+	 * @Author zhangwen
+	 * @MethodName getThisMonthLastDay
+	 * @Params []
+	 * @Return java.lang.String
+	 * @Date 2018/1/16 上午11:06
+	 * @Desp 获取当前月最后一天
+	 */
+	public static String getThisMonthLastDay(){
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		//获取当前月最后一天
+		Calendar ca = Calendar.getInstance();
+		ca.set(Calendar.DAY_OF_MONTH, ca.getActualMaximum(Calendar.DAY_OF_MONTH));
+		String last = format.format(ca.getTime());
+		return last;
+	}
+
+
+	/**
+	 * 根据 年、月 获取对应的月份 的 天数
+	 */
+	public static int getDaysByYearMonth(int year, int month) {
+		Calendar a = Calendar.getInstance();
+		a.set(Calendar.YEAR, year);
+		a.set(Calendar.MONTH, month - 1);
+		a.set(Calendar.DATE, 1);
+		a.roll(Calendar.DATE, -1);
+		int maxDate = a.get(Calendar.DATE);
+		return maxDate;
+	}
+
+
+	/**
+	 * @Author zhangwen
+	 * @MethodName dayReport
+	 * @Params [month, dayNumOfMonth]
+	 * @Return java.util.List<java.lang.String>
+	 * @Date 2018/1/16 下午2:38
+	 * @Desp 获取月份的日期集合
+	 */
+	public static List<String> dayReport(Date month, int dayNumOfMonth) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(month);//month 为指定月份任意日期
+		int year = cal.get(Calendar.YEAR);
+		int m = cal.get(Calendar.MONTH);
+		cal.set(Calendar.DAY_OF_MONTH, 1);// 从一号开始
+		List<String> days = new ArrayList<String>();
+		for (int i = 0; i < dayNumOfMonth; i++, cal.add(Calendar.DATE, 1)) {
+			Date d = cal.getTime();
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			String df = simpleDateFormat.format(d);
+//			System.out.println(df);
+			days.add(df);
+		}
+		return days;
+	}
+
+	public static void main(String[] args) {
+		try {
+
+
+
+//			String thisYear = DateUtil.getThisMonthFirstDay();
+			String thisYear = "2018-02";
+			int year = Integer.parseInt(thisYear.split("-")[0]);
+			int month = Integer.parseInt(thisYear.split("-")[1]);
+			System.out.println("年份 ===== "+year);
+			System.out.println("月份 ===== "+month);
+			int days = DateUtil.getDaysByYearMonth(year,month);
+			System.out.println("天数差 ========= "+days);
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
+			List<String> dayres = dayReport(format.parse(thisYear),days);
+			System.out.println(dayres.size());
+			for (String day : dayres){
+				System.out.println(day);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+}

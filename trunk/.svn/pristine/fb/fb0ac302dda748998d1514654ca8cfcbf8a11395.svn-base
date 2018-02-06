@@ -1,0 +1,25 @@
+package com.payease.scfordermis.utils;
+
+/**
+ * Created by lch on 2018/1/18.
+ * <p>
+ * 随机数工具类
+ */
+public class RandomUtil {
+
+    /**
+     * 生成随机数
+     *
+     * @param num
+     * @return
+     */
+    public static String RandomNumber(Integer num) {
+        int a[] = new int[num];
+        String ram = "";
+        for (int i = 0; i < a.length; i++) {
+            a[i] = (int) (10 * (Math.random()));
+            ram += a[i];
+        }
+        return ram;
+    }
+}

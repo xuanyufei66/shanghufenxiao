@@ -1,0 +1,8 @@
+package com.payease.scfordermis.bo;
+
+/**
+ * Created by YHF on 2018/1/10.
+ * 运输信息
+ */
+public class TransportInfoBo {
+}

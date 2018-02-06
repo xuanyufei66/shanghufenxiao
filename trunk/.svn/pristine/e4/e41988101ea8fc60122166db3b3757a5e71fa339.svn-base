@@ -1,0 +1,16 @@
+package com.payease.scfordermis.service;
+
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.bo.requestBo.ReqLoginPCBean;
+
+
+/**
+ * Created by zhoushijie on 2018/1/15.
+ */
+public interface LoginPCService {
+     ResultBo login(ReqLoginPCBean reqLoginPCBean);
+
+
+
+
+}

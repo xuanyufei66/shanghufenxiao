@@ -1,0 +1,32 @@
+package com.payease.scfordermis.bo.requestBo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+/**
+ * Created by zhoushijie on 2018/1/11.
+ * 客户订单登录   入参
+ */
+@ApiModel(value = "客户端登录实体类",description = "客户端登录类")
+public class ReqConsumerBean {
+    @ApiModelProperty(value = "订货账号",dataType = "string",required = true)
+    private String fIndentNo;
+    @ApiModelProperty(value = "订货账号密码",dataType = "string",required = true)
+    private String fIndentPassword;
+
+    public String getfIndentNo() {
+        return fIndentNo;
+    }
+
+    public void setfIndentNo(String fIndentNo) {
+        this.fIndentNo = fIndentNo;
+    }
+
+    public String getfIndentPassword() {
+        return fIndentPassword;
+    }
+
+    public void setfIndentPassword(String fIndentPassword) {
+        this.fIndentPassword = fIndentPassword;
+    }
+}

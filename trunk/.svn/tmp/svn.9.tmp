@@ -1,0 +1,43 @@
+package com.payease.scfordermis.dao;
+
+import com.payease.scfordermis.bo.requestBo.ReqTransportBo;
+import com.payease.scfordermis.entity.TTransportOrderEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.sql.Date;
+import java.util.List;
+
+/**
+ * Created by YHF on 2018/1/12.
+ */
+public interface TransportOrderDao extends JpaRepository<TTransportOrderEntity, Long>, JpaSpecificationExecutor {
+    //select * from t_transport_order t where t.f_search_key LIKE '%1%' AND t.f_createtime>'2018-01-15 09:36:00' AND
+    // t.f_createtime<'2018-01-15 09:40:18' AND t.f_area_info_id_two='1' AND t.f_status='ForLoading' OR t.f_status='ForLoadin'
+    // OR t.f_status='ForLoadin'
+
+    /**
+     * /*#pageable* bi   ORDER BY ?#{#pageable}
+     *
+     * @param fSearchKey
+     * @param date1
+     * @param date2
+     * @param areatwo
+     * @param ForLoading
+     * @param pageable
+     * @return
+     */
+    @Query(value = "select * from t_transport_order t where t.f_search_key LIKE %+?1+% AND t.f_createtime>?2 AND t.f_c" +
+            "reatetime<?3 AND t.f_area_info_id_two=?4 AND t.f_status=?5 ORDER BY ?#{#pageable}", countQuery = "select count(*)from t_transport_order t where t.f_search_key LIKE %+?1+% AND t.f_createtime>?2 AND t.f_c" +
+            "reatetime<?3 AND t.f_area_info_id_two=?4 AND t.f_status=?5 ", nativeQuery = true)
+    Page<TTransportOrderEntity> findTTransportOrdersByReqTransportBo(String fSearchKey, Date date1, Date date2, Long areatwo,
+                                                                     String ForLoading, Pageable pageable);
+
+   // Page<TTransportOrderEntity> findAll(Specification<TTransportOrderEntity> specification,Pageable pageable);
+
+}

@@ -1,0 +1,42 @@
+package com.payease.scfordermis.service;
+
+import com.payease.scfordermis.bo.requestBo.ReqDistributionOrderBo;
+import com.payease.scfordermis.bo.requestBo.ReqSaveOrUpdateOrderBo;
+import com.payease.scfordermis.bo.responseBo.*;
+import org.springframework.data.domain.Page;
+
+import javax.servlet.http.HttpSession;
+import java.util.List;
+
+/**
+ * Created by lch on 2018/1/15.
+ * <p>
+ * 集散地订单service接口
+ */
+public interface IDistributionOrderService {
+
+
+    Page<RespDistributionOrderBo> orderList(HttpSession session, ReqDistributionOrderBo reqDistributionOrderBo);
+
+    List<RespCustomerLevelBo> customerLevelList(HttpSession session);
+
+    List<RespAreaInfoBo> salesAreaList(HttpSession session);
+
+    List<RespDistributionBo> distributionList(HttpSession session);
+
+    List<RespCustomerBo> customerList(HttpSession session);
+
+    List<RespProductBo> productList(Long transportId);
+
+    List<RespOperationLogBo> operationLog(Long orderId);
+
+    void addNote(HttpSession session, Long orderId, String content);
+
+    RespOrderDetailsBo orderDetails(Long orderId);
+
+    List<RspPaymentRecordsBo> paymentRecords(Long orderId);
+
+    void orderReviewOrCancellation(HttpSession session, Long orderId, String type, String cancellationReason);
+
+    void orderSaveOrUpdate(HttpSession session, ReqSaveOrUpdateOrderBo reqSaveOrUpdateOrderBo);
+}

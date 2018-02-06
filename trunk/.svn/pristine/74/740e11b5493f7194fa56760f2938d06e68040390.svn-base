@@ -1,0 +1,37 @@
+package com.payease.scfordermis.bo.responseBo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+/**
+ * Created by admin on 2018/1/11.
+ */
+@ApiModel(value = "客户级别实体",description = "所有的客户级别和分页")
+public class RespLevelBean{
+    @ApiModelProperty(value = "客户级别",dataType = "String",required = false)
+    private String flevelid;
+
+    @ApiModelProperty(value = "折扣",dataType = "String",required = true)
+    private  String fdiscount;
+
+    public RespLevelBean(String flevelid, String fdiscount) {
+        this.flevelid = flevelid;
+        this.fdiscount = fdiscount;
+    }
+
+    public String getFlevelid() {
+        return flevelid;
+    }
+
+    public void setFlevelid(String flevelid) {
+        this.flevelid = flevelid;
+    }
+
+    public String getFdiscount() {
+        return fdiscount;
+    }
+
+    public void setFdiscount(String fdiscount) {
+        this.fdiscount = fdiscount;
+    }
+}

@@ -1,0 +1,36 @@
+package com.payease.scfordermis.bean;
+
+/**
+ * Created by zhangzhili on 2018/1/5.
+ * 返回状态码自定义类
+ * ps：注意codeId值是 int 类型 状态码别太长
+ */
+public enum Status {
+
+    SUCCESS(0, "OK"), FAIL(1, "fail");
+
+    private Integer codeId;
+    private String message;
+
+    Status(Integer codeId, String message) {
+        this.codeId = codeId;
+        this.message = message;
+    }
+
+
+    public Integer getCodeId() {
+        return codeId;
+    }
+
+    public void setCodeId(Integer codeId) {
+        this.codeId = codeId;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+}

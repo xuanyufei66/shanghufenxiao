@@ -1,0 +1,20 @@
+package com.payease.scfordermis.service;
+
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.bo.responseBo.RespLevelBean;
+import com.payease.scfordermis.entity.TConsumerLevelEntity;
+
+import javax.servlet.http.HttpSession;
+import java.util.List;
+
+/**
+ * Created by admin on 2018/1/10.
+ */
+public interface CustomerLevelService {
+
+    ResultBo saveAndUpdate(HttpSession session, RespLevelBean respLevelBean)throws Exception;
+
+    void LiDelete(long fid)throws Exception;
+
+    List<TConsumerLevelEntity>findAll(long fCompanyId)throws Exception;
+}

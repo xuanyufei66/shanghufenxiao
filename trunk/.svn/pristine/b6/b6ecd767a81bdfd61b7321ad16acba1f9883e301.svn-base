@@ -1,0 +1,123 @@
+package com.payease.scfordermis.bo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+import java.util.Date;
+
+/**
+ * Created by YHF on 2018/1/10.
+ */
+@ApiModel(value = "运输单实体类",description = "运输单实体类")
+public class TransportBo {
+    @ApiModelProperty(value = "long类型代表主键id",dataType = "long")
+    private Long fId;
+    @ApiModelProperty(value = "销售地区（一级）",dataType = "long",required=true)
+    private Long fAreaInfoIdOne;
+    @ApiModelProperty(value = "销售地区（二级）",dataType = "long",required = true)
+    private Long fAreaInfoIdTwo;
+    @ApiModelProperty(value = "车牌号",dataType = "string",required = true)
+    private String fCarNum;
+    @ApiModelProperty(value = "公司id",dataType = "long",required = true)
+    private Long fCompanyId;
+    @ApiModelProperty(value = "创建时间",dataType = "date")
+    private Date fCreatetime;
+    @ApiModelProperty(value = "通关单号",dataType = "string",required = true)
+    private String  fCustomsFormNo;
+    @ApiModelProperty(value = "司机名字",dataType = "string",required = true)
+    private String  fDriverName;
+    @ApiModelProperty(value = "司机电话",dataType = "string",required = true)
+    private String  fDriverPhone;
+    @ApiModelProperty(value = "操作人id",dataType = "long",required = true)
+    private Long  fOperate;
+    @ApiModelProperty(value = "检索关键词拼接所有查询条件",dataType = "string",required = true)
+    private String  fSearchKey;
+
+    public Long getfId() {
+        return fId;
+    }
+
+    public void setfId(Long fId) {
+        this.fId = fId;
+    }
+
+    public Long getfAreaInfoIdOne() {
+        return fAreaInfoIdOne;
+    }
+
+    public void setfAreaInfoIdOne(Long fAreaInfoIdOne) {
+        this.fAreaInfoIdOne = fAreaInfoIdOne;
+    }
+
+    public Long getfAreaInfoIdTwo() {
+        return fAreaInfoIdTwo;
+    }
+
+    public void setfAreaInfoIdTwo(Long fAreaInfoIdTwo) {
+        this.fAreaInfoIdTwo = fAreaInfoIdTwo;
+    }
+
+    public String getfCarNum() {
+        return fCarNum;
+    }
+
+    public void setfCarNum(String fCarNum) {
+        this.fCarNum = fCarNum;
+    }
+
+    public Long getfCompanyId() {
+        return fCompanyId;
+    }
+
+    public void setfCompanyId(Long fCompanyId) {
+        this.fCompanyId = fCompanyId;
+    }
+
+    public Date getfCreatetime() {
+        return fCreatetime;
+    }
+
+    public void setfCreatetime(Date fCreatetime) {
+        this.fCreatetime = fCreatetime;
+    }
+
+    public String getfCustomsFormNo() {
+        return fCustomsFormNo;
+    }
+
+    public void setfCustomsFormNo(String fCustomsFormNo) {
+        this.fCustomsFormNo = fCustomsFormNo;
+    }
+
+    public String getfDriverName() {
+        return fDriverName;
+    }
+
+    public void setfDriverName(String fDriverName) {
+        this.fDriverName = fDriverName;
+    }
+
+    public String getfDriverPhone() {
+        return fDriverPhone;
+    }
+
+    public void setfDriverPhone(String fDriverPhone) {
+        this.fDriverPhone = fDriverPhone;
+    }
+
+    public Long getfOperate() {
+        return fOperate;
+    }
+
+    public void setfOperate(Long fOperate) {
+        this.fOperate = fOperate;
+    }
+
+    public String getfSearchKey() {
+        return fSearchKey;
+    }
+
+    public void setfSearchKey(String fSearchKey) {
+        this.fSearchKey = fSearchKey;
+    }
+}

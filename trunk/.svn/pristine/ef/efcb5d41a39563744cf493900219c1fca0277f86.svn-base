@@ -1,0 +1,16 @@
+package com.payease.scfordermis.service;
+
+import com.payease.scfordermis.bo.UnitBo;
+
+import java.util.List;
+
+/**
+ * Created by YHF on 2018/1/10.
+ */
+public interface UnitService {
+    int unitAdd(UnitBo unitBo);
+    int unitDelete(UnitBo unitBo);
+    List<UnitBo> getUnits();
+    int unitUpdate(UnitBo unitBo);
+
+}

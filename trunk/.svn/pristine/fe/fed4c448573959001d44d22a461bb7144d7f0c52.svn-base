@@ -1,0 +1,14 @@
+package com.payease.scfordermis.dao;
+
+import com.payease.scfordermis.entity.TDepartmentInfoEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+
+
+/**
+ * Created by admin on 2018/1/15.
+ */
+@Repository
+public interface DepartmentInfoDao extends JpaRepository<TDepartmentInfoEntity,Long> {
+}

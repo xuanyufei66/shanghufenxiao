@@ -1,0 +1,204 @@
+package com.payease.scfordermis.service.impl;
+
+import com.payease.scfordermis.bo.responseBo.RespIndexListBean;
+import com.payease.scfordermis.bo.responseBo.RespLoginPCBean;
+import com.payease.scfordermis.service.IIndexService;
+import com.payease.scfordermis.utils.DateUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.servlet.http.HttpSession;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @Author : zhangwen
+ * @Data : 2018/1/16
+ * @Description :
+ */
+@Service
+public class IndexServiceImpl implements IIndexService {
+    private static final Logger log = LoggerFactory.getLogger(IndexServiceImpl.class);
+
+    @Autowired
+    EntityManager em;
+
+    /**
+     * @param queryType
+     * @Author zhangwen
+     * @MethodName index
+     * @Params String queryType  时间类型（thisMonth:本月，lastMonth:上月）
+     * @Return RespIndexListBean
+     * @Date 2018/1/16 上午10:43
+     * @Desp 首页获取信息接口
+     */
+    @Override
+    public RespIndexListBean index(HttpSession session, String queryType) throws Exception{
+        try {
+            //1.获取查询范围
+            String beginTime = null,endTime;
+            if("thisMonth".equals(queryType)){
+                beginTime = DateUtil.getThisMonthFirstDay();
+                endTime = DateUtil.getThisMonthLastDay();
+            }else{
+                beginTime = DateUtil.getLastMonthFirstDay();
+                endTime = DateUtil.getLastMonthLastDay();
+            }
+            int year = Integer.parseInt(beginTime.split("-")[0]);
+            int month = Integer.parseInt(beginTime.split("-")[1]);
+            int monthSize = DateUtil.getDaysByYearMonth(year,month);
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
+            List<String> days = DateUtil.dayReport(format.parse(beginTime),monthSize);
+            RespLoginPCBean userInfo = (RespLoginPCBean) session.getAttribute("userInfo");
+
+            long companyId = userInfo.getfCompanyId();
+            //2.拼装线性数据查询sql
+            String sql = this.getQuerySql(companyId,beginTime,endTime);
+            Query query = em.createNativeQuery(sql);
+            List<Object[]> rows = query.getResultList();
+            //3.拼装线性数据
+            List<String[]> linear = this.getDayWithMoney(rows,days);
+            //4.拼接获取订单金额的sql
+            String orderMoneySql = this.getOrderMoneySql(companyId,beginTime,endTime);
+            Query query1 = em.createNativeQuery(orderMoneySql);
+            Object ordermoneys = query1.getSingleResult();
+            //5.拼接订单客户数查询sql
+            String consumerSql = this.getConsumerNumberSql(companyId,beginTime,endTime);
+            Query consumerQuery = em.createNativeQuery(consumerSql);
+            Object consumers = consumerQuery.getSingleResult();
+            //6.拼接订货单数量查询sql
+            String orderSql = this.getOrderTotalNumberSql(companyId,beginTime,endTime);
+            Query orderQuery = em.createNativeQuery(orderSql);
+            Object orders = orderQuery.getSingleResult();
+
+            RespIndexListBean bean = new RespIndexListBean();
+            bean.setOrderMoney(null!=ordermoneys?ordermoneys.toString():"0.00");
+            bean.setOrderConsumerNumber(null!=consumers?Integer.valueOf(consumers.toString()).intValue():0);
+            bean.setOrderTotalNumber(null!=orders?Integer.valueOf(orders.toString()).intValue():0);
+            bean.setLinear(linear);
+            return bean;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("index",e);
+            throw e;
+        }
+    }
+
+    /**
+     * @Author zhangwen
+     * @MethodName getQuerySql
+     * @Params [companyId, beginTime, endTime]
+     * @Return java.lang.String
+     * @Date 2018/1/16 下午5:17
+     * @Desp 拼装查询sql
+     */
+    private String getQuerySql(long companyId,String beginTime,String endTime){
+        StringBuffer sb = new StringBuffer();
+        sb.append("select DATE(o.f_createtime) AS orderTime ,sum(o.f_order_amount_pay) as summoney from t_order o ");
+        sb.append("where o.f_company_id =  ");
+        sb.append(companyId);
+        sb.append(" and o.f_order_status!='cancelled' ");
+        sb.append(" and o.f_createtime BETWEEN '");
+        sb.append(beginTime);
+        sb.append("' and DATE_ADD('");
+        sb.append(endTime);
+        sb.append("',INTERVAL 1 DAY)  ");
+//            sb.append("and o.f_createtime BETWEEN '2018-01-11' and DATE_ADD('2018-01-16',INTERVAL 1 DAY) ");
+        sb.append("group by orderTime");
+        return sb.toString();
+    }
+
+
+    /**
+     * @Author zhangwen
+     * @MethodName getOrderMoneySql
+     * @Params [companyId, beginTime, endTime]
+     * @Return java.lang.String
+     * @Date 2018/1/16 下午5:58
+     * @Desp 拼接获取订单金额的sql
+     */
+    private String getOrderMoneySql(long companyId,String beginTime,String endTime){
+        StringBuffer sb = new StringBuffer();
+        sb.append("select sum(o.f_order_amount_pay) as summoney from t_order o ");
+        sb.append(" where o.f_company_id =  ");
+        sb.append(companyId);
+        sb.append(" and o.f_order_status!='cancelled' ");
+        sb.append(" and o.f_createtime BETWEEN '");
+        sb.append(beginTime);
+        sb.append("' and DATE_ADD('");
+        sb.append(endTime);
+        sb.append("',INTERVAL 1 DAY)  ");
+        return sb.toString();
+    }
+
+    /**
+     * @Author zhangwen
+     * @MethodName getConsumerNumberSql
+     * @Params [companyId, beginTime, endTime]
+     * @Return java.lang.String
+     * @Date 2018/1/16 下午6:08
+     * @Desp 拼接订单客户数查询sql
+     */
+    private String getConsumerNumberSql (long companyId,String beginTime,String endTime){
+        StringBuffer sb = new StringBuffer();
+        sb.append("select count(distinct o.f_consumer_id) AS consumers from t_order o ");
+        sb.append(" where o.f_company_id =  ");
+        sb.append(companyId);
+        sb.append(" and o.f_order_status!='cancelled' ");
+        sb.append(" and o.f_createtime BETWEEN '");
+        sb.append(beginTime);
+        sb.append("' and DATE_ADD('");
+        sb.append(endTime);
+        sb.append("',INTERVAL 1 DAY)  ");
+        return sb.toString();
+    }
+
+    private String getOrderTotalNumberSql(long companyId,String beginTime,String endTime){
+        StringBuffer sb = new StringBuffer();
+        sb.append("select count(1) AS orders from t_order o ");
+        sb.append(" where o.f_company_id =  ");
+        sb.append(companyId);
+        sb.append(" and o.f_order_status!='cancelled' ");
+        sb.append(" and o.f_createtime BETWEEN '");
+        sb.append(beginTime);
+        sb.append("' and DATE_ADD('");
+        sb.append(endTime);
+        sb.append("',INTERVAL 1 DAY)  ");
+        return sb.toString();
+    }
+
+    /**
+     * @Author zhangwen
+     * @MethodName getDayWithMoney
+     * @Params [rows, days]
+     * @Return java.util.List<java.lang.String[]>
+     * @Date 2018/1/16 下午5:19
+     * @Desp 整合线性数据
+     */
+    private List<String[]> getDayWithMoney(List<Object[]> rows,List<String> days){
+        //将查询结果与日期集合整合处理
+        List<String[]> linear= new ArrayList<String[]>();
+        for(String day:days){
+            String[] param = {day,"0.00"};
+            linear.add(param);
+        }
+        //对重复的日期进行金额替换
+        for (String[] param: linear){
+            for (Object[] row : rows) {
+                if(String.valueOf(param[0]).equals(String.valueOf(row[0]))){
+                    param[1]=String.valueOf(row[1]);
+                }
+            }
+
+        }
+        return linear;
+    }
+
+}

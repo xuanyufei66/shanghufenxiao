@@ -1,0 +1,16 @@
+package com.payease.scfordermis.dao;
+
+import com.payease.scfordermis.entity.TAreaInfoEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+/**
+ * Created by lch on 2018/1/16.
+ *
+ * 销售区域dao
+ */
+public interface AreaInfoDao extends JpaRepository<TAreaInfoEntity, Long> {
+
+    List<TAreaInfoEntity> findByFCompanyIdAndFParentId(String companyId,String parentId);
+}

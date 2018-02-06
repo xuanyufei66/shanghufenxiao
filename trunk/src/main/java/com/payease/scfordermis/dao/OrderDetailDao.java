@@ -1,0 +1,18 @@
+package com.payease.scfordermis.dao;
+
+import com.payease.scfordermis.entity.TOrderDetailEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+
+/**
+ * Created by lch on 2018/1/16.
+ * <p>
+ * 订单详情dao
+ */
+public interface OrderDetailDao extends JpaRepository<TOrderDetailEntity, Long> {
+
+    List<TOrderDetailEntity> findByFOrderId(Long orderId);
+    List<TOrderDetailEntity>  findByFTranOrderDetailId(Long transportDetailId);
+}

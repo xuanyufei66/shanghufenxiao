@@ -1,0 +1,73 @@
+package com.payease.scfordermis.dao;
+
+import com.payease.scfordermis.entity.TOrderEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+/**
+ * Created by lch on 2018/1/15.
+ * <p>
+ * 集散地订单dao
+ */
+public interface OrderDao extends JpaRepository<TOrderEntity, Long>, JpaSpecificationExecutor {
+    //根据运单号查订单
+    List<TOrderEntity> findByFTransportOrderId(Long transportId);
+
+    @Modifying
+    @Query("update TOrderEntity o set o.fOrderStatus=-1 where o.id=?1 and o.fOrderStatus<3")
+    int updateOrderStatus(Long id);
+
+
+    @Modifying
+    @Query("update TOrderEntity set fOrderStatus = :orderStatus where id = :orderId and "
+        + "fTransportOrderId = :tranOrderId")
+    int updateOrderStatus(@Param(value = "orderId") long orderId, @Param(value = "orderStatus")
+        int orderStatus, @Param(value = "tranOrderId") long tranOrderId);
+
+
+
+    @Query(value = "select t from TOrderEntity t where (fOrderStatus < 3 or fPayMethod = :str1 or fPayStatus = :str2) "
+        + "and fOrderStatus > -1", countQuery = "select count(u) from TOrderEntity u where "
+        + "(fOrderStatus < 3 or fPayMethod = :str1 or fPayStatus = :str2) "
+        + "and fOrderStatus > -1")
+    Page<TOrderEntity> findByFOrderStatus(@Param("str1") String str1, @Param("str2") String str2,
+                                          Pageable pageable);
+
+
+
+    /**
+     * app司机端查询全部订单
+     *
+     * @param orderStatus
+     * @param tranOrderId
+     * @return
+     */
+    List<TOrderEntity>
+    findByFOrderStatusGreaterThanEqualAndFTransportOrderIdOrderByFOrderStatusAsc(int orderStatus,
+                                                                                 long tranOrderId);
+
+
+
+    /**
+     * app司机端查询待提货订单
+     *
+     * @param orderStatus
+     * @param tranOrderId
+     * @return
+     */
+    List<TOrderEntity> findByFOrderStatusAndFTransportOrderIdOrderByIdAsc(int orderStatus, long
+        tranOrderId);
+
+    @Modifying
+    @Query("update TOrderEntity set fPaidMoney = :payMoney where id = :orderId and "
+            + "fCompanyId = :companyId")
+    int updateOrderPaidMoney(@Param(value = "orderId") long orderId, @Param(value = "companyId") long companyId, @Param(value = "payMoney") BigDecimal payMoney);
+}

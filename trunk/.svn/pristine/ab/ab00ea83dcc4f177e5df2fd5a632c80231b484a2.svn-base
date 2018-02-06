@@ -1,0 +1,34 @@
+package com.payease.scfordermis.bo.requestBo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+/**
+ * Created by zhoushijie on 2018/1/10.
+ * 入参
+ */
+@ApiModel(value = "修改重设密码实体类",description = "修改重设密码类")
+public class ReqAccInfoResetPwdBean {
+
+    @ApiModelProperty(value = "原密码",dataType = "string",required = true)
+    private String oldPwd;
+    @ApiModelProperty(value = "新密码",dataType = "string",required = true)
+    private String newPwd;
+
+
+    public String getOldPwd() {
+        return oldPwd;
+    }
+
+    public void setOldPwd(String oldPwd) {
+        this.oldPwd = oldPwd;
+    }
+
+    public String getNewPwd() {
+        return newPwd;
+    }
+
+    public void setNewPwd(String newPwd) {
+        this.newPwd = newPwd;
+    }
+}

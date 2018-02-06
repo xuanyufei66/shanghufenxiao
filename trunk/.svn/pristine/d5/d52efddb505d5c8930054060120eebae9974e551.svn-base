@@ -1,0 +1,33 @@
+package com.payease.scfordermis.service.impl;
+
+import com.payease.scfordermis.bo.UnitBo;
+import com.payease.scfordermis.service.UnitService;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * Created by YHF on 2018/1/10.
+ */
+@Service
+public class UnitServiceImpl implements UnitService {
+    @Override
+    public int unitAdd(UnitBo unitBo) {
+        return 0;
+    }
+
+    @Override
+    public int unitDelete(UnitBo unitBo) {
+        return 0;
+    }
+
+    @Override
+    public List<UnitBo> getUnits() {
+        return null;
+    }
+
+    @Override
+    public int unitUpdate(UnitBo unitBo) {
+        return 0;
+    }
+}

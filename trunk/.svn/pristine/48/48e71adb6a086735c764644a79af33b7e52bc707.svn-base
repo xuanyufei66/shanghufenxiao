@@ -1,0 +1,257 @@
+package com.payease.scfordermis.service.impl;
+
+
+import com.payease.scfordermis.bean.Status;
+import com.payease.scfordermis.bo.requestBo.GoodAddOrUpdateBo;
+import com.payease.scfordermis.bo.responseBo.*;
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.dao.*;
+import com.payease.scfordermis.entity.TCategoryInfoEntity;
+import com.payease.scfordermis.entity.TProductFormatEntity;
+import com.payease.scfordermis.entity.TProductInfoEntity;
+import com.payease.scfordermis.entity.TUnitInfoEntity;
+import com.payease.scfordermis.service.IGoodsService;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import javax.persistence.criteria.Predicate;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+
+/**
+ * Created by ljp on 2018/1/10.
+ */
+@Service
+public class GoodsServiceImpl implements IGoodsService{
+
+    @Autowired
+    CategoryInfoDao categoryInfoDao;
+    @Autowired
+    ProductInfoDao productInfoDao;
+    @Autowired
+    ProductUnitDao productUnitDao;
+    @Autowired
+    UnitInfoDao unitInfoDao;
+    @Autowired
+    ProductFormatDao productFormatDao;
+    @Autowired
+    TransportOrderDetailDao transportOrderDetailDao;
+
+    @Override
+    public ResultBo categoryAddOrUpdate(Long id,String categoryName,Long categoryParentId) {
+        ResultBo result = ResultBo.build();
+        Long aLong = categoryInfoDao.countTCategoryInfoEntitiesByFNameEquals(categoryName);
+        if (aLong>0){                                                  //判断分类名称是否重复
+            return result.setCodeId(Status.GOODSCATEREPEAT);
+        }
+        String level;
+        if (categoryParentId ==0){
+            level="1";
+        }else {
+            level="2";
+        }
+        TCategoryInfoEntity tCategoryInfoEntity = new TCategoryInfoEntity();
+        tCategoryInfoEntity.setfCompanyId(1L);          //从Session中获取f_company_id
+        tCategoryInfoEntity.setfOperate(1L);            //从Session中获取操作人的id
+        tCategoryInfoEntity.setfLevel(level);
+        tCategoryInfoEntity.setfName(categoryName);
+        tCategoryInfoEntity.setfParentId(categoryParentId);
+        if (null!=id){                                      //编辑（新增没有id）
+            tCategoryInfoEntity.setfUpdateTime(new Date());
+            Date createTime = categoryInfoDao.findOne(id).getfCreateTime();
+            tCategoryInfoEntity.setfCreateTime(createTime);
+            tCategoryInfoEntity.setfId(id);
+        }else {                                             //新增
+            tCategoryInfoEntity.setfUpdateTime(new Date());
+            tCategoryInfoEntity.setfCreateTime(new Date());
+        }
+        categoryInfoDao.save(tCategoryInfoEntity);
+        return result;
+    }
+
+    @Override
+    public ResultBo categoryDetele(Long id) {
+        ResultBo result = ResultBo.build();
+        //判断商品分类下是否有商品
+        TCategoryInfoEntity one = categoryInfoDao.findOne(id);
+        if("1".equals(one.getfLevel())){
+            Long oLong = productInfoDao.countTProductInfoEntitiesByFCategoryIdOneEquals(id);
+            if (oLong>0){
+                return result.setCodeId(Status.GOODSCATEFAIL);
+            }else {
+                categoryInfoDao.delete(id);
+                return result;
+            }
+        }else {
+            Long tLong = productInfoDao.countTProductInfoEntitiesByFCategoryIdTwoEquals(id);
+            if (tLong>0){
+                return result.setCodeId(Status.GOODSCATEFAIL);
+            }else {
+                categoryInfoDao.delete(id);
+                return result;
+            }
+        }
+    }
+
+    @Override
+    public List<QueryCategoryBo> getCategoryList() {
+        List<QueryCategoryBo> list = new ArrayList<>();
+        List<TCategoryInfoEntity> byFLevel = categoryInfoDao.findByFLevelOrderByFUpdateTimeDesc("1");//把所有一级菜单查询来
+        for (int i = 0;i<byFLevel.size();i++){
+            //通过id 找到所属这个一级菜单的二级菜单
+            List<TCategoryInfoEntity> byFParentIdList = categoryInfoDao.findByFParentIdOrderByFUpdateTimeDesc(byFLevel.get(i).getfId());
+            QueryCategoryBo queryCategoryBo = new QueryCategoryBo();
+            queryCategoryBo.setfId(byFLevel.get(i).getfId());
+            queryCategoryBo.setfName(byFLevel.get(i).getfName());
+            queryCategoryBo.setChildList(byFParentIdList);
+            list.add(queryCategoryBo);
+        }
+        return list;
+    }
+
+    @Override
+    public ResultBo unitAdd(String unitName) {
+        ResultBo result = ResultBo.build();
+        //新增时判断计量单位名称是否重复
+        Long aLong = productUnitDao.countByFNameEquals(unitName);
+        if (aLong>0){
+             return result.setCodeId(Status.GOODUNITREOEAT);
+        }
+        TUnitInfoEntity tUnitInfoEntity = new TUnitInfoEntity();
+        tUnitInfoEntity.setfCompanyId(1l);                     //从session 中获取
+        tUnitInfoEntity.setfCreateTime(new Date());
+        tUnitInfoEntity.setfUpdateTime(new Date());
+        tUnitInfoEntity.setfName(unitName);
+        tUnitInfoEntity.setfOperate(1L);                        //从Session中获取
+        tUnitInfoEntity.setfUpdateTime(new Date());
+        productUnitDao.save(tUnitInfoEntity);
+        return result;
+    }
+
+    @Override
+    public ResultBo unitDelete(Long id) {
+        //已有商品使用该计量单位，不能删除
+        ResultBo result = ResultBo.build();
+        Long aLong = productInfoDao.countTProductInfoEntitiesByFUnitId(id);
+        if (aLong>0){
+            return result.setCodeId(Status.GOODUNITFAIL);
+        }
+        productUnitDao.delete(id);
+        return result;
+    }
+
+    @Override
+    public ResultBo unitList() {
+        ResultBo result = ResultBo.build();
+        Long companyId = 1L;//通过session 获取companyId
+        List<TUnitInfoEntity> byFCompanyIdEquals = unitInfoDao.findByFCompanyIdEqualsOrderByFCreateTimeDesc(companyId);
+        List<UnitBo> unitBoList = new ArrayList<>();
+        for (int i = 0; i<byFCompanyIdEquals.size();i++){
+            UnitBo unitBo = new UnitBo();
+            unitBo.setfId(byFCompanyIdEquals.get(i).getfId());
+            unitBo.setfName(byFCompanyIdEquals.get(i).getfName());
+            unitBoList.add(unitBo);
+        }
+        result.setResultBody(unitBoList);
+        return result;
+    }
+
+    @Override
+    public Page<GoodsManageBo> getGoodsList(Integer category,Integer level,String searchCondition, Integer page, Integer size) {
+        Sort.Order fSortOrder = new Sort.Order(Sort.Direction.ASC, "fSort");
+        Sort.Order createTimeOrder = new Sort.Order(Sort.Direction.DESC, "fCreateTime");
+        List<Sort.Order> orders = new ArrayList<>();
+        orders.add(fSortOrder);//先按排序号升序
+        orders.add(createTimeOrder);//再按创建时间降序
+        Sort sort = new Sort(orders);
+        Pageable pageable = new PageRequest(page-1,size,sort);
+
+        Specification<TProductInfoEntity> category1 = (root, query, criteriaBuilder) -> {
+            List<Predicate> list = new ArrayList<Predicate>();
+
+            if (null!=category) {
+                if (level==1){
+                    list.add(criteriaBuilder.equal(root.get("fCategoryIdOne").as(Integer.class), category));
+                }else {
+                    list.add(criteriaBuilder.equal(root.get("fCategoryIdTwo").as(Integer.class), category));
+                }
+
+            }
+            if (StringUtils.isNotBlank(searchCondition)) {
+                list.add(criteriaBuilder.equal(root.get("fSearchCondition").as(String.class), searchCondition));
+            }
+            //从session 中获取companyId
+            list.add(criteriaBuilder.equal(root.get("fCompanyId").as(Integer.class), 1));
+            Predicate[] p = new Predicate[list.size()];
+            return criteriaBuilder.and(list.toArray(p));
+        };
+        Page<TProductInfoEntity> tProductInfoEntityPage = productInfoDao.findAll(category1, pageable);
+        List<GoodsManageBo> list = new ArrayList<>();
+        for (TProductInfoEntity tProductInfoEntity : tProductInfoEntityPage.getContent()) {
+            GoodsManageBo goodsManageBo = new GoodsManageBo();
+            goodsManageBo.setGoodsId(tProductInfoEntity.getfId());          //商品id
+            goodsManageBo.setPicAll(tProductInfoEntity.getfPicList());      //水果图片集合
+            goodsManageBo.setGoodsName(tProductInfoEntity.getfName());      //商品名称
+            goodsManageBo.setGoodsNo(tProductInfoEntity.getfCode());        //商品编码
+            goodsManageBo.setStatus(tProductInfoEntity.getfStatus());       //状态
+            //首先判断二级分类，如果为0，就显示一级分类的名称。如果不为0，就显示二级分类的名称
+            long l = tProductInfoEntity.getfCategoryIdTwo();
+            if (l==0){
+                goodsManageBo.setCategoryName(categoryInfoDao.findOne(tProductInfoEntity.getfCategoryIdOne()).getfName());                            //分类名称
+            }else {
+                goodsManageBo.setCategoryName(categoryInfoDao.findOne(l).getfName());                            //分类名称
+            }
+            //从session 中获取companyId
+          /*  List<TProductFormatEntity> byFProductId = productFormatDao.findByFProductIdAndFCompanyId(tProductInfoEntity.getfId(),1L);
+            for (TProductFormatEntity tProductFormatEntity:byFProductId){
+                tProductFormatEntity.getfPic()
+            }*/
+            //水果主图
+           /* goodsManageBo.setFormatName();                                  //规格
+            goodsManageBo.setUnitName();                                    //单位
+            goodsManageBo.setPrice();                                       //销售价
+
+
+            goodsManageBo.setLabel();                                       //商品标签
+            list.add(goodsManageBo);*/
+        }
+        Page<GoodsManageBo> goodsManageBos = new PageImpl<GoodsManageBo>(list, pageable, tProductInfoEntityPage.getTotalElements());
+        return goodsManageBos;
+    }
+    //修改/详情商品接口
+    @Override
+    public GoodAddOrUpdateBo getGoodsMessage(Long goodId) {
+
+        //通过商品id查出商品规格信息
+        List<TProductFormatEntity> tProductFormatEntityList = productFormatDao.findByFProductId(goodId);
+        //把实体类的属性拷贝到bo类
+        List<ProductFormatBo> newList = new ArrayList<>();
+        for (TProductFormatEntity tProductFormatEntity:tProductFormatEntityList){
+            ProductFormatBo productFormatBo= new ProductFormatBo();
+            productFormatBo.setFormatId(tProductFormatEntity.getfId());
+            productFormatBo.setFormatName(tProductFormatEntity.getfName());
+            productFormatBo.setGoodsNo(tProductFormatEntity.getfCode());
+            productFormatBo.setGoodsPrice(tProductFormatEntity.getfPrice());
+            productFormatBo.setPicMain(tProductFormatEntity.getfPic());
+            Long aLong = transportOrderDetailDao.countByFProductId(goodId);
+            if (aLong>0){
+                productFormatBo.setIsdetele(1L);
+            }else {
+                productFormatBo.setIsdetele(0L);
+            }
+            newList.add(productFormatBo);
+        }
+        //通过商品id查出商品信息
+        TProductInfoEntity one = productInfoDao.findOne(goodId);
+        GoodUpdateShowBo goodUpdateShowBo = new GoodUpdateShowBo();
+        goodUpdateShowBo.setGoodsName(one.getfName());
+        /*goodUpdateShowBo.setfCategoryId(one.get);*/
+        return null;
+    }
+
+
+}

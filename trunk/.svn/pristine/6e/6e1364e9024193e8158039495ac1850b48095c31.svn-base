@@ -1,0 +1,269 @@
+package com.payease.scfordermis.entity;
+
+import javax.persistence.*;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.Objects;
+
+/**
+ * @Author : zhangwen
+ * @Data : 2018/1/10
+ * @Description :
+ */
+@Entity
+@Table(name = "t_order", schema = "mis", catalog = "")
+public class TOrderEntity {
+    private long id;
+    private String fOrderNum;
+    private long fTransportOrderId;
+    private String fTransportNum;
+    private long fConsumerId;
+    private Date fCreatetime;
+    private BigDecimal fOrderAmountPay;
+    private String fOrderStatus;
+    private String fPayStatus;
+    private String fSpecial;
+    private String fSearchKey;
+    private BigDecimal fAmount;
+    private BigDecimal fPaidMoney;
+    private Long fOrderCreaterId;
+    private long fCompanyId;
+    private String fPayMethod;
+    private BigDecimal fPreAmount;
+    private String fFrom;
+    private int fProductNum;
+    private int fProductCategoryNum;
+
+
+    @Id
+    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    @Basic
+    @Column(name = "f_order_num", nullable = false, length = 100)
+    public String getfOrderNum() {
+        return fOrderNum;
+    }
+
+    public void setfOrderNum(String fOrderNum) {
+        this.fOrderNum = fOrderNum;
+    }
+
+    @Basic
+    @Column(name = "f_transport_order_id", nullable = false)
+    public long getfTransportOrderId() {
+        return fTransportOrderId;
+    }
+
+    public void setfTransportOrderId(long fTransportOrderId) {
+        this.fTransportOrderId = fTransportOrderId;
+    }
+
+    @Basic
+    @Column(name = "f_transport_num", nullable = false, length = 50)
+    public String getfTransportNum() {
+        return fTransportNum;
+    }
+
+    public void setfTransportNum(String fTransportNum) {
+        this.fTransportNum = fTransportNum;
+    }
+
+    @Basic
+    @Column(name = "f_consumer_id", nullable = false)
+    public long getfConsumerId() {
+        return fConsumerId;
+    }
+
+    public void setfConsumerId(long fConsumerId) {
+        this.fConsumerId = fConsumerId;
+    }
+
+    @Basic
+    @Column(name = "f_createtime", nullable = false)
+    public Date getfCreatetime() {
+        return fCreatetime;
+    }
+
+    public void setfCreatetime(Date fCreatetime) {
+        this.fCreatetime = fCreatetime;
+    }
+
+    @Basic
+    @Column(name = "f_order_amount_pay", nullable = false, precision = 2)
+    public BigDecimal getfOrderAmountPay() {
+        return fOrderAmountPay;
+    }
+
+    public void setfOrderAmountPay(BigDecimal fOrderAmountPay) {
+        this.fOrderAmountPay = fOrderAmountPay;
+    }
+
+    @Basic
+    @Column(name = "f_order_status", nullable = false, length = 20)
+    public String getfOrderStatus() {
+        return fOrderStatus;
+    }
+
+    public void setfOrderStatus(String fOrderStatus) {
+        this.fOrderStatus = fOrderStatus;
+    }
+
+    @Basic
+    @Column(name = "f_pay_status", nullable = false, length = 20)
+    public String getfPayStatus() {
+        return fPayStatus;
+    }
+
+    public void setfPayStatus(String fPayStatus) {
+        this.fPayStatus = fPayStatus;
+    }
+
+    @Basic
+    @Column(name = "f_special", nullable = false, length = 45)
+    public String getfSpecial() {
+        return fSpecial;
+    }
+
+    public void setfSpecial(String fSpecial) {
+        this.fSpecial = fSpecial;
+    }
+
+    @Basic
+    @Column(name = "f_search_key", nullable = false, length = 200)
+    public String getfSearchKey() {
+        return fSearchKey;
+    }
+
+    public void setfSearchKey(String fSearchKey) {
+        this.fSearchKey = fSearchKey;
+    }
+
+    @Basic
+    @Column(name = "f_amount", nullable = false, precision = 2)
+    public BigDecimal getfAmount() {
+        return fAmount;
+    }
+
+    public void setfAmount(BigDecimal fAmount) {
+        this.fAmount = fAmount;
+    }
+
+    @Basic
+    @Column(name = "f_paid_money", nullable = false, precision = 2)
+    public BigDecimal getfPaidMoney() {
+        return fPaidMoney;
+    }
+
+    public void setfPaidMoney(BigDecimal fPaidMoney) {
+        this.fPaidMoney = fPaidMoney;
+    }
+
+    @Basic
+    @Column(name = "f_order_creater_id", nullable = true)
+    public Long getfOrderCreaterId() {
+        return fOrderCreaterId;
+    }
+
+    public void setfOrderCreaterId(Long fOrderCreaterId) {
+        this.fOrderCreaterId = fOrderCreaterId;
+    }
+
+    @Basic
+    @Column(name = "f_company_id", nullable = false)
+    public long getfCompanyId() {
+        return fCompanyId;
+    }
+
+    public void setfCompanyId(long fCompanyId) {
+        this.fCompanyId = fCompanyId;
+    }
+
+    @Basic
+    @Column(name = "f_pay_method", nullable = false, length = 45)
+    public String getfPayMethod() {
+        return fPayMethod;
+    }
+
+    public void setfPayMethod(String fPayMethod) {
+        this.fPayMethod = fPayMethod;
+    }
+
+    @Basic
+    @Column(name = "f_pre_amount", nullable = true, precision = 2)
+    public BigDecimal getfPreAmount() {
+        return fPreAmount;
+    }
+
+    public void setfPreAmount(BigDecimal fPreAmount) {
+        this.fPreAmount = fPreAmount;
+    }
+
+    @Basic
+    @Column(name = "f_from", nullable = false, length = 45)
+    public String getfFrom() {
+        return fFrom;
+    }
+
+    public void setfFrom(String fFrom) {
+        this.fFrom = fFrom;
+    }
+
+    @Basic
+    @Column(name = "f_product_num", nullable = true)
+    public int getfProductNum() {
+        return fProductNum;
+    }
+
+    public void setfProductNum(int fProductNum) {
+        this.fProductNum = fProductNum;
+    }
+
+    @Basic
+    @Column(name = "f_product_category_num", nullable = true)
+    public int getfProductCategoryNum() {
+        return fProductCategoryNum;
+    }
+
+    public void setfProductCategoryNum(int fProductCategoryNum) {
+        this.fProductCategoryNum = fProductCategoryNum;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        TOrderEntity that = (TOrderEntity) o;
+        return id == that.id && fTransportOrderId == that.fTransportOrderId
+            && fConsumerId == that.fConsumerId && fCompanyId == that.fCompanyId
+            && Objects.equals(fOrderNum, that.fOrderNum)
+            && Objects.equals(fTransportNum, that.fTransportNum)
+            && Objects.equals(fCreatetime, that.fCreatetime)
+            && Objects.equals(fOrderAmountPay, that.fOrderAmountPay)
+            && Objects.equals(fOrderStatus, that.fOrderStatus)
+            && Objects.equals(fPayStatus, that.fPayStatus)
+            && Objects.equals(fSpecial, that.fSpecial)
+            && Objects.equals(fSearchKey, that.fSearchKey) && Objects.equals(fAmount, that.fAmount)
+            && Objects.equals(fPaidMoney, that.fPaidMoney)
+            && Objects.equals(fOrderCreaterId, that.fOrderCreaterId)
+            && Objects.equals(fPayMethod, that.fPayMethod)
+            && Objects.equals(fPreAmount, that.fPreAmount) && Objects.equals(fFrom, that.fFrom);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(id, fOrderNum, fTransportOrderId, fTransportNum, fConsumerId,
+            fCreatetime, fOrderAmountPay, fOrderStatus, fPayStatus, fSpecial, fSearchKey,
+            fAmount, fPaidMoney, fOrderCreaterId, fCompanyId, fPayMethod, fPreAmount, fFrom);
+    }
+}

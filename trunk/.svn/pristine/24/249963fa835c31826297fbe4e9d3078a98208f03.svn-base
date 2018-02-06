@@ -1,0 +1,171 @@
+package com.payease.scfordermis.service.impl;
+
+import com.payease.scfordermis.bean.Status;
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.bo.requestBo.ReqComInfoBean;
+import com.payease.scfordermis.bo.responseBo.RespComInfoBean;
+import com.payease.scfordermis.dao.CompanyInfoDao;
+import com.payease.scfordermis.entity.TCompanyInfoEntity;
+import com.payease.scfordermis.service.CompanyInfoService;
+
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+
+import javax.servlet.http.HttpSession;
+
+
+
+/**
+ * Created by zhoushijie on 2018/1/16.
+ */
+@Service
+public class CompanyInfoServiceImpl implements CompanyInfoService{
+    private static final Logger log = LoggerFactory.getLogger(CompanyInfoServiceImpl.class);
+    @Autowired
+    CompanyInfoDao companyInfoDao;
+
+    /**
+     * 获取公司信息详情
+     * @param session
+     * @return
+     */
+    @Override
+    public ResultBo getComInfo(HttpSession session)throws Exception {
+        ResultBo result = ResultBo.build();
+        try{
+            Long fCompanyId = Long.valueOf("1");
+            //todo   Long fCompanyId
+//        Long fCompanyId = (Long) session.getAttribute("fCompanyId");
+//        if(session.getAttribute("fCompanyId") == null){
+//            return result.fail();
+//        }
+
+            TCompanyInfoEntity comInfo = companyInfoDao.findOne(fCompanyId);
+            if (comInfo ==null){
+                return result.fail();
+            }
+            RespComInfoBean resp = new RespComInfoBean();
+            //公司信息
+            resp.setfName(comInfo.getfName());
+            //行业类别
+            resp.setfCategory(comInfo.getfCategory());
+            //logoUrl
+            resp.setfLogo(comInfo.getfLogo());
+            //联系人
+            resp.setfContact(comInfo.getfContact());
+            //手机号码
+            resp.setfMobile(comInfo.getfMobile());
+            //邮箱
+            resp.setfEmail(comInfo.getfEmail());
+
+            //公司地址
+            resp.setfAddress(comInfo.getfAddress());
+            //邮编
+                resp.setfPostalCode(comInfo.getfPostalCode());
+
+            //电话号码
+            resp.setfPhone(comInfo.getfPhone());
+
+            //传真
+            resp.setfFax(comInfo.getfFax());
+
+            //公司网址
+            resp.setfWebsite(comInfo.getfWebsite());
+
+            //服务热线
+            resp.setfServiceNumber(comInfo.getfServiceNumber());
+
+            result.setResultBody(resp);
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error("getCompanyInfoError",e);
+            result.setCodeId(Status.COMPANYINFOERRO);
+            result.setMessage(Status.COMPANYINFOERRO.getMessage());
+            throw e;
+        }finally {
+            return result;
+        }
+    }
+
+    /**
+     *更新公司信息
+     * @param session
+     * @param req
+     * @return
+     */
+    @Override
+    public ResultBo saveComInfo(HttpSession session, ReqComInfoBean req)throws Exception {
+        ResultBo result = ResultBo.build();
+        try{
+            Long fCompanyId = Long.valueOf("1");
+            //todo   Long fCompanyId
+//        Long fCompanyId = (Long) session.getAttribute("fCompanyId");
+//        if(session.getAttribute("fCompanyId") == null){
+//            return result.fail();
+//        }
+
+            //查找公司id
+            TCompanyInfoEntity comId = companyInfoDao.findOne(fCompanyId);
+            if (comId == null){
+                return result.fail();
+            }
+
+            //联系人
+            comId.setfContact(req.getfContact());
+            //手机号码
+            comId.setfMobile(req.getfMobile());
+            //邮箱
+            if (StringUtils.isNotBlank(req.getfEmail())){
+                comId.setfEmail(req.getfEmail());
+            }else {
+                comId.setfEmail("");
+            }
+            //公司地址
+            comId.setfAddress(req.getfAddress());
+            //邮编
+            if (StringUtils.isNotBlank(req.getfPhone())){
+                comId.setfPostalCode(req.getfPostalCode());
+            }else {
+                comId.setfPostalCode("");
+            }
+            //电话号码
+            if (StringUtils.isNotBlank(req.getfPhone())){
+                comId.setfPhone(req.getfPhone());
+            }else {
+                comId.setfPhone("");
+            }
+            //传真
+            if (StringUtils.isNotBlank(req.getfFax())){
+                comId.setfFax(req.getfFax());
+            }else {
+                comId.setfFax("");
+            }
+            //公司网址
+            if (StringUtils.isNotBlank(req.getfWebsite())){
+                comId.setfWebsite(req.getfWebsite());
+            }else {
+                comId.setfWebsite("");
+            }
+            //服务热线
+            comId.setfServiceNumber(req.getfServiceNumber());
+            companyInfoDao.save(comId);
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error("saveComInfoError",e);
+            result.setCodeId(Status.SAVECOMINFOERROR);
+            result.setMessage(Status.SAVECOMINFOERROR.getMessage());
+            throw e;
+        }finally {
+            return result;
+        }
+    }
+   //根据公司id获取公司实体
+    public TCompanyInfoEntity findCompanyById(long fid){
+        return  companyInfoDao.findOne(fid);
+    }
+}

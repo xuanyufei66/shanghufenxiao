@@ -1,0 +1,33 @@
+package com.payease.scfordermis.service;
+
+import com.payease.scfordermis.bo.responseBo.QueryCategoryBo;
+import com.payease.scfordermis.bo.ResultBo;
+
+import java.util.List;
+
+
+/**
+ * Created by ljp on 2018/1/10.
+ */
+public interface IGoodsService {
+    /**
+     * 商品分类
+     */
+    //商品添加与修改接口
+    public ResultBo categoryAddOrUpdate(Long id,String level,String categoryName,Long categoryParentId);
+    //商品分类删除接口
+    public ResultBo categoryDetele(Long id);
+    //商品分类列表
+    public List<QueryCategoryBo> getCategoryList();
+    /**
+     * 商品管理
+     */
+   /* //商品列表
+    public List<GoodsManageBo> getGoodsList(Integer category,String searchCondition);
+    //显示商品修改信息接口
+    public GoodAddOrUpdateBo getGoodsMessage();
+    //添加修改商品信息接口
+    public void goodsAddOrUpdate();
+    //删除商品
+    public void goodsDetele();*/
+}

@@ -1,0 +1,68 @@
+package com.payease.scfordermis.service.impl;
+
+import com.payease.scfordermis.bo.responseBo.RespLevelBean;
+import com.payease.scfordermis.dao.CustomerLevelDao;
+import com.payease.scfordermis.entity.TConsumerLevelEntity;
+import com.payease.scfordermis.service.CustomerLevelService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityManager;
+import javax.servlet.http.HttpSession;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created by admin on 2018/1/10.
+ */
+@Service
+public class CustomerLevelServiceImpl implements CustomerLevelService{
+
+    @Autowired
+    EntityManager em;
+
+    @Autowired
+    CustomerLevelDao customerLevelDao;
+
+
+    /**
+     * 获取所有客户级别
+     * @param
+     * @return
+     */
+    @Override
+    public List<TConsumerLevelEntity> findAll(){
+        return customerLevelDao.findAll();
+    }
+    /**
+     * 客户级别添加和修改
+     * @param
+     * @return
+     */
+    @Override
+    public  void saveAndUpdate(HttpSession session, RespLevelBean respLevelBean){
+        TConsumerLevelEntity tConsumerLevelEntity = new TConsumerLevelEntity();
+        //tConsumerLevelEntity.setfOperate((long)session.getAttribute("fId"));//操作人
+        //tConsumerLevelEntity.setfCompanyId((long) session.getAttribute("fCompanyId"));//公司id
+        tConsumerLevelEntity.setfId(respLevelBean.getfId());
+        tConsumerLevelEntity.setfName(respLevelBean.getfName());
+        //为修改操作
+        if (0!=respLevelBean.getfId()){
+            tConsumerLevelEntity.setfUpdateTime(new Date());
+            customerLevelDao.save(tConsumerLevelEntity);
+        }else {//新增操作
+            tConsumerLevelEntity.setfCreateTime(new Date());
+            customerLevelDao.save(tConsumerLevelEntity);
+        }
+    }
+
+    /**
+     * 删除客户级别
+     * @param
+     * @return
+     */
+    @Override
+    public  void LiDelete(long fid){
+        customerLevelDao.delete(fid);
+    }
+}

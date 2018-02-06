@@ -1,0 +1,103 @@
+package com.payease.scfordermis.service.impl;
+
+import com.payease.scfordermis.bo.responseBo.RespLevelBean;
+import com.payease.scfordermis.bo.responseBo.RespLoginPCBean;
+import com.payease.scfordermis.dao.CustomerLevelDao;
+import com.payease.scfordermis.entity.TConsumerLevelEntity;
+import com.payease.scfordermis.service.CustomerLevelService;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityManager;
+import javax.servlet.http.HttpSession;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created by admin on 2018/1/10.
+ */
+@Service
+public class CustomerLevelServiceImpl implements CustomerLevelService{
+
+    private static final Logger log = LoggerFactory.getLogger(CustomerLevelServiceImpl.class);
+
+    @Autowired
+    EntityManager em;
+
+    @Autowired
+    CustomerLevelDao customerLevelDao;
+
+
+    /**
+     * 获取所有客户级别
+     * @param
+     * @return
+     */
+    @Override
+    public List<TConsumerLevelEntity> findAll(long fCompanyId)throws Exception{
+        try {
+            return customerLevelDao.findByFCompanyId(fCompanyId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("findAll",e);
+            throw e;
+        }
+    }
+    /**
+     * 客户级别添加和修改
+     * @param
+     * @return
+     */
+    @Override
+    public  int  saveAndUpdate(HttpSession session, RespLevelBean respLevelBean)throws Exception{
+        try {
+            if (StringUtils.isNotBlank(respLevelBean.getfName())) {
+                TConsumerLevelEntity tConsumerLevelEntity = new TConsumerLevelEntity();
+                //RespLoginPCBean resp = (RespLoginPCBean)session.getAttribute("userInfo");
+                //tConsumerLevelEntity.setfOperate(resp.getAttribute("fId"));//操作人
+                //tConsumerLevelEntity.setfCompanyId(resp.getAttribute("fCompanyId"));//公司id
+                tConsumerLevelEntity.setfId(respLevelBean.getfId());
+                tConsumerLevelEntity.setfName(respLevelBean.getfName());
+                //为修改操作
+                if (0 != respLevelBean.getfId()) {
+                    tConsumerLevelEntity.setfUpdateTime(new Date());
+                    customerLevelDao.save(tConsumerLevelEntity);
+                } else {//新增操作
+                    List<TConsumerLevelEntity>  leve =  customerLevelDao.findByFName(respLevelBean.getfName());
+                    if (leve.size()==0){
+                        tConsumerLevelEntity.setfCreateTime(new Date());
+                        customerLevelDao.save(tConsumerLevelEntity);
+                    }else {
+                        return 2;
+                    }
+                }
+                    return  0;
+            }else{
+                    return  1;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("saveAndUpdate",e);
+            throw e;
+        }
+    }
+
+    /**
+     * 删除客户级别
+     * @param
+     * @return
+     */
+    @Override
+    public  void LiDelete(long fid)throws Exception{
+        try {
+            customerLevelDao.delete(fid);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("LiDelete",e);
+            throw e;
+        }
+    }
+}

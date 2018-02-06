@@ -1,0 +1,50 @@
+package com.payease.scfordermis.bo;
+
+import io.swagger.annotations.ApiModelProperty;
+
+/**
+ * Created by ljp on 2018/1/9.
+ */
+public class ProductFormatBo {
+
+    @ApiModelProperty(value = "商品主图",dataType = "string",required = true)
+    private String picMain;
+    @ApiModelProperty(value = "商品规格名称",dataType = "string",required = true)
+    private String formatName;
+    @ApiModelProperty(value = "商品编码",dataType = "string",required = true)
+    private String goodsNo;
+    @ApiModelProperty(value = "商品销售价格",dataType = "string",required = true)
+    private String goodsPrice;
+
+    public String getPicMain() {
+        return picMain;
+    }
+
+    public void setPicMain(String picMain) {
+        this.picMain = picMain;
+    }
+
+    public String getFormatName() {
+        return formatName;
+    }
+
+    public void setFormatName(String formatName) {
+        this.formatName = formatName;
+    }
+
+    public String getGoodsNo() {
+        return goodsNo;
+    }
+
+    public void setGoodsNo(String goodsNo) {
+        this.goodsNo = goodsNo;
+    }
+
+    public String getGoodsPrice() {
+        return goodsPrice;
+    }
+
+    public void setGoodsPrice(String goodsPrice) {
+        this.goodsPrice = goodsPrice;
+    }
+}

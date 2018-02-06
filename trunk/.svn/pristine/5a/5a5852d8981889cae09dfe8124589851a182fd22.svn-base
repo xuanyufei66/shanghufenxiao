@@ -1,0 +1,14 @@
+package com.payease.scfordermis.dao;
+
+import com.payease.scfordermis.entity.TOrderEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
+/**
+ * Created by lch on 2018/1/15.
+ *
+ * 集散地订单dao
+ */
+public interface OrderDao extends JpaRepository<TOrderEntity, Long>, JpaSpecificationExecutor {
+
+}

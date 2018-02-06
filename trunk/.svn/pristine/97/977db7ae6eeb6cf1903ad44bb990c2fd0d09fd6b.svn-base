@@ -1,0 +1,71 @@
+package com.payease.scfordermis.bo.responseBo;
+
+import io.swagger.annotations.ApiModelProperty;
+
+/**
+ * Created by ljp on 2018/1/9.
+ */
+public class ProductFormatBo {
+
+    @ApiModelProperty(value = "规格id",dataType = "Long")
+    private Long formatId;
+    @ApiModelProperty(value = "商品主图",dataType = "string",required = true)
+    private String picMain;
+    @ApiModelProperty(value = "商品规格名称",dataType = "string",required = true)
+    private String formatName;
+    @ApiModelProperty(value = "商品编码",dataType = "string",required = true)
+    private String goodsNo;
+    @ApiModelProperty(value = "商品销售价格",dataType = "string",required = true)
+    private String goodsPrice;
+    @ApiModelProperty(value = "状态（删除-delete）",dataType = "string")
+    private String status;
+
+
+    public Long getFormatId() {
+        return formatId;
+    }
+
+    public void setFormatId(Long formatId) {
+        this.formatId = formatId;
+    }
+
+    public String getPicMain() {
+        return picMain;
+    }
+
+    public void setPicMain(String picMain) {
+        this.picMain = picMain;
+    }
+
+    public String getFormatName() {
+        return formatName;
+    }
+
+    public void setFormatName(String formatName) {
+        this.formatName = formatName;
+    }
+
+    public String getGoodsNo() {
+        return goodsNo;
+    }
+
+    public void setGoodsNo(String goodsNo) {
+        this.goodsNo = goodsNo;
+    }
+
+    public String getGoodsPrice() {
+        return goodsPrice;
+    }
+
+    public void setGoodsPrice(String goodsPrice) {
+        this.goodsPrice = goodsPrice;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+}

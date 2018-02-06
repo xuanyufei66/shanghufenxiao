@@ -1,0 +1,24 @@
+package com.payease.scfordermis.service;
+
+import com.payease.scfordermis.bo.requestBo.ReqCustomerBean;
+import com.payease.scfordermis.bo.requestBo.ReqEmpCustomerBean;
+import com.payease.scfordermis.bo.responseBo.RespCustomerBean;
+import com.payease.scfordermis.entity.TConsumerInfoEntity;
+
+import javax.servlet.http.HttpSession;
+import java.util.List;
+
+/**
+ * Created by admin on 2018/1/10.
+ */
+public interface CustomerService {
+
+    RespCustomerBean selectIndext(ReqCustomerBean reqCustomerBean);
+
+    TConsumerInfoEntity getDetail(long id);
+
+    void isDelete(long fid);
+
+    void upAndSave(HttpSession session,TConsumerInfoEntity tConsumerInfoEntity);
+
+}

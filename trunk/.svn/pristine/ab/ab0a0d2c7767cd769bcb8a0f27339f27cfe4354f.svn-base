@@ -1,0 +1,63 @@
+package com.payease.scfordermis.bo.responseBo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+/**
+ * @Created By liuxiaoming
+ * @CreateTime 2018/1/10 下午5:38
+ **/
+@ApiModel(value = "消息",description = "描述消息")
+public class RespMsgBean {
+    //TODO  订单状态  订单号  订单ID  消息时间  消息描述
+    @ApiModelProperty(value = "订单ID",dataType = "long")
+    private Long orderId;
+    @ApiModelProperty(value = "订单号",dataType = "string")
+    private String orderNo;
+    @ApiModelProperty(value = "订单状态：forcheck-待订单审核\\nforpick-待提货\\ncompleted-已完成\\ncancelled-已作废",dataType = "string")
+    private String orderStatus;
+    @ApiModelProperty(value = "消息描述",dataType = "string")
+    private String MsgDesc;
+    @ApiModelProperty(value = "消息时间",dataType = "date")
+    private String msgTime;
+
+    public Long getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
+    }
+
+    public String getOrderNo() {
+        return orderNo;
+    }
+
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
+    }
+
+    public String getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(String orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
+    public String getMsgDesc() {
+        return MsgDesc;
+    }
+
+    public void setMsgDesc(String msgDesc) {
+        MsgDesc = msgDesc;
+    }
+
+    public String getMsgTime() {
+        return msgTime;
+    }
+
+    public void setMsgTime(String msgTime) {
+        this.msgTime = msgTime;
+    }
+}

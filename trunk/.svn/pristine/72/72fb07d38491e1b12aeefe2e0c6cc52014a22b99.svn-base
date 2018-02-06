@@ -1,0 +1,130 @@
+package com.payease.scfordermis.service;
+
+import com.payease.scfordermis.bo.responseBo.PageResponseCommBean;
+import com.payease.scfordermis.bo.responseBo.app.customer.RespAppCustomerOrderBean;
+import com.payease.scfordermis.bo.responseBo.app.customer.RespAppCustomerOrderDetailBean;
+import com.payease.scfordermis.bo.responseBo.app.customer.RespAppPayDetailBean;
+import com.payease.scfordermis.bo.responseBo.app.driver.RespAppOrderBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
+
+/**
+ * Created by zhangzhili on 2018/1/19.
+ */
+public interface IAppOrderService {
+
+    /**
+     * 订单列表
+     *
+     * @param companyId 公司id
+     * @param status    0所有订单 ；1未完成订单
+     * @param pageable  分页信息
+     * @return
+     */
+    PageResponseCommBean<RespAppCustomerOrderBean> findAllOrderNotComplete(Long companyId, int
+        status, Pageable pageable);
+
+
+
+    /**
+     * 订单详情
+     *
+     * @param companyId 公司id
+     * @param id        订单id
+     * @return
+     */
+    RespAppCustomerOrderDetailBean getOrderDetail(Long companyId, Long id);
+
+
+
+    /**
+     * 获取支付详情
+     *
+     * @param companyId 公司id
+     * @param id        订单id
+     * @return
+     */
+    RespAppPayDetailBean getPayDetails(Long companyId, Long id);
+
+
+
+    /**
+     * 获取待支付金额
+     *
+     * @param companyId 公司id
+     * @param id        订单id
+     * @return
+     */
+    RespAppPayDetailBean getOrderMount(Long companyId, Long id);
+
+
+
+    /**
+     * 签订支付协议
+     *
+     * @param customerName 客户名字
+     * @param companyId    公司id
+     * @param id           订单id
+     * @return
+     */
+    RespAppPayDetailBean makeAgreement(String customerName, Long companyId, Long id);
+
+
+
+    /**
+     * 获取提货码
+     *
+     * @param customerName 客户名字
+     * @param companyId    公司id
+     * @param id           订单id
+     * @return
+     */
+    RespAppOrderBean getPickCode(String customerName, Long companyId, Long id);
+
+
+
+    /**
+     * app司机端订单列表
+     *
+     * @param orderStatus 1待提货  null与0查询所有
+     * @param tranOrderId
+     * @return
+     */
+    List<RespAppOrderBean> driverOrders(Long companyId, Long orderStatus, long tranOrderId);
+
+
+
+    /**
+     * app司机端订单详情
+     *
+     * @param tranOrderId
+     * @param orderId
+     * @return
+     */
+    RespAppOrderBean getDriverOrderDetail(Long tranOrderId, long orderId);
+
+
+
+    /**
+     * 获取提货单
+     *
+     * @param tranOrderId 公司id
+     * @param pickCode    提货码
+     * @return
+     */
+    RespAppOrderBean getScanPickCode(Long companyId, String tranOrderNum, Long tranOrderId,
+                                     String pickCode);
+
+
+
+    /**
+     * 提货
+     *
+     * @param tranOrderId 运单id
+     * @param orderId     订单id
+     * @return
+     */
+    String pickGoods(String driverName, Long tranOrderId, Long orderId);
+}

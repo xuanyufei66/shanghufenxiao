@@ -1,0 +1,125 @@
+package com.payease.scfordermis.entity;
+
+import javax.persistence.*;
+import java.util.Date;
+import java.util.Objects;
+
+/**
+ * @Author : zhangwen
+ * @Data : 2018/1/10
+ * @Description :
+ */
+@Entity
+@Table(name = "t_note", schema = "mis", catalog = "")
+public class TNoteEntity {
+    private long id;
+    private String fNote;
+    private Date fCreatetime;
+    private long fOperate;
+    private long fCompanyId;
+    private String fOeratingType;
+    private long fTransportAndOrderId;
+    private String fType;
+
+    @Id
+    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    @Basic
+    @Column(name = "f_note", nullable = false, length = 500)
+    public String getfNote() {
+        return fNote;
+    }
+
+    public void setfNote(String fNote) {
+        this.fNote = fNote;
+    }
+
+    @Basic
+    @Column(name = "f_createtime", nullable = false)
+    public Date getfCreatetime() {
+        return fCreatetime;
+    }
+
+    public void setfCreatetime(Date fCreatetime) {
+        this.fCreatetime = fCreatetime;
+    }
+
+    @Basic
+    @Column(name = "f_operate", nullable = false)
+    public long getfOperate() {
+        return fOperate;
+    }
+
+    public void setfOperate(long fOperate) {
+        this.fOperate = fOperate;
+    }
+
+    @Basic
+    @Column(name = "f_company_id", nullable = false)
+    public long getfCompanyId() {
+        return fCompanyId;
+    }
+
+    public void setfCompanyId(long fCompanyId) {
+        this.fCompanyId = fCompanyId;
+    }
+
+    @Basic
+    @Column(name = "f_oerating_type", nullable = false, length = 20)
+    public String getfOeratingType() {
+        return fOeratingType;
+    }
+
+    public void setfOeratingType(String fOeratingType) {
+        this.fOeratingType = fOeratingType;
+    }
+
+    @Basic
+    @Column(name = "f_transport_and_order_id", nullable = false)
+    public long getfTransportAndOrderId() {
+        return fTransportAndOrderId;
+    }
+
+    public void setfTransportAndOrderId(long fTransportAndOrderId) {
+        this.fTransportAndOrderId = fTransportAndOrderId;
+    }
+
+    @Basic
+    @Column(name = "f_type", nullable = false, length = 45)
+    public String getfType() {
+        return fType;
+    }
+
+    public void setfType(String fType) {
+        this.fType = fType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TNoteEntity that = (TNoteEntity) o;
+        return id == that.id &&
+                fOperate == that.fOperate &&
+                fCompanyId == that.fCompanyId &&
+                fTransportAndOrderId == that.fTransportAndOrderId &&
+                Objects.equals(fNote, that.fNote) &&
+                Objects.equals(fCreatetime, that.fCreatetime) &&
+                Objects.equals(fOeratingType, that.fOeratingType) &&
+                Objects.equals(fType, that.fType);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(id, fNote, fCreatetime, fOperate, fCompanyId, fOeratingType, fTransportAndOrderId, fType);
+    }
+}

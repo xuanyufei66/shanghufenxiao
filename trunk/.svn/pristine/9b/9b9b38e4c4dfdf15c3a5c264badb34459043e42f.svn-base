@@ -1,0 +1,62 @@
+package com.payease.scfordermis.bo.responseBo.app.driver;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+/**
+ * Created by zhangzhili on 2018/1/11.
+ */
+@ApiModel("商品实体类")
+public class AppGoodBean {
+
+    @ApiModelProperty(value = "图片路径",dataType = "string")
+    private String imgUrl;
+    @ApiModelProperty(value = "规格名字",dataType = "string")
+    private String formateName;
+    @ApiModelProperty(value = "单位名字",dataType = "string")
+    private String unitName;
+    @ApiModelProperty(value = "数量",dataType = "integer")
+    private int goodNum;
+    @ApiModelProperty(value = "单价",dataType = "string")
+    private String goodPrice;
+
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+
+    public String getFormateName() {
+        return formateName;
+    }
+
+    public void setFormateName(String formateName) {
+        this.formateName = formateName;
+    }
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
+    }
+
+    public int getGoodNum() {
+        return goodNum;
+    }
+
+    public void setGoodNum(int goodNum) {
+        this.goodNum = goodNum;
+    }
+
+    public String getGoodPrice() {
+        return goodPrice;
+    }
+
+    public void setGoodPrice(String goodPrice) {
+        this.goodPrice = goodPrice;
+    }
+}

@@ -1,0 +1,56 @@
+package com.payease.scfordermis.controller.app.customer;
+
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.bo.responseBo.RespClientInfo;
+import com.payease.scfordermis.service.IAppMyInfoService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * @Created By liuxiaoming
+ * @CreateTime 2018/1/11 下午5:04
+ **/
+@RestController
+@RequestMapping("app/customer/my")
+@Api(tags = {"客户端（app)-我的-张文"})
+public class APPCustomerMyController {
+
+    private static final Logger log = LoggerFactory.getLogger(APPCustomerMyController.class);
+    @Autowired
+    private IAppMyInfoService appMyInfoService;
+
+    @GetMapping(value = "clientInfo")
+    @ApiOperation(value = "个人信息全量",response = RespClientInfo.class)
+    public ResultBo clientInfo(String token) {
+        ResultBo result = ResultBo.build();
+        try {
+            RespClientInfo entity = new RespClientInfo();
+//            entity.setPhone("1311111111");
+//            entity.setContact("zhangsan");
+//            entity.setIndentNo("13131313131");
+//            entity.setLevelName("1111");
+//            entity.setAreaName("111-111");
+//            entity.setServerPhone("40004000");
+//            entity.setConsumerName("3232");
+
+            entity = this.appMyInfoService.getConsumerDetail(token);
+            result.setResultBody(entity);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("clientInfo",e);
+            result.fail();
+        }finally {
+            return result;
+        }
+
+    }
+
+
+
+}

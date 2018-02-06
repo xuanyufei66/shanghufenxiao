@@ -1,0 +1,23 @@
+package com.payease.scfordermis.dao;
+
+import com.payease.scfordermis.entity.TEmployeeInfoEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+
+@Repository
+public interface EmployeeInfoDao extends JpaRepository<TEmployeeInfoEntity,Long> {
+
+    //根据账号查用户
+    List<TEmployeeInfoEntity> findByFAccount(String fAccount);
+    List<TEmployeeInfoEntity> findByFAccountAndFCompanyId(String fAccount,Long fCompanyId);
+
+    //查看账号是否重复
+    Integer countByFAccount(String fAccount);
+    Integer countByFAccountAndFCompanyId(String fAccount,Long fCompanyId);
+
+
+
+}

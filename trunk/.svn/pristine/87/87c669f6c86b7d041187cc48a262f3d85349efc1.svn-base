@@ -1,0 +1,160 @@
+package com.payease.scfordermis.service.impl;
+
+import com.payease.scfordermis.bean.Status;
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.bo.responseBo.RespLoginPCBean;
+import com.payease.scfordermis.dao.RoleInfoDao;
+import com.payease.scfordermis.entity.TRoleInfoEntity;
+import com.payease.scfordermis.service.RoleAuthService;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpSession;
+import java.util.Date;
+
+/**
+ * 首页-设置-角色权限
+ * @Created By liuxiaoming
+ * @CreateTime 2018/1/15 下午1:55
+ **/
+@Service
+public class RoleAuthServiceImpl implements RoleAuthService {
+
+    private static final Logger log = LoggerFactory.getLogger(RoleAuthServiceImpl.class);
+
+    @Autowired
+    RoleInfoDao roleInfoDao;
+
+    /**
+     * 角色名字修改接口
+     */
+    @Override
+    public ResultBo saveName(HttpSession session, Long roleId, String roleName) throws Exception{
+        ResultBo result = ResultBo.build();
+        try{
+            if(StringUtils.isBlank(roleName)){
+                return result.queryError();
+            }
+            RespLoginPCBean sessionInfo = (RespLoginPCBean)session.getAttribute("userInfo");
+            if(sessionInfo== null || sessionInfo.getfCompanyId() == null || sessionInfo.getfId() == null){
+                return result.timeOut();
+            }
+
+            //  Long fCompanyId
+            Long fCompanyId = sessionInfo.getfCompanyId(); //Long.valueOf("1");
+            //  Long sessionId
+            Long sessionId = sessionInfo.getfId();//Long.valueOf("1");
+
+        if(roleName.equals("系统管理员")){
+            //角色名称不允许是系统管理员
+            log.error("RoleAuthService - - saveName :"+Status.ROLENAMEISADMIN.getMessage());
+            return result.setCodeId(Status.ROLENAMEISADMIN);
+        }
+        if(roleInfoDao.countByFNameAndFCompanyId(roleName,fCompanyId) != 0){
+           //角色名称重复
+            log.error("RoleAuthService - - saveName :"+Status.ROLENAMEREPEAT.getMessage());
+            return result.setCodeId(Status.ROLENAMEREPEAT);
+        }
+
+        TRoleInfoEntity one = roleInfoDao.findOne(roleId);
+
+        if(one == null){
+            //未查询到该角色信息
+            log.error("RoleAuthService - - saveName :"+Status.GETROLEINFO.getMessage());
+            return result.setCodeId(Status.GETROLEINFO);
+        }
+
+        if(one.getfName().equals("系统管理员")){
+            //系统管理员角色不允许改名
+            log.error("RoleAuthService - - saveName :"+Status.UPDROLENAMEISADMIN.getMessage());
+            return result.setCodeId(Status.UPDROLENAMEISADMIN);
+        }
+
+        one.setfName(roleName);
+        one.setfOperate(sessionId);
+        one.setfCompanyId(fCompanyId);
+        one.setfUpdateTime(new Date());
+        roleInfoDao.save(one);
+    }catch (Exception e){
+        e.printStackTrace();
+        result.fail();
+        log.error("RoleAuthService - - saveName :",e);
+        throw e;
+    }
+        return result;
+    }
+
+    /**
+     * 角色权限修改接口
+     */
+    @Override
+    public ResultBo saveAuth(HttpSession session, Long roleId, String roleMenus) throws Exception{
+
+        ResultBo result = ResultBo.build();
+        try {
+            if(roleId == null || StringUtils.isBlank(roleMenus)){return result.queryError();}
+            TRoleInfoEntity one = roleInfoDao.findOne(roleId);
+
+            if (one == null) {
+                log.error("RoleAuthService - - saveAuth :"+Status.GETEMPINFO.getMessage());
+                return result.setCodeId(Status.GETEMPINFO);
+            }
+
+            RespLoginPCBean sessionInfo = (RespLoginPCBean)session.getAttribute("userInfo");
+            if(sessionInfo== null || sessionInfo.getfCompanyId() == null || sessionInfo.getfId() == null){
+                return result.timeOut();
+            }
+
+            //  Long fCompanyId
+            Long fCompanyId = sessionInfo.getfCompanyId(); //Long.valueOf("1");
+            //  Long sessionId
+            Long sessionId = sessionInfo.getfId();//Long.valueOf("1");
+
+
+            one.setfMenus(roleMenus);
+            one.setfOperate(sessionId);
+            one.setfCompanyId(fCompanyId);
+            one.setfUpdateTime(new Date());
+            roleInfoDao.save(one);
+        }catch (Exception e){
+                e.printStackTrace();
+                result.fail();
+                log.error("RoleAuthService - - saveAuth :",e);
+                throw e;
+        }
+        return result;
+    }
+
+
+    /**
+     * 角色权限明细接口
+     */
+    @Override
+    public ResultBo authDetail(HttpSession session, Long roleId) throws Exception{
+        ResultBo result = ResultBo.build();
+        try{
+            if(roleId == null){return result.queryError();}
+        TRoleInfoEntity one = roleInfoDao.findOne(roleId);
+            if (one == null) {
+                log.error("RoleAuthService - - saveAuth :"+Status.GETEMPINFO.getMessage());
+                return result.setCodeId(Status.GETEMPINFO);
+            }
+
+            result.setResultBody(StringUtils.isNotBlank(one.getfMenus())?one.getfMenus():"");
+
+        }catch (Exception e){
+        e.printStackTrace();
+        result.fail();
+        log.error("RoleAuthService - - authDetail :",e);
+        throw e;
+    }
+        return result;
+    }
+
+
+
+
+}

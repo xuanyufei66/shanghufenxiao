@@ -1,0 +1,104 @@
+package com.payease.scfordermis.bo.responseBo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+
+
+/**
+ * Created by zhoushijie on 2018/1/11.
+ * 出参
+ */
+@ApiModel(value = "后台登录实体类",description = "后台登录实体类类")
+public class RespLoginPCBean {
+    @ApiModelProperty(value = "姓名",dataType = "string",required = true)
+    private String fName;
+    @ApiModelProperty(value = "菜单权限列表",dataType = "array",required = true)
+    private String[] fMenus;
+    @ApiModelProperty(value = "登录账号",dataType = "string")
+    private String fAccount;
+    @ApiModelProperty(value = "部门名称",dataType = "string")
+    private String fDepartName;
+    @ApiModelProperty(value = "部门Id",dataType = "string")
+    private String fDepartId;
+    @ApiModelProperty(value = "职位",dataType = "string")
+    private String fPosition;
+    @ApiModelProperty(value = "手机",dataType = "string",required = true)
+    private String fMobile;
+    @ApiModelProperty(value = "邮箱",dataType = "string")
+    private String fEmail;
+    @ApiModelProperty(value = "QQ",dataType = "string")
+    private String fQq;
+
+    public String getfName() {
+        return fName;
+    }
+
+    public void setfName(String fName) {
+        this.fName = fName;
+    }
+
+    public String getfAccount() {
+        return fAccount;
+    }
+
+    public void setfAccount(String fAccount) {
+        this.fAccount = fAccount;
+    }
+
+    public String getfPosition() {
+        return fPosition;
+    }
+
+    public void setfPosition(String fPosition) {
+        this.fPosition = fPosition;
+    }
+
+    public String getfMobile() {
+        return fMobile;
+    }
+
+    public void setfMobile(String fMobile) {
+        this.fMobile = fMobile;
+    }
+
+    public String getfEmail() {
+        return fEmail;
+    }
+
+    public void setfEmail(String fEmail) {
+        this.fEmail = fEmail;
+    }
+
+    public String getfQq() {
+        return fQq;
+    }
+
+    public void setfQq(String fQq) {
+        this.fQq = fQq;
+    }
+
+    public String[] getfMenus() {
+        return fMenus;
+    }
+
+    public void setfMenus(String[] fMenus) {
+        this.fMenus = fMenus;
+    }
+
+    public String getfDepartName() {
+        return fDepartName;
+    }
+
+    public void setfDepartName(String fDepartName) {
+        this.fDepartName = fDepartName;
+    }
+
+    public String getfDepartId() {
+        return fDepartId;
+    }
+
+    public void setfDepartId(String fDepartId) {
+        this.fDepartId = fDepartId;
+    }
+}

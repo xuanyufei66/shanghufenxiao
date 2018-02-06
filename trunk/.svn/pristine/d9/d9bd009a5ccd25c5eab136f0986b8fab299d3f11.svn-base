@@ -1,0 +1,98 @@
+package com.payease.scfordermis.bo.responseBo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+/**
+ * Created by admin on 2018/1/10.
+ */
+@ApiModel(value = "客户管理实体",description = "客户管理出参实体")
+public class RespEmpCustomerBean {
+    @ApiModelProperty(value = "客户id",dataType = "String",required = false)
+    private Long fId; //客户名称
+
+    @ApiModelProperty(value = "客户名称",dataType = "String",required = true)
+    private String fName; //客户名称
+
+    @ApiModelProperty(value = "客户编码",dataType = "String",required = true)
+    private String fCode;  //客户编码
+
+    @ApiModelProperty(value = "登陆账号",dataType = "String",required = true)
+    private  String codeName; //登陆账号
+
+    @ApiModelProperty(value = "销售地区（）",dataType = "String",required = true)
+    private  String  fAreaIdOneAndTwo;//销售地区
+
+    @ApiModelProperty(value = "联系人",dataType = "String",required = true)
+    private String fContact;//联系人
+
+    @ApiModelProperty(value = "联系电话",dataType = "String",required = true)
+    private String fPhone;//联系电话
+
+    @ApiModelProperty(value = "状态",dataType = "String",required = true)
+    private String fIndentStatus;//状态
+
+    public Long getfId() {
+        return fId;
+    }
+
+    public void setfId(Long fId) {
+        this.fId = fId;
+    }
+
+    public String getfName() {
+        return fName;
+    }
+
+    public void setfName(String fName) {
+        this.fName = fName;
+    }
+
+    public String getfCode() {
+        return fCode;
+    }
+
+    public void setfCode(String fCode) {
+        this.fCode = fCode;
+    }
+
+    public String getCodeName() {
+        return codeName;
+    }
+
+    public void setCodeName(String codeName) {
+        this.codeName = codeName;
+    }
+
+    public String getfAreaIdOneAndTwo() {
+        return fAreaIdOneAndTwo;
+    }
+
+    public void setfAreaIdOneAndTwo(String fAreaIdOneAndTwo) {
+        this.fAreaIdOneAndTwo = fAreaIdOneAndTwo;
+    }
+
+    public String getfContact() {
+        return fContact;
+    }
+
+    public void setfContact(String fContact) {
+        this.fContact = fContact;
+    }
+
+    public String getfPhone() {
+        return fPhone;
+    }
+
+    public void setfPhone(String fPhone) {
+        this.fPhone = fPhone;
+    }
+
+    public String getfIndentStatus() {
+        return fIndentStatus;
+    }
+
+    public void setfIndentStatus(String fIndentStatus) {
+        this.fIndentStatus = fIndentStatus;
+    }
+}

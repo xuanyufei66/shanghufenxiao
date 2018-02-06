@@ -1,0 +1,54 @@
+package com.payease.scfordermis.bo.requestBo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+/**
+ * Created by zhoushijie on 2018/1/11.
+ * 入参
+ */
+@ApiModel(value = "后台登录实体类",description = "后台登录实体类")
+public class ReqLoginPCBean {
+    @ApiModelProperty(value = "登录账号/手机号",dataType = "string",required = true)
+    private String fAccount;
+    @ApiModelProperty(value = "登录密码",dataType = "string",required = true)
+    private String fPassword;
+    //账号状态  open-开通 close-禁用
+    @ApiModelProperty(value = "账号状态",dataType = "string")
+    private String fStatus;
+    //是否删除   yes-删除 no-未删除
+    @ApiModelProperty(value = "是否删除",dataType = "string")
+    private String fIsDelete;
+
+    public String getfAccount() {
+        return fAccount;
+    }
+
+    public void setfAccount(String fAccount) {
+        this.fAccount = fAccount;
+    }
+
+    public String getfPassword() {
+        return fPassword;
+    }
+
+    public void setfPassword(String fPassword) {
+        this.fPassword = fPassword;
+    }
+
+    public String getfStatus() {
+        return fStatus;
+    }
+
+    public void setfStatus(String fStatus) {
+        this.fStatus = fStatus;
+    }
+
+    public String getfIsDelete() {
+        return fIsDelete;
+    }
+
+    public void setfIsDelete(String fIsDelete) {
+        this.fIsDelete = fIsDelete;
+    }
+}

@@ -1,0 +1,342 @@
+package com.payease.scfordermis.controller;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.bo.requestBo.*;
+import com.payease.scfordermis.bo.responseBo.*;
+import com.payease.scfordermis.service.TransportService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpSession;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created by YHF on 2018/1/11.
+ */
+
+@RestController
+@RequestMapping("/transport")
+@Api(tags = {"运单类(yanghongfei)"})
+public class TransportController extends BaseController{
+    private static final Logger log = LoggerFactory.getLogger(TransportController.class);
+    @Autowired
+    private TransportService transportService;
+    /**
+     * 销售地区列表（石海坤）
+     */
+    @GetMapping(value = "salearealist")
+    @ApiOperation(value = "获取销售地区列表 返回json 对象")
+    public ResultBo saleArealist() {
+        ResultBo resultBo = ResultBo.build();
+
+        String a= "[{\"onename\":\"华北\",\"children\":[{\"twoname\":\"北京\"},{\"twoname\":\"天津\"},{\"twoname\":\"上海\"}]},{\"onename\":\"华东\",\"children\":[{\"twoname\":\"广州\"},{\"twoname\":\"深圳\"}]}]";
+        JSONObject json =JSON.parseObject(a);
+        resultBo.setResultBody(json);
+
+
+        return resultBo;
+
+}
+
+///**
+// * 修改运单时 删除商品操作
+// */
+//@GetMapping(value = "deletegoods")
+//@ApiOperation(value = "判断是否可以删除商品，返回boolean, true（可以删除）false（不可删除）")
+//@ApiImplicitParams({
+//        @ApiImplicitParam(name = "transportdetailid",value = "入参为运单详情id",paramType = "query",required = true)
+//})
+//public ResultBo deleteGoods(String transportdetailid){
+//    ResultBo resultBo = ResultBo.build();
+//    resultBo.setResultBody(transportService.deleteGoods(transportdetailid));
+//    return resultBo;
+//}
+
+
+
+
+
+    /**
+     * 运单列表
+     */
+    @GetMapping(value = "list")
+    @ApiOperation(value = "获取运单列表",response = RespTransportBo.class)
+
+    public ResultBo tranportList(HttpSession session,ReqTransportBo reqTransportBo){
+        ResultBo resultBo = ResultBo.build();
+        ResultBo resultBo1=transportService.transportListSelect(session,reqTransportBo);
+
+        List<RespTransportBo> rspTransportBos = new ArrayList<>();
+
+        PageResponseCommBean pageResponseCommBean = new PageResponseCommBean();
+        //transportService.transportListSelect(reqTransportBo);
+
+
+
+
+        RespTransportBo rspTransportBo = new RespTransportBo();
+        rspTransportBo.setfStatus("ForLoading");
+        rspTransportBo.setfTransportNum("YS-20171101-436781");
+        rspTransportBo.setfTransportId("1");
+        rspTransportBo.setfAreaInfoIdTwo("北京");
+        rspTransportBo.setfCarNum("冀e66666");
+        rspTransportBo.setfCreatetime("2018-01-01 00:00:00");
+        rspTransportBo.setfDriverName("张三");
+        rspTransportBo.setfDriverPhone("18888888888");
+        rspTransportBos.add(rspTransportBo);
+        pageResponseCommBean.setContent(rspTransportBos);
+        pageResponseCommBean.setNumber(1);
+        pageResponseCommBean.setSize(10);
+        pageResponseCommBean.setTotalElements(100);
+        pageResponseCommBean.setTotalPages(5);
+
+       resultBo.setResultBody(pageResponseCommBean);
+     return  resultBo;
+    }
+/**
+ * 运单删除操作
+ */
+@GetMapping(value = "delete")
+@ApiOperation(value = "删除运单")
+@ApiImplicitParams({
+        @ApiImplicitParam(name = "transportId",value = "入参为运单id",paramType = "query",required = true),
+        @ApiImplicitParam(name = "transportStatus",value = "入参为运单状态",paramType = "query",required = true)
+})
+public ResultBo transportDelete(String transportId,String transportStatus){
+
+    ResultBo resultBo = ResultBo.build();
+
+    transportService.transportDelete(getUserInfo(),transportId,transportStatus);
+
+    return resultBo;
+
+}
+
+
+    /**
+     * 运单新增/修改
+     */
+    @GetMapping(value = "save")
+    @ApiOperation(value = "新增/修改运单列表 只有运输状态为待装车时可以修改运单列表（销售地区不能修改）")
+    public ResultBo tranportSave(ReqTransportAddBo reqTransportAddBo){
+        ResultBo resultBo = ResultBo.build();
+        transportService.transportSave(getUserInfo(),reqTransportAddBo);
+
+        return  resultBo;
+    }
+    /**
+     * 运单详情商品删除
+     *
+     */
+    @GetMapping(value = "deletegoods")
+    @ApiOperation(value = "若该运单下已有订单，则商品列表只能新增，已添加商品不能删除。提示“该运单下已有订单，不能删除该商品")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "transportOrderDetailId",value = "入参为运单详情id",paramType = "query",required = true)
+    })
+    public ResultBo tranportDelete(String  transportOrderDetailId){
+        ResultBo resultBo = ResultBo.build();
+        transportService.deleteGoods(transportOrderDetailId);
+
+        return  resultBo;
+    }
+
+    /**
+     * 选择商品列表  每个规格都是列表项
+     *参数为商品名称或商品编码
+     */
+    @GetMapping(value = "goodslist")
+    @ApiOperation(value = "选择商品列表  每个规格都是列表项",response = RespGoodsBo.class)
+    public ResultBo goodsList(){
+        ResultBo resultBo =ResultBo.build();
+
+        transportService.getGoods();
+        List<RespGoodsBo> rspGoodsBos = new ArrayList<>();
+        RespGoodsBo rspGoodsBo = new RespGoodsBo();
+        rspGoodsBo.setfCode("g000001");
+        rspGoodsBo.setfName("泰国榴莲");
+        rspGoodsBo.setFormatName("品质：优");
+        rspGoodsBo.setfProductId("1");
+        rspGoodsBo.setfProductFormatId("2");
+        rspGoodsBo.setfPicUrl("baidu.com");
+        rspGoodsBo.setfUnit("KG");
+        rspGoodsBos.add(rspGoodsBo);
+        resultBo.setResultBody(rspGoodsBos);
+
+
+        return  resultBo;
+    }
+
+    /**
+     * 运单详情
+     * @param transportOrderId
+     */
+    @GetMapping(value = "detail")
+    @ApiOperation(value = "运单详情",response =RespTransportDetailBo.class )
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "transportOrderId",value = "入参为运单id",paramType = "query",required = true)
+    })
+    public ResultBo transportDetail(String transportOrderId){
+        //===================日志======================
+        List<RespOperationLogBo> noteBos = new ArrayList<>();
+        RespOperationLogBo noteBo = new RespOperationLogBo();
+        noteBo.setCompanyName("东盟商会");
+        noteBo.setfCreatetime("2017-11-06 09:34");
+        noteBo.setfNote("将司机从 李尊 修改为 郭俊杰");
+        noteBo.setfOperatingType("修改运货单");
+        noteBo.setfOperator("郭俊杰");
+        noteBos.add(noteBo);
+        //=====================备注======================
+        List<RespRemarkBo> remarks = new ArrayList<>();
+        RespRemarkBo respRemarkBo = new RespRemarkBo();
+        respRemarkBo.setOperator("李遵");
+        respRemarkBo.setfCreatetime("2018-01-01 00:00:00");
+        respRemarkBo.setfContent("快速送达");
+
+        //=========================运单详情商品实体类=====================
+        List<RespTransportDetailGoodsBo> respTransportDetailGoodsBos = new ArrayList<>();
+        RespTransportDetailGoodsBo respTransportDetailGoodsBo = new RespTransportDetailGoodsBo();
+        respTransportDetailGoodsBo.setfCode("P1001");
+        respTransportDetailGoodsBo.setfName("云南水果");
+        respTransportDetailGoodsBo.setFormatName("品质：优等");
+        respTransportDetailGoodsBo.setfPicUrl("baidu.com");
+        respTransportDetailGoodsBo.setfUnit("kg");
+        respTransportDetailGoodsBo.setPlanNum("1000");
+        respTransportDetailGoodsBo.setSurplusNum("1000");
+        respTransportDetailGoodsBo.setHaveNum("0");
+        respTransportDetailGoodsBos.add(respTransportDetailGoodsBo);
+//==================运单详情实体类==============================
+        //=================运单信息========================
+        RespTransportDetailBo rspTransportBo = new RespTransportDetailBo();
+        rspTransportBo.setTransportCode("YS-20171101-436781");
+        rspTransportBo.setTransportStatus("待装车");
+        rspTransportBo.setSendArea("北京");
+        rspTransportBo.setCreateTime("2017-11-06 09:34");
+        rspTransportBo.setOperate("李尊");
+        rspTransportBo.setCustomsFormNum("000100000001");
+        //=================运输信息=======================
+        rspTransportBo.setfDriverName("曹操");
+        rspTransportBo.setfDriverPhone("18888888888");
+        rspTransportBo.setfCarNum("冀p0001");
+        rspTransportBo.setRemarkContent(remarks);//添加备注
+        rspTransportBo.setRespTransportDetailGoodsBos(respTransportDetailGoodsBos);//添加商品
+        rspTransportBo.setNoteBos(noteBos); //添加日志
+
+
+        ResultBo resultBo = ResultBo.build();
+        resultBo.setResultBody(rspTransportBo);
+        return resultBo;
+    }
+
+    /**
+     * 修改备注信息
+     *
+     */
+    @GetMapping(value = "remarkadd")
+    @ApiOperation(value = "修改备注",response = RespTransportRemarkBo.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "transportId",value = "入参为运单id",paramType = "query",required = true),
+            @ApiImplicitParam(name = "remarkContent",value = "入参为备注内容",paramType = "query",required = true)
+    })
+    public ResultBo transportRemark(String transportId,String remarkContent){
+
+        ResultBo resultBo = ResultBo.build();
+        List<RespTransportRemarkBo> respTransportRemarkBos = new ArrayList<>();
+        RespTransportRemarkBo respTransportRemarkBo = new RespTransportRemarkBo();
+        respTransportRemarkBo.setRemarkContent("北京客户急需");
+        respTransportRemarkBo.setRemarkId("1");
+        respTransportRemarkBo.setTransportId("1");
+        respTransportRemarkBo.setOperate("李遵");
+        respTransportRemarkBo.setCreateTime("2018-01-15 09:40:18");
+
+        respTransportRemarkBos.add(respTransportRemarkBo);
+        resultBo.setResultBody(respTransportRemarkBos);
+
+
+        return resultBo;
+
+
+
+    }
+    /**
+     * 修改运输信息接口
+     */
+    @GetMapping(value = "transportinfoupdate")
+    @ApiOperation(value = "修改运输信息",response = RespTransportInfoBo.class)
+    public ResultBo transportInfoUpdate(ReqTransportInfoBo reqTransportInfoBo){
+        ResultBo resultBo = ResultBo.build();
+
+
+        return resultBo;
+    }
+
+
+    /**
+     * 操作日志list
+     * 操作类型：createTranOrder-创建运单;\nupdateTranOrder-修改运单;\nupdateTranInfo-修改运输信息;
+     * \nloadingConfirmation-装车确认;\ntranComplete-运输完成；
+     */
+    @GetMapping(value = "notelist")
+    @ApiOperation(value = "日志查看")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "transportId",value = "入参为运单id",paramType = "query",required = true)
+    })
+    public ResultBo note(String transportId){
+
+
+        List<RespOperationLogBo> noteBos = new ArrayList<>();
+        RespOperationLogBo noteBo = new RespOperationLogBo();
+        noteBo.setCompanyName("东盟商会");
+        noteBo.setfCreatetime("2017-11-06 09:34");
+        noteBo.setfNote("将司机从 李尊 修改为 郭俊杰");
+        noteBo.setfOperatingType("修改运货单");
+        noteBo.setfOperator("郭俊杰");
+        noteBos.add(noteBo);
+
+        ResultBo resultBo = ResultBo.build();
+        resultBo.setMessage("ok");
+        resultBo.setResultBody(noteBos);
+        return resultBo;
+
+    }
+
+    /**
+     *
+     * 装车按钮状态改变接口／与运输完成一个接口
+     * 更改运单状态  点击装车 状态更改为  待提货 ，点击运输完成 状态更改 为 已完成
+     */
+    @GetMapping(value = "load")
+    @ApiOperation(value = "装车按钮状态改变接口／与运输完成一个接口，更改运单状态  点击装车 状态更改为  待提货 ，点击运输完成 状态更改 为 已完成")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "transportOrderId",value = "入参为运单id",paramType = "query",required = true),
+            @ApiImplicitParam(name = "transportStatus",value = "入参为要更改的状态",paramType = "query",required = true)
+
+    })
+    public ResultBo load(String transportOrderId,String transportStatus){
+        ResultBo resultBo = ResultBo.build();
+
+        return resultBo;
+    }
+
+
+    public static void main(String[] args) {
+        String a ="123";
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+       String date = simpleDateFormat.format(new Date());
+        System.out.println(new Date(date));
+    }
+}

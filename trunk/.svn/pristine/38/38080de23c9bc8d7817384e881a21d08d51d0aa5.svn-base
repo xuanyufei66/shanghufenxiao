@@ -1,0 +1,27 @@
+package com.payease.scfordermis.service;
+
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.bo.requestBo.ReqEmpAccNumBean;
+import com.payease.scfordermis.bo.requestBo.ReqEmpSaveBean;
+
+import javax.servlet.http.HttpSession;
+
+/**
+ * @Created By liuxiaoming
+ * @CreateTime 2018/1/15 下午1:55
+ **/
+public interface EmpAccNumService {
+
+    ResultBo getEmpAccNumList(HttpSession session,ReqEmpAccNumBean reqEmpAccNumBean);
+
+    ResultBo empDetail(Long employeeInfoId);
+
+    ResultBo save(HttpSession session,ReqEmpSaveBean req);
+
+    ResultBo deleteEmpAccNumById(HttpSession session,Long id);
+
+    ResultBo authList(HttpSession session,Long employeeInfoId);
+
+    ResultBo resetPwd(HttpSession session,Long employeeInfoId,String fPassword);
+
+}

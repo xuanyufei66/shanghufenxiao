@@ -1,0 +1,11 @@
+package com.payease.scfordermis.dao;
+
+import com.payease.scfordermis.entity.TUnitInfoEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ProductUnitDao extends JpaRepository<TUnitInfoEntity,Long>{
+    //通过名称查询
+    Long countByFNameEquals(String name);
+
+
+}

@@ -1,0 +1,82 @@
+package com.payease.scfordermis.controller.app.driver;
+
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.bo.responseBo.app.driver.RespAppDriverUserBean;
+import io.swagger.annotations.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Created by zhangzhili on 2018/1/10.
+ * desc:司机登录
+ */
+@RestController
+@RequestMapping("app/driver")
+@Api(tags = {"app司机端登录模块  Created by zhangzhili"})
+public class AppDriverLoginController extends AppDriverBaseController{
+
+
+
+    @GetMapping("sendsms")
+    @ApiOperation(value = "发送短信验证码")
+    @ApiImplicitParam(name = "phone", value = "手机号", paramType = "query", required = true)
+    @ApiImplicitParams({@ApiImplicitParam(name = "phone", value = "手机号", paramType = "query", required = true),
+            @ApiImplicitParam(name = "smsType", value = "发送场景 dirverLogin:司机端登录 misLogin:客户端登录", paramType = "query",
+            required = true)})
+    public ResultBo sendLoginCode(String phone,String smsType) {
+        ResultBo resultBo = ResultBo.build();
+        Map<String, String> map = new HashMap();
+        map.put("code", "5432");
+        resultBo.setResultBody(map);
+        return resultBo;
+    }
+
+    @PostMapping("login")
+    @ApiOperation(value = "登录")
+    @ApiImplicitParams({@ApiImplicitParam(name = "username", value = "手机号", paramType = "query",
+        required = true), @ApiImplicitParam(name = "code", value = "短信验证码", paramType = "query",
+        required = true)})
+    public ResultBo login(String username, String code) {
+        ResultBo resultBo = ResultBo.build();
+        Map<String, String> map = new HashMap();
+        map.put("token", "HGFDSASDFGHGFDSDFGHGFD8765432");
+        resultBo.setResultBody(map);
+        return resultBo;
+    }
+
+
+    @PostMapping("logout")
+    @ApiOperation(value = "退出")
+    @ApiImplicitParam(name = "token", value = "token", paramType = "query", required = true)
+    public ResultBo logout(String token) {
+        ResultBo resultBo = ResultBo.build();
+        return resultBo;
+    }
+
+
+
+    @GetMapping("getuserinfo")
+    @ApiOperation(value = "获取用户信息",response = RespAppDriverUserBean.class)
+    @ApiImplicitParam(name = "token", value = "token", paramType = "query", required = true)
+    public ResultBo getUserInfo(String token){
+        ResultBo resultBo = ResultBo.build();
+
+        RespAppDriverUserBean respAppDriverUserBean = new RespAppDriverUserBean();
+        respAppDriverUserBean.setDriverName("张三");
+        respAppDriverUserBean.setDriverPhone("18502102012");
+        respAppDriverUserBean.setMerchantPhone("4006311887");
+        resultBo.setResultBody(respAppDriverUserBean);
+        return resultBo;
+
+    }
+
+
+
+
+
+}

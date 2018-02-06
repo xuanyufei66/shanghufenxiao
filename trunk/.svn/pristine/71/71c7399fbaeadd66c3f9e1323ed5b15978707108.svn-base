@@ -1,0 +1,28 @@
+package com.payease.scfordermis.dao;
+
+import com.payease.scfordermis.entity.TTransportOrderDetailEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
+
+/**
+ * 运单产品信息
+ */
+public interface TransportOrderDetailDao extends JpaRepository<TTransportOrderDetailEntity,Long>{
+    //用于判断该商品规格是否发生运单
+    Long countByTProductFormatId(Long productFormatId);
+    //用于删除商品单位时，运单是否存储了该单位
+    Long countByTUnitInfoId(Long unitInfoId);
+
+    List<TTransportOrderDetailEntity> findByFTransportOrderId(Long transportId);
+
+    //更新运单详情中的剩余数量（防止更新时剩余数量有变化）
+    @Modifying
+    @Query("update TTransportOrderDetailEntity t set t.fSurplusNumber=?1 where t.id=?2 and t.fSurplusNumber=?3")
+    int updateSurplusNumber(int fSurplusNumber,Long id,int surplusNumber);
+
+   // void deleteByFTransportOrderIdAndFCompanyId(Long transportId,Long companyId);
+    void deleteAllByFTransportOrderIdAndAndFCompanyId(Long transportId,Long companyId);
+}

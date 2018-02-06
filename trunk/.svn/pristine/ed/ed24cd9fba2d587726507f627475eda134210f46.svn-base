@@ -1,0 +1,142 @@
+package com.payease.scfordermis.bo.responseBo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+/**
+ * Created by admin on 2018/1/10.
+ * 出参
+ */
+@ApiModel(value = "获取公司信息详情类",description = "获取公司信息详情类")
+public class RespCompanyInfoBean {
+    @ApiModelProperty(value = "主键id",dataType = "long")
+    private long fId;
+    @ApiModelProperty(value = "公司信息",dataType = "String")
+    private String fName;
+    @ApiModelProperty(value = "行业类别",dataType = "String")
+    private String fCategory;
+    @ApiModelProperty(value = "logoUrl",dataType = "String")
+    private String fLogo;
+    @ApiModelProperty(value = "联系人",dataType = "String",required = true)
+    private String fContact;
+    @ApiModelProperty(value = "手机号码",dataType = "String",required = true)
+    private String fMobile;
+    @ApiModelProperty(value = "邮箱",dataType = "String")
+    private String fEmail;
+    @ApiModelProperty(value = "公司地址",dataType = "String",required = true)
+    private String fAddress;
+    @ApiModelProperty(value = "邮编",dataType = "String")
+    private String fPostalCode;
+    @ApiModelProperty(value = "电话号码",dataType = "String")
+    private String fPhone;
+    @ApiModelProperty(value = "传真",dataType = "String")
+    private String fFax;
+    @ApiModelProperty(value = "公司网址",dataType = "String")
+    private String fWebsite;
+    @ApiModelProperty(value = "服务热线",dataType = "String",required = true)
+    private String fServiceNumber;
+
+    public long getfId() {
+        return fId;
+    }
+
+    public void setfId(long fId) {
+        this.fId = fId;
+    }
+
+    public String getfName() {
+        return fName;
+    }
+
+    public void setfName(String fName) {
+        this.fName = fName;
+    }
+
+    public String getfCategory() {
+        return fCategory;
+    }
+
+    public void setfCategory(String fCategory) {
+        this.fCategory = fCategory;
+    }
+
+    public String getfLogo() {
+        return fLogo;
+    }
+
+    public void setfLogo(String fLogo) {
+        this.fLogo = fLogo;
+    }
+
+    public String getfContact() {
+        return fContact;
+    }
+
+    public void setfContact(String fContact) {
+        this.fContact = fContact;
+    }
+
+    public String getfMobile() {
+        return fMobile;
+    }
+
+    public void setfMobile(String fMobile) {
+        this.fMobile = fMobile;
+    }
+
+    public String getfEmail() {
+        return fEmail;
+    }
+
+    public void setfEmail(String fEmail) {
+        this.fEmail = fEmail;
+    }
+
+    public String getfAddress() {
+        return fAddress;
+    }
+
+    public void setfAddress(String fAddress) {
+        this.fAddress = fAddress;
+    }
+
+    public String getfPostalCode() {
+        return fPostalCode;
+    }
+
+    public void setfPostalCode(String fPostalCode) {
+        this.fPostalCode = fPostalCode;
+    }
+
+    public String getfPhone() {
+        return fPhone;
+    }
+
+    public void setfPhone(String fPhone) {
+        this.fPhone = fPhone;
+    }
+
+    public String getfFax() {
+        return fFax;
+    }
+
+    public void setfFax(String fFax) {
+        this.fFax = fFax;
+    }
+
+    public String getfWebsite() {
+        return fWebsite;
+    }
+
+    public void setfWebsite(String fWebsite) {
+        this.fWebsite = fWebsite;
+    }
+
+    public String getfServiceNumber() {
+        return fServiceNumber;
+    }
+
+    public void setfServiceNumber(String fServiceNumber) {
+        this.fServiceNumber = fServiceNumber;
+    }
+}

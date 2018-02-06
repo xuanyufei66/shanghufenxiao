@@ -1,0 +1,24 @@
+package com.payease.scfordermis.service;
+
+import com.payease.scfordermis.bo.*;
+
+import java.util.List;
+
+/**
+ * Created by YHF on 2018/1/10.
+ */
+public interface TransportService {
+    List<TransportBo> transportListSelect(); //运单列表
+    int transportAdd();  //添加
+    int transportDelete();//删除
+    int transportUpdate();//修改
+    TransportBo transportDetail();//详情
+    int transportInfoUpdate(TransportInfoBo transportInfo);  //运输信息修改
+    void load(); //装车
+    void transportFinish();  //运输完成
+    int remarkUpdate(RemarkBo remarkBo);//备注信息修改
+    List<NoteBo> noteSelect();//日志操作
+    List<GoodsBo> getGoods();//商品列表查询  每个商品的规格都是列表项
+
+
+}

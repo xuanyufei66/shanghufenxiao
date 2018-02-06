@@ -1,0 +1,16 @@
+package com.payease.scfordermis.dao;
+
+import com.payease.scfordermis.entity.TUnitInfoEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface UnitInfoDao extends JpaRepository<TUnitInfoEntity,Long> {
+    //根据公司id查出所有单位
+    List<TUnitInfoEntity> findByFCompanyIdEqualsOrderByFCreateTimeDesc(Long companyId);
+    //通过名称查询
+    Long countByFNameEquals(String name);
+  //根据单位id 查
+    TUnitInfoEntity findByFId(Long id);
+
+}

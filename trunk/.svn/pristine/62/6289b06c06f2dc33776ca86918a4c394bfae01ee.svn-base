@@ -1,0 +1,226 @@
+package com.payease.scfordermis.controller;
+
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.bo.requestBo.ReqDistributionOrderBo;
+import com.payease.scfordermis.bo.requestBo.ReqSaveOrUpdateOrderBo;
+import com.payease.scfordermis.bo.responseBo.*;
+import com.payease.scfordermis.exception.CommonRuntimeException;
+import com.payease.scfordermis.service.IDistributionOrderService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/**
+ * Created by lch on 2018/1/10.
+ * <p>
+ * 集散地订单
+ */
+
+@RestController
+@RequestMapping("distributionOrder")
+@Api(tags = {"集散地订单-李长宏"})
+public class DistributionOrderController extends BaseController {
+
+    @Autowired
+    private IDistributionOrderService distributionOrderService;
+
+    @ExceptionHandler
+    public ResultBo expHandler(Exception e) {
+        ResultBo resultBo = ResultBo.build();
+        if (e instanceof CommonRuntimeException) {
+            resultBo.setCodeId((((CommonRuntimeException) e).getCodeId()));
+            resultBo.setMessage((((CommonRuntimeException) e).getMsg()));
+            return resultBo;
+        } else {
+            e.printStackTrace();
+            return resultBo;
+        }
+    }
+
+    /**
+     * 集散地订单列表
+     */
+    @GetMapping("distributionOrderList")
+    @ApiOperation(value = "集散地订单列表", response = RespDistributionOrderBo.class)
+    public ResultBo orderList(ReqDistributionOrderBo reqDistributionOrderBo) {
+        putUserInfo();
+        RespLoginPCBean respLoginPCBean = getUserInfo();
+        ResultBo resultBo = ResultBo.build();
+        Page<RespDistributionOrderBo> distributionOrderBoList = distributionOrderService.orderList(respLoginPCBean, reqDistributionOrderBo);
+        resultBo.setResultBody(distributionOrderBoList);
+        return resultBo;
+    }
+
+    /**
+     * 客户级别列表
+     */
+    @GetMapping("customerLevelList")
+    @ApiOperation(value = "客户级别列表", response = RespCustomerLevelBo.class)
+    public ResultBo customerLevelList() {
+        putUserInfo();
+        RespLoginPCBean respLoginPCBean = getUserInfo();
+        ResultBo resultBo = ResultBo.build();
+        List<RespCustomerLevelBo> customerLevelBoList = distributionOrderService.customerLevelList(respLoginPCBean);
+        resultBo.setResultBody(customerLevelBoList);
+        return resultBo;
+    }
+
+    /**
+     * 销售地区列表
+     */
+    @GetMapping("salesAreaList")
+    @ApiOperation(value = "销售地区列表", response = RespAreaInfoBo.class)
+    public ResultBo salesAreaList() {
+        putUserInfo();
+        RespLoginPCBean respLoginPCBean = getUserInfo();
+        ResultBo resultBo = null;
+        resultBo = ResultBo.build();
+        List<RespAreaInfoBo> areaInfoBoList = distributionOrderService.salesAreaList(respLoginPCBean);
+        resultBo.setResultBody(areaInfoBoList);
+        return resultBo;
+    }
+
+    /**
+     * 集散地列表
+     */
+    @GetMapping("distributionList")
+    @ApiOperation(value = "集散地列表", response = RespDistributionBo.class)
+    public ResultBo distributionList() {
+        putUserInfo();
+        RespLoginPCBean respLoginPCBean = getUserInfo();
+        ResultBo resultBo = ResultBo.build();
+        List<RespDistributionBo> distributionBoList = distributionOrderService.distributionList(respLoginPCBean);
+        resultBo.setResultBody(distributionBoList);
+        return resultBo;
+    }
+
+    /**
+     * 客户列表
+     */
+    @GetMapping("customerList")
+    @ApiOperation(value = "客户列表", response = RespCustomerBo.class)
+    public ResultBo customerList() {
+        putUserInfo();
+        RespLoginPCBean respLoginPCBean = getUserInfo();
+        ResultBo resultBo = ResultBo.build();
+        List<RespCustomerBo> customerBoList = distributionOrderService.customerList(respLoginPCBean);
+        resultBo.setResultBody(customerBoList);
+        return resultBo;
+    }
+
+    /**
+     * 运输单内商品列表信息
+     */
+    @GetMapping("productList")
+    @ApiOperation(value = "运输单内商品列表信息", response = RespProductBo.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "transportId", value = "运单id", paramType = "query", required = true)
+    })
+    public ResultBo productList(Long transportId) {
+        ResultBo resultBo = ResultBo.build();
+        List<RespProductBo> productBoList = distributionOrderService.productList(transportId);
+        resultBo.setResultBody(productBoList);
+        return resultBo;
+    }
+
+    /**
+     * 操作日志
+     */
+    @GetMapping("operationLog")
+    @ApiOperation(value = "操作日志", response = RespOperationLogBo.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "orderId", value = "订单id", paramType = "query", required = true)
+    })
+    public ResultBo operationLog(Long orderId) {
+        ResultBo resultBo = ResultBo.build();
+        List<RespOperationLogBo> operationLogBoList = distributionOrderService.operationLog(orderId);
+        resultBo.setResultBody(operationLogBoList);
+        return resultBo;
+    }
+
+    /**
+     * 添加备注（修改订单页面点击添加备注按钮调用该接口，新增订单页面不调用）
+     */
+    @PostMapping("addNote")
+    @ApiOperation(value = "添加备注（修改订单页面点击添加备注按钮调用该接口，新增订单页面不调用）")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "orderId", value = "订单id", paramType = "query", required = true),
+            @ApiImplicitParam(name = "content", value = "备注内容", paramType = "query", required = true)
+    })
+    public ResultBo addNote(Long orderId, String content) {
+        putUserInfo();
+        RespLoginPCBean respLoginPCBean = getUserInfo();
+        ResultBo resultBo = ResultBo.build();
+        distributionOrderService.addNote(respLoginPCBean, orderId, content);
+        return resultBo;
+    }
+
+    /**
+     * 订单详情
+     */
+    @GetMapping("orderDetails")
+    @ApiOperation(value = "订单详情", response = RespOrderDetailsBo.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "orderId", value = "订单id", paramType = "query", required = true)
+    })
+    public ResultBo orderDetails(Long orderId) {
+        ResultBo resultBo = ResultBo.build();
+        RespOrderDetailsBo orderDetailsBo = distributionOrderService.orderDetails(orderId);
+        resultBo.setResultBody(orderDetailsBo);
+        return resultBo;
+    }
+
+    /**
+     * 收款记录
+     */
+    @GetMapping("paymentRecords")
+    @ApiOperation(value = "收款记录", response = RspPaymentRecordsBo.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "orderId", value = "订单id", paramType = "query", required = true)
+    })
+    public ResultBo paymentRecords(Long orderId) {
+        ResultBo resultBo = ResultBo.build();
+        List<RspPaymentRecordsBo> paymentRecordsBoList = distributionOrderService.paymentRecords(orderId);
+        resultBo.setResultBody(paymentRecordsBoList);
+        return resultBo;
+    }
+
+    /**
+     * 订单审核/作废
+     */
+    @PostMapping("orderReviewOrCancellation")
+    @ApiOperation(value = "订单审核/作废")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "orderId", value = "订单id", paramType = "query", required = true),
+            @ApiImplicitParam(name = "type", value = "类型（审核-review;作废-cancellation）", paramType = "query", required = true),
+            @ApiImplicitParam(name = "cancellationReason", value = "作废原因（作废时必填）", paramType = "query")
+    })
+    public ResultBo orderReviewOrCancellation(Long orderId, String type, String cancellationReason) {
+        putUserInfo();
+        RespLoginPCBean respLoginPCBean = getUserInfo();
+        ResultBo resultBo = ResultBo.build();
+        distributionOrderService.orderReviewOrCancellation(respLoginPCBean, orderId, type, cancellationReason);
+        return resultBo;
+    }
+
+    /**
+     * 添加/修改订单
+     */
+    @PostMapping("orderSaveOrUpdate")
+    @ApiOperation(value = "添加/修改订单")
+    public ResultBo orderSaveOrUpdate(ReqSaveOrUpdateOrderBo reqSaveOrUpdateOrderBo) {
+        putUserInfo();
+        RespLoginPCBean respLoginPCBean = getUserInfo();
+        ResultBo resultBo = ResultBo.build();
+        distributionOrderService.orderSaveOrUpdate(respLoginPCBean, reqSaveOrUpdateOrderBo);
+        return resultBo;
+    }
+}

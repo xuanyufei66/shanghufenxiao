@@ -1,0 +1,103 @@
+package com.payease.scfordermis.service.impl;
+
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.bo.requestBo.ReqAccInfoResetPwdBean;
+import com.payease.scfordermis.bo.requestBo.ReqAccountInfoBean;
+import com.payease.scfordermis.dao.EmployeeInfoDao;
+import com.payease.scfordermis.entity.TEmployeeInfoEntity;
+import com.payease.scfordermis.service.AccountInfoService;
+import com.payease.scfordermis.utils.MD5;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpSession;
+import java.util.Date;
+
+/**
+ * Created by zhoushijie on 2018/1/17.
+ * 账号实现类
+ */
+@Service
+public class AccountInfoServiceImpl implements AccountInfoService{
+    @Autowired
+    EmployeeInfoDao employeeInfoDao;
+
+    /**
+     * 重置密码
+     * @param session
+     * @param reqAccInfoResetPwdBean
+     * @return
+     */
+    @Override
+    public ResultBo savepwd(HttpSession session, ReqAccInfoResetPwdBean reqAccInfoResetPwdBean) {
+        ResultBo result = ResultBo.build();
+        Long fId =(long)1;//账号id
+        //todo   Long fId
+//        Long fId = (Long) session.getAttribute("fId");
+//        if(session.getAttribute("fId") == null){
+//            return result.fail();
+//        }
+        //通过fid找到账号id
+        TEmployeeInfoEntity accId = employeeInfoDao.findOne(fId);
+        if (accId == null){
+            return result.fail();
+        }
+        //检查原密码是否为空
+        if (reqAccInfoResetPwdBean.getOldPwd() == null ){
+            return result.fail();
+        }
+        //检查新密码是否为空
+        if (reqAccInfoResetPwdBean.getNewPwd() == null){
+            return result.fail();
+        }
+
+        //  入参原密码加密后和数据库中密码不一致  false
+        if (!MD5.encode(reqAccInfoResetPwdBean.getOldPwd()).equals(accId.getfPassword())){
+            return result.fail();
+        }
+        //修改时间
+        accId.setfUpdateTime(new Date());
+        //将数据库中的登录密码修改为新密码
+        accId.setfPassword(MD5.encode(reqAccInfoResetPwdBean.getNewPwd()));
+        employeeInfoDao.save(accId);
+        return result;
+
+    }
+
+    /**
+     *修改用户信息
+     * @param session
+     * @return
+     */
+    @Override
+    public ResultBo saveaccinfo(HttpSession session,ReqAccountInfoBean req) {
+        //通过id找到一个对象
+        ResultBo result = ResultBo.build();
+        Long fId =(long)1;//账号id
+        //todo   Long fId
+//        Long fId = (Long) session.getAttribute("fId");
+//        if(session.getAttribute("fId") == null){
+//            return result.fail();
+//        }
+        //通过fId找到账号id
+        TEmployeeInfoEntity entity = employeeInfoDao.findOne(fId);
+        //名字
+        entity.setfName(req.getfName());
+        //手机
+        entity.setfMobile(req.getfMobile());
+        //邮箱
+        if (req.getfEmail() != null){
+            entity.setfEmail(req.getfEmail());
+        }else {
+            entity.setfEmail("");
+        }
+        //QQ
+        if (req.getfQq() != null){
+            entity.setfQq(req.getfQq());
+        }else {
+            entity.setfQq("");
+        }
+        employeeInfoDao.save(entity);
+        return result;
+    }
+}

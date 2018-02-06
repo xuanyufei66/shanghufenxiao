@@ -1,0 +1,94 @@
+package com.payease.scfordermis.controller;
+
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.bo.responseBo.RespLevelBean;
+import com.payease.scfordermis.entity.TConsumerLevelEntity;
+import com.payease.scfordermis.service.CustomerLevelService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by admin on 2018/1/11.
+ */
+@RestController
+@RequestMapping("/level")
+@Api(tags = {"客户级别-郑强威"})
+public class CustomerLevelController {
+
+    private static final Logger log = LoggerFactory.getLogger(CustomerLevelController.class);
+
+    @Autowired
+    private CustomerLevelService customerLevelService;
+
+    @GetMapping(value = "index")
+    @ApiOperation(value = "获取客户级别列表",response = RespLevelBean.class)
+    @ApiImplicitParams({
+    })
+    public ResultBo getCustomerLevelAll() {
+        ResultBo result = ResultBo.build();
+        try {
+            List< TConsumerLevelEntity> tConsumerLevelEntities = customerLevelService.findAll();
+            List<RespLevelBean> resp = new ArrayList<>();
+            for (TConsumerLevelEntity  Leve :tConsumerLevelEntities) {
+                   RespLevelBean respLevelBean = new RespLevelBean();
+                   BeanUtils.copyProperties(Leve,respLevelBean);
+                   resp.add(respLevelBean);
+            }
+            result.setResultBody(resp);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("getCustomerLevelAll",e);
+            result.fail();
+        }
+        return result;
+    }
+
+    @PutMapping(value = "saveup")
+    @ApiOperation(value = "添加修改接口")
+    @ApiImplicitParams({
+    })
+    public ResultBo saveAndUpdate(HttpSession session, RespLevelBean  respLevelBean) {
+        ResultBo result = ResultBo.build();
+        try {
+            customerLevelService.saveAndUpdate(session,respLevelBean);
+            result.setResultBody("操作成功！");
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("saveAndUpdate",e);
+            result.fail();
+        }
+           return result;
+    }
+
+    @DeleteMapping(value = "delete")
+    @ApiOperation(value = "删除接口")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "fid",value = "客户级别id",paramType = "query"),
+    })
+    public ResultBo CustomerLevelUp(long fid) {
+        ResultBo result = ResultBo.build();
+        try {
+            customerLevelService.LiDelete(fid);
+            result.setResultBody("删除成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("CustomerLevelUp",e);
+            result.fail();
+        }
+            return result;
+    }
+
+}

@@ -1,0 +1,33 @@
+package com.payease.scfordermis.bo.requestBo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+/**
+ * @Created By liuxiaoming
+ * @CreateTime 2018/1/10 上午10:45
+ **/
+@ApiModel(value = "分页实体类",description = "描述分页实体类")
+public class PageBean {
+    @ApiModelProperty(value = "当前页",dataType = "int",required = true)
+    private Integer number = 1;
+    @ApiModelProperty(value =  "每页显示条数",dataType = "int",required = true)
+    private Integer size = 5;
+
+
+    public Integer getNumber() {
+        return number;
+    }
+
+    public void setNumber(Integer number) {
+        this.number = number;
+    }
+
+    public Integer getSize() {
+        return size;
+    }
+
+    public void setSize(Integer size) {
+        this.size = size;
+    }
+}

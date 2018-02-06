@@ -1,0 +1,12 @@
+package com.payease.scfordermis.dao;
+
+import com.payease.scfordermis.entity.TConsumerInfoEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+/**
+ * Created by lch on 2018/1/15.
+ *
+ * 客户repository
+ */
+public interface ConsumerInfoRepository extends JpaRepository<TConsumerInfoEntity,Long>{
+}

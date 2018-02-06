@@ -1,0 +1,114 @@
+package com.payease.scfordermis.bo.responseBo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+/**
+ * Created by YHF on 2018/1/11.
+ */
+@ApiModel(value = "运单信息实体类",description = "运单信息实体类")
+public class RespTransportBo {
+    @ApiModelProperty(value = "运单id")
+    private  String  fTransportId;
+    @ApiModelProperty(value = "运单编号")
+    private String fTransportNum;
+//    @ApiModelProperty(value = "运单状态")
+//    private String fStatus;
+    @ApiModelProperty(value = "销售地区")
+    private String fAreaInfoIdTwo;
+//    @ApiModelProperty(value = "通关单号")
+//    private String fCustomsFormNo;
+//    @ApiModelProperty(value = "制单员")
+//    private String fOperate;
+    @ApiModelProperty(value = "制单时间 时间格式 ： yyyy-MM-dd HH:mm:ss")
+    private String fCreatetime;
+    @ApiModelProperty(value = "车牌号")
+    private String fCarNum;
+    @ApiModelProperty(value = "司机")
+    private String fDriverName;
+    @ApiModelProperty(value = "登陆账号（司机电话）")
+    private String fDriverPhone;
+    @ApiModelProperty(value = "运单状态")
+    private String fStatus;
+//    @ApiModelProperty(value = "主图")
+//    private String picUrl;
+//    @ApiModelProperty(value = "商品编码")
+//    private String goodsCode;//商品编码
+//    @ApiModelProperty(value = "商品名称")
+//    private String goodsName;//商品名称
+//    @ApiModelProperty(value = "规格")
+//    private String formatName ;//规格
+//    @ApiModelProperty(value = "单位")
+//    private String unit;//单位
+//    @ApiModelProperty(value = "计划装车数")
+//    private Integer planNum;//计划装车数
+//    @ApiModelProperty(value = "可用数")
+//    private Integer surplusNum;//可用数  计划-可用=已用
+//    @ApiModelProperty(value = "已用")
+//    private Integer num;//已用
+
+
+    public String getfTransportId() {
+        return fTransportId;
+    }
+
+    public void setfTransportId(String fTransportId) {
+        this.fTransportId = fTransportId;
+    }
+
+    public String getfTransportNum() {
+        return fTransportNum;
+    }
+
+    public void setfTransportNum(String fTransportNum) {
+        this.fTransportNum = fTransportNum;
+    }
+
+    public String getfAreaInfoIdTwo() {
+        return fAreaInfoIdTwo;
+    }
+
+    public void setfAreaInfoIdTwo(String fAreaInfoIdTwo) {
+        this.fAreaInfoIdTwo = fAreaInfoIdTwo;
+    }
+
+    public String getfCreatetime() {
+        return fCreatetime;
+    }
+
+    public void setfCreatetime(String fCreatetime) {
+        this.fCreatetime = fCreatetime;
+    }
+
+    public String getfCarNum() {
+        return fCarNum;
+    }
+
+    public void setfCarNum(String fCarNum) {
+        this.fCarNum = fCarNum;
+    }
+
+    public String getfDriverName() {
+        return fDriverName;
+    }
+
+    public void setfDriverName(String fDriverName) {
+        this.fDriverName = fDriverName;
+    }
+
+    public String getfDriverPhone() {
+        return fDriverPhone;
+    }
+
+    public void setfDriverPhone(String fDriverPhone) {
+        this.fDriverPhone = fDriverPhone;
+    }
+
+    public String getfStatus() {
+        return fStatus;
+    }
+
+    public void setfStatus(String fStatus) {
+        this.fStatus = fStatus;
+    }
+}

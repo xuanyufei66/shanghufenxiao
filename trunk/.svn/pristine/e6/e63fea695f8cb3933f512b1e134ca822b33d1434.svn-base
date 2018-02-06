@@ -1,0 +1,284 @@
+package com.payease.scfordermis.controller.app.customer;
+
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.bo.responseBo.RespOperationLogBo;
+import com.payease.scfordermis.bo.responseBo.RespRemarkBo;
+import com.payease.scfordermis.bo.responseBo.app.customer.RespAppCustomerOrderBean;
+import com.payease.scfordermis.bo.responseBo.app.customer.RespAppCustomerOrderDetailBean;
+import com.payease.scfordermis.bo.responseBo.app.customer.RespAppPayDetailBean;
+import com.payease.scfordermis.bo.responseBo.app.customer.RespAppPayHistoryBean;
+import com.payease.scfordermis.bo.responseBo.app.driver.RespAppGoodBean;
+import com.payease.scfordermis.bo.responseBo.app.driver.RespAppOrderBean;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by zhangzhili on 2018/1/11.
+ */
+@RestController
+@RequestMapping("app/customer/order")
+@Api(tags = {"app客户端订单业务处理模块 Created by zhangzhili"})
+public class AppCustomerOrderController extends AppCustomerBaseController{
+
+
+    @GetMapping("listorders")
+    @ApiOperation(value = "订单列表查询", response = RespAppCustomerOrderBean.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "token", value = "token标识", dataType = "string",
+        paramType = "query", required = true), @ApiImplicitParam(name = "orderType", value =
+        "订单标识0-所有订单；1-未完成订单", dataType = "string", paramType = "query", required = true)})
+    public ResultBo ordersList(String token, int orderType) {
+        ResultBo resultBo = ResultBo.build();
+
+        List<RespAppCustomerOrderBean> appCustomerOrderBeanList = new ArrayList<>();
+        RespAppCustomerOrderBean appCustomerOrderBean = new RespAppCustomerOrderBean();
+        appCustomerOrderBean.setOrderId(1L);
+        appCustomerOrderBean.setOrderNum("DH-20171219-209812");
+        appCustomerOrderBean.setOrderAmount("12000.00");
+        appCustomerOrderBean.setCreatetime("2018-01-01 12:12:12");
+        appCustomerOrderBean.setPayStatus("wait");
+        appCustomerOrderBean.setProductNum(1000);
+        appCustomerOrderBean.setStatus(0);
+
+
+        RespAppCustomerOrderBean appCustomerOrderBean1 = new RespAppCustomerOrderBean();
+        appCustomerOrderBean1.setOrderId(2L);
+        appCustomerOrderBean1.setOrderNum("DH-20171219-209813");
+        appCustomerOrderBean1.setOrderAmount("12001.00");
+        appCustomerOrderBean1.setCreatetime("2018-01-01 12:12:13");
+        appCustomerOrderBean1.setPayStatus("completed");
+        appCustomerOrderBean1.setProductNum(2000);
+        appCustomerOrderBean1.setStatus(1);
+
+
+        appCustomerOrderBeanList.add(appCustomerOrderBean);
+        appCustomerOrderBeanList.add(appCustomerOrderBean1);
+        resultBo.setResultBody(appCustomerOrderBeanList);
+        return resultBo;
+    }
+
+
+
+    @GetMapping("orderdetail/{id}")
+    @ApiOperation(value = "订单详情", response = RespAppCustomerOrderDetailBean.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "token", value = "token标识", dataType = "string",
+        paramType = "query", required = true), @ApiImplicitParam(name = "id", value = "订单id",
+        dataType = "string", paramType = "path", required = true),})
+    public ResultBo orderDetail(String token, @PathVariable Long id) {
+
+        ResultBo resultBo = ResultBo.build();
+
+        RespAppCustomerOrderDetailBean appCustomerOrderDetailBean =
+            new RespAppCustomerOrderDetailBean();
+        appCustomerOrderDetailBean.setOrderId(1L);
+        appCustomerOrderDetailBean.setOrderNum("DH-20171219-209812");
+        appCustomerOrderDetailBean.setCreatetime("2017-12-19 12:32:01");
+        appCustomerOrderDetailBean.setStatus(1);
+        appCustomerOrderDetailBean.setProductNum(1000);
+        appCustomerOrderDetailBean.setSpecial("yes");
+        appCustomerOrderDetailBean.setAmount("11000.00");
+        appCustomerOrderDetailBean.setOrderAmount("10000.00");
+        appCustomerOrderDetailBean.setPayStatus("part");
+        appCustomerOrderDetailBean.setPaidAmount("7000.00");
+        appCustomerOrderDetailBean.setCardNum("津BD6105");
+        appCustomerOrderDetailBean.setDriverPhone("18502102012");
+        appCustomerOrderDetailBean.setDriverName("张海军");
+        appCustomerOrderDetailBean.setRemarkCount(1);
+        appCustomerOrderDetailBean.setNoteCount(1);
+
+        resultBo.setResultBody(appCustomerOrderDetailBean);
+        return resultBo;
+    }
+
+
+    @GetMapping("getorderdetail/{id}")
+    @ApiOperation(value = "商品清单", response = RespAppOrderBean.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "token", value = "token标识", dataType = "string",
+        paramType = "query", required = true), @ApiImplicitParam(name = "id", value = "订单id",
+        dataType = "string", paramType = "path", required = true)})
+    public ResultBo getOrderDetail(String token, @PathVariable Long id) {
+        ResultBo resultBo = ResultBo.build();
+
+
+        RespAppOrderBean respAppOrderBean = new RespAppOrderBean();
+        respAppOrderBean.setOrderId(2L);
+        respAppOrderBean.setCustomerName("北京新发地水果商户");
+        respAppOrderBean.setOrderNum("DH-20171219-678219");
+        respAppOrderBean.setProductCategoryNum(2);
+        respAppOrderBean.setProductNum(2000);
+        respAppOrderBean.setStatus("待提货");
+        List<RespAppGoodBean> list = new ArrayList<>();
+        RespAppGoodBean respAppGoodBean = new RespAppGoodBean();
+        respAppGoodBean.setImgUrl("http://overseatesco.yizhifubj"
+            + ".com:8091/group1/M00/00/00/rBW07VpS2euAadb8AAAt8oApJbw968.jpg");
+        respAppGoodBean.setFormateName("A果");
+        respAppGoodBean.setGoodNum(1000);
+        respAppGoodBean.setUnitName("KG");
+        list.add(respAppGoodBean);
+        respAppOrderBean.setGoodBeanList(list);
+
+        resultBo.setResultBody(respAppOrderBean);
+        return resultBo;
+
+    }
+
+
+
+    @GetMapping("getpaydetail/{id}")
+    @ApiOperation(value = "支付详情", response = RespAppPayDetailBean.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "token", value = "token标识", dataType = "string",
+        paramType = "query", required = true), @ApiImplicitParam(name = "id", value = "订单id",
+        dataType = "string", paramType = "path", required = true)})
+    public ResultBo getPayDetail(String token, @PathVariable Long id) {
+        ResultBo resultBo = ResultBo.build();
+
+
+        RespAppPayDetailBean respAppPayDetailBean = new RespAppPayDetailBean();
+        respAppPayDetailBean.setOrderId(2L);
+        respAppPayDetailBean.setOrderAmount("10000.00");
+        respAppPayDetailBean.setPaidAmount("7000.00");
+        respAppPayDetailBean.setPayStatus("part");
+
+
+        List<RespAppPayHistoryBean> respAppPayHistoryBeans = new ArrayList<>();
+        RespAppPayHistoryBean appOrderBean = new RespAppPayHistoryBean();
+        appOrderBean.setPayAmount("200.00");
+        appOrderBean.setPayMethod("bankCard");
+        appOrderBean.setPayNum("201801010112233939400000030001");
+        appOrderBean.setPaytime("2018-01-01 12:12:12");
+        appOrderBean.setPayRemark("无");
+        respAppPayHistoryBeans.add(appOrderBean);
+
+
+        respAppPayDetailBean.setHistoryBeanList(respAppPayHistoryBeans);
+        resultBo.setResultBody(respAppPayDetailBean);
+        return resultBo;
+
+    }
+
+
+
+    @GetMapping("topay/{id}")
+    @ApiOperation(value = "去支付", response = RespAppPayDetailBean.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "token", value = "token标识", dataType = "string",
+        paramType = "query", required = true), @ApiImplicitParam(name = "id", value = "订单id",
+        dataType = "string", paramType = "path", required = true)})
+    public ResultBo toPay(String token, @PathVariable Long id) {
+        ResultBo resultBo = ResultBo.build();
+
+        RespAppPayDetailBean respAppPayDetailBean = new RespAppPayDetailBean();
+        respAppPayDetailBean.setOrderId(1L);
+        respAppPayDetailBean.setOrderAmount("10000.00");
+        respAppPayDetailBean.setPaidAmount("7000.00");
+        respAppPayDetailBean.setPayStatus("part");
+
+        resultBo.setResultBody(respAppPayDetailBean);
+        return resultBo;
+    }
+
+
+
+    @GetMapping("agreement/{id}")
+    @ApiOperation(value = "去签赊销协议", response = RespAppPayDetailBean.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "token", value = "token标识", dataType = "string",
+        paramType = "query", required = true), @ApiImplicitParam(name = "id", value = "订单id",
+        dataType = "string", paramType = "path", required = true)})
+    public ResultBo agreement(String token, @PathVariable Long id) {
+        ResultBo resultBo = ResultBo.build();
+        RespAppPayDetailBean respAppPayDetailBean = new RespAppPayDetailBean();
+        respAppPayDetailBean.setOrderId(1L);
+        respAppPayDetailBean.setOrderAmount("10000.00");
+        respAppPayDetailBean.setPaidAmount("7000.00");
+        respAppPayDetailBean.setPayStatus("part");
+        respAppPayDetailBean.setCustomer("北京新发地水果商户A");
+        respAppPayDetailBean.setOrderNum("DH-20171219-678219");
+        resultBo.setResultBody(respAppPayDetailBean);
+        return resultBo;
+    }
+
+
+
+    @GetMapping("getpickcode/{id}")
+    @ApiOperation(value = "获取提货码", response = RespAppOrderBean.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "token", value = "token标识", dataType = "string",
+        paramType = "query", required = true), @ApiImplicitParam(name = "id", value = "订单id",
+        dataType = "string", paramType = "path", required = true)})
+    public ResultBo getPickCode(String token, @PathVariable Long id) {
+        ResultBo resultBo = ResultBo.build();
+
+        RespAppOrderBean respAppOrderBean = new RespAppOrderBean();
+        respAppOrderBean.setOrderId(2L);
+        respAppOrderBean.setCustomerName("北京新发地水果商户");
+        respAppOrderBean.setOrderNum("DH-20171219-678219");
+        respAppOrderBean.setProductCategoryNum(2);
+        respAppOrderBean.setProductNum(2000);
+        respAppOrderBean.setStatus("待提货");
+        respAppOrderBean.setPickUpCode("908743");
+        respAppOrderBean.setCardNum("津BD6105");
+        respAppOrderBean.setDriverName("李启亮");
+        respAppOrderBean.setDriverPhone("18502102012");
+
+        List<RespAppGoodBean> list = new ArrayList<>();
+        RespAppGoodBean respAppGoodBean = new RespAppGoodBean();
+        respAppGoodBean.setImgUrl("http://overseatesco.yizhifubj"
+            + ".com:8091/group1/M00/00/00/rBW07VpS2euAadb8AAAt8oApJbw968.jpg");
+        respAppGoodBean.setFormateName("A果");
+        respAppGoodBean.setGoodNum(1000);
+        respAppGoodBean.setUnitName("KG");
+        list.add(respAppGoodBean);
+        respAppOrderBean.setGoodBeanList(list);
+
+        resultBo.setResultBody(respAppOrderBean);
+
+        return resultBo;
+    }
+
+    @GetMapping("getorderremarks/{id}")
+    @ApiOperation(value = "获取订单备注", response = RespRemarkBo.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "token", value = "token标识", dataType = "string",
+        paramType = "query", required = true), @ApiImplicitParam(name = "id", value = "订单id",
+        dataType = "string", paramType = "path", required = true)})
+    public ResultBo getOrderRemarks(String token, @PathVariable Long id) {
+
+        ResultBo resultBo = ResultBo.build();
+        List<RespRemarkBo> respRemarkBoList = new ArrayList<>();
+        RespRemarkBo respRemarkBo = new RespRemarkBo();
+        respRemarkBo.setfContent("请尽快发货哦");
+        respRemarkBo.setfCreatetime("2018-01-01 12:12:12");
+        respRemarkBo.setOperator("张海军");
+        respRemarkBoList.add(respRemarkBo);
+
+        resultBo.setResultBody(respRemarkBoList);
+
+        return resultBo;
+
+    }
+
+    @GetMapping("getordernotes/{id}")
+    @ApiOperation(value = "获取订单日志信息", response = RespOperationLogBo.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "token", value = "token标识", dataType = "string",
+        paramType = "query", required = true), @ApiImplicitParam(name = "id", value = "订单id",
+        dataType = "string", paramType = "path", required = true)})
+    public ResultBo getOrdernotes(String token, @PathVariable Long id) {
+
+        ResultBo resultBo = ResultBo.build();
+        List<RespOperationLogBo> respRemarkBoList = new ArrayList<>();
+        RespOperationLogBo respOperationLogBo = new RespOperationLogBo();
+        respOperationLogBo.setfCreatetime("2018-01-01 12:12:12");
+        respOperationLogBo.setfNote("订货单已通过出库审核，待发货");
+        respOperationLogBo.setfOperator("张海军");
+        respRemarkBoList.add(respOperationLogBo);
+        resultBo.setResultBody(respRemarkBoList);
+        return resultBo;
+
+    }
+
+}

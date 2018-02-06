@@ -1,0 +1,22 @@
+package com.payease.scfordermis.controller.app.customer;
+
+import com.payease.scfordermis.bo.ResultBo;
+import io.swagger.annotations.Api;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * Created by zhangzhili on 2018/1/10.
+ */
+@RestController
+@RequestMapping("app/customer")
+@Api(tags = {"app客户端登录模块"})
+public class AppCustomerLoginController extends AppCustomerBaseController {
+
+
+
+
+
+
+}

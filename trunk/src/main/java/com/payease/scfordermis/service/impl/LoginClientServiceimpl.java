@@ -1,0 +1,264 @@
+package com.payease.scfordermis.service.impl;
+
+import com.alibaba.fastjson.JSON;
+import com.payease.scfordermis.bean.Status;
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.bo.requestBo.ReqLoginClientBean;
+import com.payease.scfordermis.bo.responseBo.RespLoginClientBean;
+import com.payease.scfordermis.dao.CompanyInfoDao;
+import com.payease.scfordermis.dao.ConsumerInfoDao;
+import com.payease.scfordermis.entity.TCompanyInfoEntity;
+import com.payease.scfordermis.entity.TConsumerInfoEntity;
+import com.payease.scfordermis.service.LoginClientService;
+import com.payease.scfordermis.utils.RandomUtil;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * Created by zhoushijie on 2018/1/17.
+ */
+@Service
+public class LoginClientServiceimpl implements LoginClientService{
+    private static final Logger log = LoggerFactory.getLogger(LoginClientServiceimpl.class);
+    @Autowired
+    StringRedisTemplate redis;//获取Redis
+    @Autowired
+    ConsumerInfoDao consumerInfoDao;
+    @Autowired
+    CompanyInfoDao companyInfoDao;
+
+
+    /**
+     * 登录
+     */
+    @Override
+    public ResultBo login(ReqLoginClientBean req) throws Exception{
+        ResultBo result =ResultBo.build();
+        try{
+            if(req == null){return result.queryError();}
+            /**
+             * 登录密码为login + 手机号  ---对应数据库中msgCode
+             * 登录后token保存登录信息为  user +手机号
+             * token中保存为这个对象
+             */
+            //判断订单号(手机号)
+            if (StringUtils.isBlank(req.getfIndentNo()) || StringUtils.isBlank(req.getfMsgCode())){return result.queryError();}
+            String reqCode = req.getfMsgCode();//短信验证码(入参)
+            String msgCode = redis.opsForValue().get("mis-login-"+req.getfIndentNo());
+            //验证短信验证码 入参 是否等于 Redis
+           // if(reqCode.equals(msgCode)){     //先不做短信判断   //todo=======================
+                //查找数据库中登录号
+                List<TConsumerInfoEntity> list0 = consumerInfoDao.findByFIndentNo(req.getfIndentNo());
+                if (list0 == null || list0.size()==0){
+                    return result.setCodeId(Status.CONSUMERISNULL);
+                }
+                TConsumerInfoEntity login = list0.get(0);
+                //生成token
+                String token = this.createToken(req.getfIndentNo());
+                //向Redis中保存token
+                this.saveUserToken(req,token,login);
+                //获取出参
+                result = getParameter(login, token);
+//            }else {
+//                return result.setCodeId(Status.MSGCODEERROR);
+//            }
+            return result;
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error("loginError",e);
+            result.setCodeId(Status.APPLOGINERROR);
+            throw e;
+        }
+    }
+
+    /**
+     * 获取出参
+     */
+    private ResultBo getParameter(TConsumerInfoEntity login,String token)throws Exception{
+        ResultBo result = ResultBo.build();
+        //出参
+        RespLoginClientBean resp =new RespLoginClientBean();
+        //公司名称     获取公司id
+        TCompanyInfoEntity comp = companyInfoDao.findOne(login.getfCompanyId());
+        resp.setCompanyName(comp.getfName());
+        //token
+        resp.setToken(token);
+        //bannerUrl 集合
+        resp = getList(resp);
+        result.setResultBody(resp);
+        return result;
+    }
+
+    /**
+     * bannerUrl 集合
+     */
+    private RespLoginClientBean getList(RespLoginClientBean resp)throws Exception{
+        /**
+         *  map
+         *   @property(nonatomic,strong)NSString *turnUrl;
+         *   @property(nonatomic,strong)NSString *imgUrl;
+         *   @property(nonatomic,strong)NSString *title;
+         */
+        Map<String,Object> map = new HashMap<>();
+        map.put("imgUrl","http://img2.niutuku.com/desk/130126/41/41-niutuku.com-2975.jpg");
+        Map<String,Object> map1 = new HashMap<>();
+        map1.put("imgUrl","http://img2.niutuku.com/desk/130126/50/50-niutuku.com-3495.jpg");
+        Map<String,Object> map2 = new HashMap<>();
+        map2.put("imgUrl","http://img2.niutuku.com/desk/1208/1951/ntk-1951-38647.jpg");
+        Map<String,Object> map3 = new HashMap<>();
+        map3.put("imgUrl","http://img2.niutuku.com/desk/1207/1016/ntk129856.jpg");
+        Map<String,Object> map4 = new HashMap<>();
+        map4.put("imgUrl","http://img2.niutuku.com/1312/0827/0827-niutuku.com-13638.jpg");
+
+        List<Map<String,Object>> list = new ArrayList<>();
+        list.add(map);
+        list.add(map1);
+        list.add(map2);
+        list.add(map3);
+        list.add(map4);
+        //bannerUrl 集合
+        resp.setBanners(list);
+        return resp;
+    }
+
+    /**
+     * 创建token
+     */
+    private String createToken(String fIndexNo) throws  Exception{
+        String tokenText = "login-"+fIndexNo+ RandomUtil.RandomNumber(6);
+        return DigestUtils.md5Hex(tokenText).toUpperCase();
+    }
+    //向Redis中保存token
+    private void saveUserToken(ReqLoginClientBean req,String token,TConsumerInfoEntity login) throws Exception{
+        try {
+            String key = "customer-user-"+req.getfIndentNo();
+            String delToken = redis.opsForValue().get(key);
+
+            //1.删除acctno与token的redis 然后插入新的acctno与token的redis
+            if(StringUtils.isNotBlank(delToken)){
+                redis.delete(key);
+                redis.delete(delToken);
+            }
+            //向redis中存 token     user-手机号
+            redis.opsForValue().set(key,token,7, TimeUnit.DAYS);
+            //2.删除token与user的redis 然后插入新的token与user的redis
+            //向redis中存 user    login-手机号-随机数
+            redis.opsForValue().set(token,JSON.toJSONString(login),7,TimeUnit.DAYS);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+
+
+
+    //==============================================================
+
+    /**
+     * 自动登录
+     */
+    @Override
+    public ResultBo autoLogin(String token) throws Exception{
+        ResultBo result =ResultBo.build();
+        try {
+            //从redis中获取token
+            if(StringUtils.isBlank(token)){return result.queryError();}
+            String tokenVal = redis.opsForValue().get(token);//"user-18920736652-1234";
+            if(StringUtils.isBlank(tokenVal)){return result.timeOut();}
+            TConsumerInfoEntity reidsentity = JSON.parseObject(tokenVal,TConsumerInfoEntity.class);
+            //判断数据中的token是否为null
+            //1.判断token是否存在
+            if(null!=reidsentity &&  StringUtils.isNotBlank(reidsentity.getfIndentNo())){
+                //延长token
+                List<TConsumerInfoEntity> reidsEntity = consumerInfoDao.findByFIndentNo(reidsentity.getfIndentNo());
+                if (reidsEntity == null || reidsEntity.size()==0){
+
+                    return result.setCodeId(Status.CONSUMERISNULL);
+                }
+                String newTokenVal = this.createToken(reidsentity.getfIndentNo());
+               //更新redis
+                this.updateRedisToken(reidsEntity.get(0),newTokenVal);
+                //出参
+                result = getParameter(reidsEntity.get(0), newTokenVal);
+            }else {
+                //2.token失效 返回异常
+                result.timeOut();
+            }
+            return result;
+        }catch (Exception e){
+             e.printStackTrace();
+            log.error("autoLoginError",e);
+            result.setCodeId(Status.APPAUTOLOGINERROR);
+            throw e;
+        }
+    }
+
+
+    /**
+     * 更新token有效期
+     * @param reidsentity
+     */
+    private void updateRedisToken(TConsumerInfoEntity reidsentity,String newTokenVal)throws Exception{
+        String tokenKey = "customer-user-"+reidsentity.getfIndentNo();//获取redis中的账号
+        String oldTokenVal = redis.opsForValue().get(tokenKey);
+
+        if(StringUtils.isNotBlank(oldTokenVal)){
+            //1.删除 账号与token的redis 然后插入新的 账号与token的redis
+            redis.delete(tokenKey);
+            //2.删除token与user的redis 然后插入新的token与user的redis
+            redis.delete(oldTokenVal);
+        }
+
+        redis.opsForValue().set(tokenKey,newTokenVal,7, TimeUnit.DAYS);
+        //2.删除token与user的redis 然后插入新的token与user的redis
+        redis.opsForValue().set(newTokenVal,JSON.toJSONString(reidsentity),7, TimeUnit.DAYS);
+    }
+
+
+
+    //===================================================================================
+
+    /**
+     * 根据token获取redis中的用户信息
+     */
+    @Override
+    public TConsumerInfoEntity getUserInRedis(String token) throws Exception {
+        TConsumerInfoEntity bo = null;
+        try {
+            String userVal = String.valueOf(redis.opsForValue().get(token));
+            if(StringUtils.isBlank(userVal)){return null;}
+            bo = JSON.parseObject(userVal,TConsumerInfoEntity.class);
+            return bo;
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("getUserInRedis",e);
+            throw e;
+        }
+    }
+
+    /**
+     * 登出
+     */
+    @Override
+    public ResultBo logout(String token) throws Exception{
+        ResultBo result = ResultBo.build();
+        try {
+            redis.delete(token);
+            return result;
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error("LogoutError",e);
+            result.setCodeId(Status.APPLOGOUT);
+            throw e;
+        }
+    }
+}

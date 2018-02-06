@@ -1,0 +1,89 @@
+package com.payease.scfordermis.service.impl;
+
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.bo.requestBo.ReqLoginPCBean;
+import com.payease.scfordermis.bo.responseBo.RespLoginPCBean;
+import com.payease.scfordermis.dao.DepartmentInfoDao;
+import com.payease.scfordermis.dao.EmployeeInfoDao;
+import com.payease.scfordermis.dao.EmployeeRoleDao;
+import com.payease.scfordermis.dao.RoleInfoDao;
+import com.payease.scfordermis.entity.TDepartmentInfoEntity;
+import com.payease.scfordermis.entity.TEmployeeInfoEntity;
+import com.payease.scfordermis.entity.TEmployeeRoleEntity;
+import com.payease.scfordermis.entity.TRoleInfoEntity;
+import com.payease.scfordermis.service.LoginPCService;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * Created by admin on 2018/1/15.
+ */
+@Service
+public class LoginPCServiceImpl implements LoginPCService{
+    @Autowired
+    EmployeeInfoDao employeeInfoDao;
+    @Autowired
+    DepartmentInfoDao departmentInfoDao;
+    @Autowired
+    EmployeeRoleDao employeeRoleDao;
+    @Autowired
+    RoleInfoDao roleInfoDao;
+    @Override
+    public ResultBo login(ReqLoginPCBean reqLoginPCBean) {
+        ResultBo result = ResultBo.build();
+        if (reqLoginPCBean == null){
+            return result.fail();
+        }
+        if (StringUtils.isBlank(reqLoginPCBean.getfAccount())){
+            return result.fail();
+        }
+        if (StringUtils.isBlank(reqLoginPCBean.getfPassword())){
+            return result.fail();
+        }
+        List<TEmployeeInfoEntity> list = employeeInfoDao.findByFAccountAndFPassword(reqLoginPCBean.getfAccount(), reqLoginPCBean.getfPassword());
+
+        if(list == null  && list.size() == 0){
+            return result.fail();
+        }
+        TEmployeeInfoEntity entity= list.get(0);
+
+
+        RespLoginPCBean resp=new RespLoginPCBean();
+        resp.setfName(entity.getfName());
+        // 通过员工ID 查员工角色关系（t_employee_role）表中的角色ID  再通过角色ID查角色信息（t_role_info）表中的菜单权限
+        List<TEmployeeRoleEntity> byFEmployeeIdList = employeeRoleDao.findByFEmployeeId(entity.getfId());
+        if(byFEmployeeIdList == null  && byFEmployeeIdList.size() == 0){
+            resp.setfMenus(new String[]{""});
+        }
+        TEmployeeRoleEntity tEmployeeRoleEntity = byFEmployeeIdList.get(0);
+        if(tEmployeeRoleEntity == null){
+            resp.setfMenus(new String[]{""});
+        }
+        TRoleInfoEntity roleInfoEntity = roleInfoDao.findOne(tEmployeeRoleEntity.getfRoleId());
+        if(roleInfoEntity == null){
+            resp.setfMenus(new String[]{""});
+        }else{
+            resp.setfMenus(new String[]{roleInfoEntity.getfMenus()});
+        }
+
+        resp.setfAccount(entity.getfAccount());
+        resp.setfDepartId(String.valueOf(entity.getfDepartIdTwo()));
+        //部门名称 通过部门id查询部门表(TDepartmentInfo)
+        TDepartmentInfoEntity departmentInfoEntity = departmentInfoDao.findOne(entity.getfDepartIdTwo());
+        resp.setfDepartName(departmentInfoEntity.getfName());
+
+        resp.setfPosition(entity.getfPosition());
+        resp.setfName(entity.getfName());
+        resp.setfMobile(entity.getfPosition());
+        resp.setfEmail(entity.getfEmail());
+        resp.setfQq(entity.getfQq());
+        result.setResultBody(resp);
+        return result;
+    }
+}
+
+
+

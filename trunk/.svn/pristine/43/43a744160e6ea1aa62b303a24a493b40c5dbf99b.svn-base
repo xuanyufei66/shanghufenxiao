@@ -1,0 +1,197 @@
+package com.payease.scfordermis.entity;
+
+import javax.persistence.*;
+import java.util.Date;
+import java.util.Objects;
+
+/**
+ * @Author : zhangwen
+ * @Data : 2018/1/10
+ * @Description :
+ */
+@Entity
+@Table(name = "t_company_info")
+public class TCompanyInfoEntity {
+    private long fId;
+    private String fName;
+    private String fCategory;
+    private String fLogo;
+    private String fContact;
+    private String fMobile;
+    private String fEmail;
+    private String fAddress;
+    private String fPostalCode;
+    private String fPhone;
+    private String fFax;
+    private String fWebsite;
+    private String fServiceNumber;
+    private Date fCreateTime;
+
+    @Id
+    @Column(name = "f_id", nullable = false)
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    public long getfId() {
+        return fId;
+    }
+
+    public void setfId(long fId) {
+        this.fId = fId;
+    }
+
+    @Basic
+    @Column(name = "f_name", nullable = false, length = 50)
+    public String getfName() {
+        return fName;
+    }
+
+    public void setfName(String fName) {
+        this.fName = fName;
+    }
+
+    @Basic
+    @Column(name = "f_category", nullable = false, length = 50)
+    public String getfCategory() {
+        return fCategory;
+    }
+
+    public void setfCategory(String fCategory) {
+        this.fCategory = fCategory;
+    }
+
+    @Basic
+    @Column(name = "f_logo", nullable = false, length = 200)
+    public String getfLogo() {
+        return fLogo;
+    }
+
+    public void setfLogo(String fLogo) {
+        this.fLogo = fLogo;
+    }
+
+    @Basic
+    @Column(name = "f_contact", nullable = false, length = 50)
+    public String getfContact() {
+        return fContact;
+    }
+
+    public void setfContact(String fContact) {
+        this.fContact = fContact;
+    }
+
+    @Basic
+    @Column(name = "f_mobile", nullable = false, length = 20)
+    public String getfMobile() {
+        return fMobile;
+    }
+
+    public void setfMobile(String fMobile) {
+        this.fMobile = fMobile;
+    }
+
+    @Basic
+    @Column(name = "f_email", nullable = true, length = 50)
+    public String getfEmail() {
+        return fEmail;
+    }
+
+    public void setfEmail(String fEmail) {
+        this.fEmail = fEmail;
+    }
+
+    @Basic
+    @Column(name = "f_address", nullable = false, length = 200)
+    public String getfAddress() {
+        return fAddress;
+    }
+
+    public void setfAddress(String fAddress) {
+        this.fAddress = fAddress;
+    }
+
+    @Basic
+    @Column(name = "f_postal_code", nullable = true, length = 10)
+    public String getfPostalCode() {
+        return fPostalCode;
+    }
+
+    public void setfPostalCode(String fPostalCode) {
+        this.fPostalCode = fPostalCode;
+    }
+
+    @Basic
+    @Column(name = "f_phone", nullable = true, length = 20)
+    public String getfPhone() {
+        return fPhone;
+    }
+
+    public void setfPhone(String fPhone) {
+        this.fPhone = fPhone;
+    }
+
+    @Basic
+    @Column(name = "f_fax", nullable = true, length = 50)
+    public String getfFax() {
+        return fFax;
+    }
+
+    public void setfFax(String fFax) {
+        this.fFax = fFax;
+    }
+
+    @Basic
+    @Column(name = "f_website", nullable = true, length = 100)
+    public String getfWebsite() {
+        return fWebsite;
+    }
+
+    public void setfWebsite(String fWebsite) {
+        this.fWebsite = fWebsite;
+    }
+
+    @Basic
+    @Column(name = "f_service_number", nullable = false, length = 20)
+    public String getfServiceNumber() {
+        return fServiceNumber;
+    }
+
+    public void setfServiceNumber(String fServiceNumber) {
+        this.fServiceNumber = fServiceNumber;
+    }
+
+    @Basic
+    @Column(name = "f_create_time", nullable = false)
+    public Date getfCreateTime() {
+        return fCreateTime;
+    }
+
+    public void setfCreateTime(Date fCreateTime) {
+        this.fCreateTime = fCreateTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TCompanyInfoEntity that = (TCompanyInfoEntity) o;
+        return fId == that.fId &&
+                Objects.equals(fName, that.fName) &&
+                Objects.equals(fCategory, that.fCategory) &&
+                Objects.equals(fLogo, that.fLogo) &&
+                Objects.equals(fContact, that.fContact) &&
+                Objects.equals(fMobile, that.fMobile) &&
+                Objects.equals(fEmail, that.fEmail) &&
+                Objects.equals(fAddress, that.fAddress) &&
+                Objects.equals(fPostalCode, that.fPostalCode) &&
+                Objects.equals(fPhone, that.fPhone) &&
+                Objects.equals(fFax, that.fFax) &&
+                Objects.equals(fWebsite, that.fWebsite) &&
+                Objects.equals(fServiceNumber, that.fServiceNumber) &&
+                Objects.equals(fCreateTime, that.fCreateTime);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(fId, fName, fCategory, fLogo, fContact, fMobile, fEmail, fAddress, fPostalCode, fPhone, fFax, fWebsite, fServiceNumber, fCreateTime);
+    }
+}

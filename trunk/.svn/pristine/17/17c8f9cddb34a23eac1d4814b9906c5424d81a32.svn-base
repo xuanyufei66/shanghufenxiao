@@ -1,0 +1,110 @@
+package com.payease.scfordermis.service.impl;
+
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.dao.RoleInfoDao;
+import com.payease.scfordermis.entity.TRoleInfoEntity;
+import com.payease.scfordermis.service.RoleAuthService;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpSession;
+import java.util.Date;
+
+/**
+ * 首页-设置-角色权限
+ * @Created By liuxiaoming
+ * @CreateTime 2018/1/15 下午1:55
+ **/
+@Service
+public class RoleAuthServiceImpl implements RoleAuthService {
+
+    @Autowired
+    RoleInfoDao roleInfoDao;
+
+    /**
+     * 角色名字修改接口
+     */
+    @Override
+    public ResultBo saveName(HttpSession session, Long roleId, String roleName) {
+        ResultBo result = ResultBo.build();
+        TRoleInfoEntity one = roleInfoDao.getOne(roleId);
+
+        if(one == null){                     return result.fail();}
+        if(StringUtils.isBlank(roleName)){return result.fail();}
+        Long fCompanyId = Long.valueOf("1");
+        //todo   Long fCompanyId
+//        Long fCompanyId = (Long) session.getAttribute("fCompanyId");
+//        if(session.getAttribute("fCompanyId") == null){
+//            return result.fail();
+//        }
+        Long sessionId = Long.valueOf("1");
+        //todo   Long sessionId
+//        if(session.getAttribute("fId") == null){
+//            return result.fail();
+//        }
+
+
+        one.setfName(roleName);
+        one.setfOperate(sessionId);
+        one.setfCompanyId(fCompanyId);
+        one.setfUpdateTime(new Date());
+        roleInfoDao.save(one);
+
+        return result;
+    }
+
+    /**
+     * 角色权限修改接口
+     */
+    @Override
+    public ResultBo saveAuth(HttpSession session, Long roleId, String roleMenus) {
+        ResultBo result = ResultBo.build();
+        TRoleInfoEntity one = roleInfoDao.findOne(roleId);
+
+        if(one == null){                     return result.fail();}
+        if(StringUtils.isBlank(roleMenus)){return result.fail();}
+        Long fCompanyId = Long.valueOf("1");
+        //todo   Long fCompanyId
+//        Long fCompanyId = (Long) session.getAttribute("fCompanyId");
+//        if(session.getAttribute("fCompanyId") == null){
+//            return result.fail();
+//        }
+        Long sessionId = Long.valueOf("1");
+        //todo   Long sessionId
+//        if(session.getAttribute("fId") == null){
+//            return result.fail();
+//        }
+
+
+        one.setfMenus(roleMenus);
+        one.setfOperate(sessionId);
+        one.setfCompanyId(fCompanyId);
+        one.setfUpdateTime(new Date());
+        roleInfoDao.save(one);
+
+        return result;
+    }
+
+
+    /**
+     * 角色权限明细接口
+     */
+    @Override
+    public ResultBo authDetail(HttpSession session, Long roleId) {
+        ResultBo result = ResultBo.build();
+        TRoleInfoEntity one = roleInfoDao.findOne(roleId);
+        if(one == null){
+            return result.fail();
+        }
+            result.setResultBody(
+                    StringUtils.isNotBlank(one.getfMenus())?one.getfMenus():""
+            );
+
+        return result;
+    }
+
+
+
+
+}

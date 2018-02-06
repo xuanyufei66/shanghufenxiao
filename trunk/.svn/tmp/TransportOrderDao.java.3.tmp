@@ -1,0 +1,47 @@
+package com.payease.scfordermis.dao;
+
+<<<<<<< .mine
+
+=======
+>>>>>>> .r1465
+import com.payease.scfordermis.entity.TTransportOrderEntity;
+<<<<<<< .mine
+
+=======
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+>>>>>>> .r1465
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+<<<<<<< .mine
+
+=======
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+>>>>>>> .r1465
+
+import java.util.List;
+
+/**
+ * Created by YHF on 2018/1/12.
+ */
+@Repository
+public interface TransportOrderDao extends JpaRepository<TTransportOrderEntity, Long>, JpaSpecificationExecutor {
+
+    List<TTransportOrderEntity> findByFSearchKeyContainingAndFCompanyId(String searchKey, Long companyId);
+
+    List<TTransportOrderEntity> findByFAreaInfoIdOne(Long areaInfoLevel);
+
+    List<TTransportOrderEntity> findByFAreaInfoIdTwo(Long areaInfoLevel);
+
+    //根据查找司机手机  来  登录
+    List<TTransportOrderEntity> findByFDriverPhone(String username);
+
+    //根据车牌号
+    List<TTransportOrderEntity> findByFCarNum(String fCarNum);
+
+    //  通过 f_driver_phone 司机手机号  f_status ForGoods-待提货 校验是否发送短线验证码
+    Integer countByFDriverPhoneAndFStatus(String fDriverPhone, String fStatus);
+
+
+}

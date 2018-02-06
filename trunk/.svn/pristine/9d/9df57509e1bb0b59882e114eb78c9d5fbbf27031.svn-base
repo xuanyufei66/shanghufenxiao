@@ -1,0 +1,43 @@
+package com.payease.scfordermis.bean;
+
+/**
+ * Created by zhangzhili on 2018/1/5.
+ * 返回状态码自定义类
+ * ps：注意codeId值是 int 类型 状态码别太长
+ */
+public enum Status {
+
+    SUCCESS(0, "OK"), FAIL(1, "fail"),QUERYERROR(-1,"请求参数异常"),TIMEOUT(-2,"登录已失效"),
+    GOODSCATEFAIL(1001,"该商品分类下已有商品，请修改商品所属分类后再进行删除操作！"),GOODSCATEREPEAT(1002,"分类名称不能重复"),GOODUNITREOEAT(1003,"计量单位名称不能重复")
+    ,GOODUNITFAIL(1004,"已有商品使用该计量单位，不能删除"),GOODNAMEREPEAT(1005,"商品名称不能重复"),FORMARTDELETE(1006,"该商品已经发生订单，不能删除"), GOODFORMATNORE(1007,"商品编码不能重复"),
+    UPDATEFAIL(9001,"更新时数据库中值有变化，更新失败！"),CHECKISNULL(2001,"获取参数失败"),CHECKACCOUNTSTATUS(2002,"查找账号为空,失败"),
+    CHECKPWDERROR(2003,"查询密码错误"),CHECKPWDNULL(2004,"查询密码为空"),CHECKROLEIDISNULL(2005,"查找角色id失败"),CHECKROLEINFOERROR(2006,"角色信息获取权限失败"),
+    CHECKDEPARTMENTINFOERROR(2007,"部门id查询失败"),SAVEPWDERROR(2008,"重设密码错误"),SAVEACCINFOERROR(2009,"修改用户信息"),COMPANYINFOERRO(2010,"公司信息获取失败"),
+    SAVECOMINFOERROR(2011,"保存公司信息失败"),APPLOGINERROR(3001,"app端登录失败"),APPAUTOLOGINERROR(3002,"app端自动登录失败"),APPLOGOUT(3003,"app端登出失败"),PICKCODE(4001,"二维码失效"),
+    MSGCODEERROR(4001,"短信验证码错误"),CONSUMERISNULL(4002,"用户不存在")
+    ;
+    private Integer codeId;
+    private String message;
+
+    Status(Integer codeId, String message) {
+        this.codeId = codeId;
+        this.message = message;
+    }
+
+
+    public Integer getCodeId() {
+        return codeId;
+    }
+
+    public void setCodeId(Integer codeId) {
+        this.codeId = codeId;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+}

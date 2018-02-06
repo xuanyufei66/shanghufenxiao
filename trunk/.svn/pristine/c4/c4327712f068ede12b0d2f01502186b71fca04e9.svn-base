@@ -1,0 +1,87 @@
+package com.payease.scfordermis.bo;
+
+import com.payease.scfordermis.bean.Status;
+
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Created by lch on 2018/1/4.
+ * desc: 返回值对象
+ */
+public class ResultBo<T> implements Serializable {
+
+    private Integer codeId;
+
+    private String message;
+
+    private T resultBody;
+
+
+    /**
+     * 建立对象
+     *
+     * @return
+     */
+    public static ResultBo build() {
+        ResultBo resultBo = new ResultBo();
+        resultBo.setCodeId(Status.SUCCESS.getCodeId());
+        resultBo.setMessage(Status.SUCCESS.getMessage());
+        return resultBo;
+    }
+
+
+    /**
+     * 失败调用
+     *
+     * @return
+     */
+    public ResultBo fail() {
+        this.setStatus(Status.FAIL);
+        return this;
+    }
+
+
+    public ResultBo setCodeId(Status status) {
+        setStatus(status);
+        return this;
+    }
+
+
+    private void setStatus(Status status) {
+        this.setCodeId(status.getCodeId());
+        this.setMessage(status.getMessage());
+    }
+
+
+    private ResultBo() {
+
+    }
+
+    public Integer getCodeId() {
+        return codeId;
+    }
+
+    public void setCodeId(Integer codeId) {
+        this.codeId = codeId;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public T getResultBody() {
+        return resultBody;
+    }
+
+    public void setResultBody(T resultBody) {
+        this.resultBody = resultBody;
+    }
+}

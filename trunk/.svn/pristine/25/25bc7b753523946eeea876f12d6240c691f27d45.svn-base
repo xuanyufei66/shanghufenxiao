@@ -1,0 +1,47 @@
+package com.payease.scfordermis.service;
+
+import com.payease.scfordermis.bo.requestBo.GoodAddOrUpdateBo;
+import com.payease.scfordermis.bo.responseBo.GoodsManageBo;
+import com.payease.scfordermis.bo.responseBo.QueryCategoryBo;
+import com.payease.scfordermis.bo.ResultBo;
+import org.springframework.data.domain.Page;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+
+import java.util.List;
+
+
+/**
+ * Created by ljp on 2018/1/10.
+ */
+public interface IGoodsService {
+    /**
+     * 商品分类
+     */
+    //商品添加与修改接口
+    public ResultBo categoryAddOrUpdate(Long id,String categoryName,Long categoryParentId);
+    //商品分类删除接口
+    public ResultBo categoryDetele(Long id);
+    //商品分类列表
+    public List<QueryCategoryBo> getCategoryList();
+    /**
+     * 计量单位
+     */
+    //新增计量单位
+    public ResultBo unitAdd(String unitName);
+    //删除计量单位
+    public ResultBo unitDelete(Long id);
+    //计量单位列表
+    public ResultBo unitList();
+
+    /**
+     * 商品管理
+     */
+    //商品列表
+    public Page<GoodsManageBo> getGoodsList(Integer category,Integer level,String searchCondition, Integer page, Integer size);
+    //显示商品修改信息接口
+    public GoodAddOrUpdateBo getGoodsMessage(Long goodsId);
+    //添加修改商品信息接口
+    //public void goodsAddOrUpdate();
+    //删除商品
+    //public void goodsDetele();
+}

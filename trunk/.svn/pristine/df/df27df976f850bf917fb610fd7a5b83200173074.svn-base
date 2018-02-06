@@ -1,0 +1,73 @@
+package com.payease.scfordermis.bo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+import java.util.Date;
+
+/**
+ * Created by YHF on 2018/1/10.
+ */
+@ApiModel(value = "计量单位实体类",description = "计量单位实体类")
+public class UnitBo {
+    @ApiModelProperty(value = "公司id",dataType = "long",required = true)
+    private long fCompanyId;
+    @ApiModelProperty(value = "创建时间",dataType = "date",required = true)
+    private Date fCreateTime;
+    @ApiModelProperty(value = "计量单位名字",dataType = "string",required = true)
+    private String fName;   //计量单位名字
+    @ApiModelProperty(value = "long类型代表操作人id",dataType = "long")
+    private long fOperate;  //操作人id
+    @ApiModelProperty(value = "更新时间",dataType = "date")
+    private Date  fUpdateTime;
+    @ApiModelProperty(value = "long类型代表主键id")
+    private Long fId;
+
+    public Long getfId() {
+        return fId;
+    }
+
+    public void setfId(Long fId) {
+        this.fId = fId;
+    }
+
+    public long getfCompanyId() {
+        return fCompanyId;
+    }
+
+    public void setfCompanyId(long fCompanyId) {
+        this.fCompanyId = fCompanyId;
+    }
+
+    public Date getfCreateTime() {
+        return fCreateTime;
+    }
+
+    public void setfCreateTime(Date fCreateTime) {
+        this.fCreateTime = fCreateTime;
+    }
+
+    public String getfName() {
+        return fName;
+    }
+
+    public void setfName(String fName) {
+        this.fName = fName;
+    }
+
+    public long getfOperate() {
+        return fOperate;
+    }
+
+    public void setfOperate(long fOperate) {
+        this.fOperate = fOperate;
+    }
+
+    public Date getfUpdateTime() {
+        return fUpdateTime;
+    }
+
+    public void setfUpdateTime(Date fUpdateTime) {
+        this.fUpdateTime = fUpdateTime;
+    }
+}

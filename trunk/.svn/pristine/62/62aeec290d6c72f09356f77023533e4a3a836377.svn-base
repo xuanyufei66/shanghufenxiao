@@ -1,0 +1,281 @@
+package com.payease.scfordermis.entity;
+
+import javax.persistence.*;
+import java.util.Date;
+import java.util.Objects;
+
+/**
+ * @Author : zhangwen
+ * @Data : 2018/1/10
+ * @Description :
+ */
+@Entity
+@Table(name = "t_consumer_info")
+public class TConsumerInfoEntity {
+    private long fId;
+    private String fName;
+    private long fLevelId;
+    private String fCode;
+    private long fAreaIdOne;
+    private long fAreaIdTwo;
+    private String fAddress;
+    private String fContact;
+    private String fPhone;
+    private String fPosition;
+    private String fEmail;
+    private String fQq;
+    private String fIndentNo;
+    private String fIndentPassword;
+    //客户状态 open-开启 close-禁用
+    private String fIndentStatus;
+    private Date fCreateTime;
+    private Date fUpdateTime;
+    private Long fOperate;
+    private long fCompanyId;
+    private String fIsDelete;
+    private String fSearchKey;
+
+    @Id
+    @Column(name = "f_id", nullable = false)
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    public long getfId() {
+        return fId;
+    }
+
+    public void setfId(long fId) {
+        this.fId = fId;
+    }
+
+    @Basic
+    @Column(name = "f_name", nullable = false, length = 20)
+    public String getfName() {
+        return fName;
+    }
+
+    public void setfName(String fName) {
+        this.fName = fName;
+    }
+
+    @Basic
+    @Column(name = "f_level_id", nullable = false)
+    public long getfLevelId() {
+        return fLevelId;
+    }
+
+    public void setfLevelId(long fLevelId) {
+        this.fLevelId = fLevelId;
+    }
+
+    @Basic
+    @Column(name = "f_code", nullable = true, length = 20)
+    public String getfCode() {
+        return fCode;
+    }
+
+    public void setfCode(String fCode) {
+        this.fCode = fCode;
+    }
+
+    @Basic
+    @Column(name = "f_area_id_one", nullable = false)
+    public long getfAreaIdOne() {
+        return fAreaIdOne;
+    }
+
+    public void setfAreaIdOne(long fAreaIdOne) {
+        this.fAreaIdOne = fAreaIdOne;
+    }
+
+    @Basic
+    @Column(name = "f_indent_status", nullable = false )
+    public String getfIndentStatus() {
+        return fIndentStatus;
+    }
+
+    public void setfIndentStatus(String fIndentStatus) {
+        this.fIndentStatus = fIndentStatus;
+    }
+
+    @Basic
+    @Column(name = "f_area_id_two", nullable = false)
+    public long getfAreaIdTwo() {
+        return fAreaIdTwo;
+    }
+
+    public void setfAreaIdTwo(long fAreaIdTwo) {
+        this.fAreaIdTwo = fAreaIdTwo;
+    }
+
+    @Basic
+    @Column(name = "f_address", nullable = true, length = 500)
+    public String getfAddress() {
+        return fAddress;
+    }
+
+    public void setfAddress(String fAddress) {
+        this.fAddress = fAddress;
+    }
+
+    @Basic
+    @Column(name = "f_contact", nullable = false, length = 50)
+    public String getfContact() {
+        return fContact;
+    }
+
+    public void setfContact(String fContact) {
+        this.fContact = fContact;
+    }
+
+    @Basic
+    @Column(name = "f_phone", nullable = false, length = 20)
+    public String getfPhone() {
+        return fPhone;
+    }
+
+    public void setfPhone(String fPhone) {
+        this.fPhone = fPhone;
+    }
+
+    @Basic
+    @Column(name = "f_position", nullable = true, length = 20)
+    public String getfPosition() {
+        return fPosition;
+    }
+
+    public void setfPosition(String fPosition) {
+        this.fPosition = fPosition;
+    }
+
+    @Basic
+    @Column(name = "f_email", nullable = true, length = 50)
+    public String getfEmail() {
+        return fEmail;
+    }
+
+    public void setfEmail(String fEmail) {
+        this.fEmail = fEmail;
+    }
+
+    @Basic
+    @Column(name = "f_qq", nullable = true, length = 20)
+    public String getfQq() {
+        return fQq;
+    }
+
+    public void setfQq(String fQq) {
+        this.fQq = fQq;
+    }
+
+    @Basic
+    @Column(name = "f_indent_no", nullable = false, length = 50)
+    public String getfIndentNo() {
+        return fIndentNo;
+    }
+
+    public void setfIndentNo(String fIndentNo) {
+        this.fIndentNo = fIndentNo;
+    }
+
+    @Basic
+    @Column(name = "f_indent_password", nullable = false, length = 50)
+    public String getfIndentPassword() {
+        return fIndentPassword;
+    }
+
+    public void setfIndentPassword(String fIndentPassword) {
+        this.fIndentPassword = fIndentPassword;
+    }
+
+    @Basic
+    @Column(name = "f_create_time", nullable = false)
+    public Date getfCreateTime() {
+        return fCreateTime;
+    }
+
+    public void setfCreateTime(Date fCreateTime) {
+        this.fCreateTime = fCreateTime;
+    }
+
+    @Basic
+    @Column(name = "f_update_time", nullable = true)
+    public Date getfUpdateTime() {
+        return fUpdateTime;
+    }
+
+    public void setfUpdateTime(Date fUpdateTime) {
+        this.fUpdateTime = fUpdateTime;
+    }
+
+    @Basic
+    @Column(name = "f_operate", nullable = true)
+    public Long getfOperate() {
+        return fOperate;
+    }
+
+    public void setfOperate(Long fOperate) {
+        this.fOperate = fOperate;
+    }
+
+    @Basic
+    @Column(name = "f_company_id", nullable = false)
+    public long getfCompanyId() {
+        return fCompanyId;
+    }
+
+    public void setfCompanyId(long fCompanyId) {
+        this.fCompanyId = fCompanyId;
+    }
+
+    @Basic
+    @Column(name = "f_is_delete", nullable = false, length = 10)
+    public String getfIsDelete() {
+        return fIsDelete;
+    }
+
+    public void setfIsDelete(String fIsDelete) {
+        this.fIsDelete = fIsDelete;
+    }
+
+    @Basic
+    @Column(name = "f_search_key", nullable = false, length = 300)
+    public String getfSearchKey() {
+        return fSearchKey;
+    }
+
+    public void setfSearchKey(String fSearchKey) {
+        this.fSearchKey = fSearchKey;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TConsumerInfoEntity that = (TConsumerInfoEntity) o;
+        return fId == that.fId &&
+                fLevelId == that.fLevelId &&
+                fAreaIdOne == that.fAreaIdOne &&
+                fAreaIdTwo == that.fAreaIdTwo &&
+                fCompanyId == that.fCompanyId &&
+                Objects.equals(fName, that.fName) &&
+                Objects.equals(fCode, that.fCode) &&
+                Objects.equals(fAddress, that.fAddress) &&
+                Objects.equals(fContact, that.fContact) &&
+                Objects.equals(fPhone, that.fPhone) &&
+                Objects.equals(fPosition, that.fPosition) &&
+                Objects.equals(fEmail, that.fEmail) &&
+                Objects.equals(fQq, that.fQq) &&
+                Objects.equals(fIndentNo, that.fIndentNo) &&
+                Objects.equals(fIndentPassword, that.fIndentPassword) &&
+                Objects.equals(fCreateTime, that.fCreateTime) &&
+                Objects.equals(fUpdateTime, that.fUpdateTime) &&
+                Objects.equals(fOperate, that.fOperate) &&
+                Objects.equals(fIsDelete, that.fIsDelete) &&
+                Objects.equals(fSearchKey, that.fSearchKey);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(fId, fName, fLevelId, fCode, fAreaIdOne, fAreaIdTwo, fAddress, fContact, fPhone, fPosition, fEmail, fQq, fIndentNo, fIndentPassword, fCreateTime, fUpdateTime, fOperate, fCompanyId, fIsDelete, fSearchKey);
+    }
+}

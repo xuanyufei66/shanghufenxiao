@@ -1,0 +1,526 @@
+package com.payease.scfordermis.controller;
+
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.bo.requestBo.ReqDistributionOrderBo;
+import com.payease.scfordermis.bo.requestBo.ReqSaveOrUpdateOrderBo;
+import com.payease.scfordermis.bo.responseBo.*;
+import com.payease.scfordermis.exception.CommonRuntimeException;
+import com.payease.scfordermis.service.IDistributionOrderService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.*;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created by lch on 2018/1/10.
+ * <p>
+ * 集散地订单
+ */
+
+@RestController
+@RequestMapping("order")
+@Api(tags = {"集散地订单-李长宏"})
+public class OrderController extends BaseController {
+
+    private static final Logger log = LoggerFactory.getLogger(OrderController.class);
+
+    @Autowired
+    private IDistributionOrderService distributionOrderService;
+
+    @ExceptionHandler
+    public ResultBo expHandler(Exception e) {
+        log.error("",e);
+        return ResultBo.build().errorHandle(e);
+    }
+
+
+
+    /**
+     * 集散地订单列表
+     */
+    @GetMapping("orderlist")
+    @ApiOperation(value = "集散地订单列表", response = RespDistributionOrderBo.class)
+    public ResultBo orderList(ReqDistributionOrderBo reqDistributionOrderBo) {
+        List<RespDistributionOrderBo> respDistributionOrderBoList = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        String fCreateTime = sdf.format(new Date());
+        RespDistributionOrderBo respDistributionOrderBo = new RespDistributionOrderBo();
+        respDistributionOrderBo.setId(1l);
+        respDistributionOrderBo.setfOrderNum("DH-20171101-436781");
+        respDistributionOrderBo.setfSpecial("yes");
+        respDistributionOrderBo.setfTransportNum("YS-20171013-000030");
+        respDistributionOrderBo.setfCreateTime(fCreateTime);
+        respDistributionOrderBo.setConsumerName("北京新发水果商户");
+        respDistributionOrderBo.setfOrderAmountPay("12000.00");
+        respDistributionOrderBo.setfOrderStatus(0);
+        respDistributionOrderBo.setfPayStatus("wait");
+        respDistributionOrderBoList.add(respDistributionOrderBo);
+
+        RespDistributionOrderBo respDistributionOrderBo1 = new RespDistributionOrderBo();
+        respDistributionOrderBo1.setId(2l);
+        respDistributionOrderBo1.setfOrderNum("DH-20171101-436781");
+        respDistributionOrderBo1.setfSpecial("no");
+        respDistributionOrderBo1.setfTransportNum("YS-20171013-000030");
+        respDistributionOrderBo1.setfCreateTime(fCreateTime);
+        respDistributionOrderBo1.setConsumerName("北京新发水果商户");
+        respDistributionOrderBo1.setfOrderAmountPay("12000.00");
+        respDistributionOrderBo1.setfOrderStatus(0);
+        respDistributionOrderBo1.setfPayStatus("wait");
+        respDistributionOrderBoList.add(respDistributionOrderBo1);
+
+        RespDistributionOrderBo respDistributionOrderBo2 = new RespDistributionOrderBo();
+        respDistributionOrderBo2.setId(3l);
+        respDistributionOrderBo2.setfOrderNum("DH-20171101-436781");
+        respDistributionOrderBo2.setfSpecial("yes");
+        respDistributionOrderBo2.setfTransportNum("YS-20171013-000030");
+        respDistributionOrderBo2.setfCreateTime(fCreateTime);
+        respDistributionOrderBo2.setConsumerName("北京新发水果商户");
+        respDistributionOrderBo2.setfOrderAmountPay("26000.00");
+        respDistributionOrderBo2.setfOrderStatus(0);
+        respDistributionOrderBo2.setfPayStatus("wait");
+        respDistributionOrderBoList.add(respDistributionOrderBo2);
+
+        PageResponseCommBean pageResponseCommBean = new PageResponseCommBean();
+        pageResponseCommBean.setContent(respDistributionOrderBoList);
+        pageResponseCommBean.setNumber(1);
+        pageResponseCommBean.setSize(10);
+        pageResponseCommBean.setTotalElements(1);
+        pageResponseCommBean.setTotalPages(1);
+        ResultBo resultBo = ResultBo.build();
+        resultBo.setResultBody(pageResponseCommBean);
+
+        //        putUserInfo();
+        //        RespLoginPCBean respLoginPCBean = getUserInfo();
+        //        ResultBo resultBo = ResultBo.build();
+        //        Page<RespDistributionOrderBo> distributionOrderBoList =
+        // distributionOrderService.orderList(respLoginPCBean, reqDistributionOrderBo);
+        //        resultBo.setResultBody(distributionOrderBoList);
+        return resultBo;
+    }
+
+    /**
+     * 客户级别列表
+     */
+    @GetMapping("customerlevellist")
+    @ApiOperation(value = "客户级别列表", response = RespCustomerLevelBo.class)
+    public ResultBo customerLevelList() {
+        List<RespCustomerLevelBo> respCustomerLevelBos = new ArrayList<>();
+        RespCustomerLevelBo respCustomerLevelBo = new RespCustomerLevelBo();
+        respCustomerLevelBo.setfId(1l);
+        respCustomerLevelBo.setfName("一级经销商");
+        respCustomerLevelBos.add(respCustomerLevelBo);
+        RespCustomerLevelBo respCustomerLevelBo1 = new RespCustomerLevelBo();
+        respCustomerLevelBo1.setfId(2l);
+        respCustomerLevelBo1.setfName("二级经销商");
+        respCustomerLevelBos.add(respCustomerLevelBo1);
+        RespCustomerLevelBo respCustomerLevelBo2 = new RespCustomerLevelBo();
+        respCustomerLevelBo2.setfId(3l);
+        respCustomerLevelBo2.setfName("三级经销商");
+        respCustomerLevelBos.add(respCustomerLevelBo2);
+        ResultBo resultBo = ResultBo.build();
+        resultBo.setResultBody(respCustomerLevelBos);
+
+        //        putUserInfo();
+        //        RespLoginPCBean respLoginPCBean = getUserInfo();
+        //        ResultBo resultBo = ResultBo.build();
+        //        List<RespCustomerLevelBo> customerLevelBoList = distributionOrderService
+        // .customerLevelList(respLoginPCBean);
+        //        resultBo.setResultBody(customerLevelBoList);
+        return resultBo;
+    }
+
+    /**
+     * 销售地区列表
+     */
+    @GetMapping("salesarealist")
+    @ApiOperation(value = "销售地区列表", response = RespAreaInfoBo.class)
+    public ResultBo salesAreaList() {
+
+        List<RespAreaInfoBo> respAreaInfoBos = new ArrayList<>();
+        RespAreaInfoBo respAreaInfoBo = new RespAreaInfoBo();
+        respAreaInfoBo.setfId(2l);
+        respAreaInfoBo.setfName("天津");
+        respAreaInfoBo.setfLevel("two");
+        respAreaInfoBos.add(respAreaInfoBo);
+        RespAreaInfoBo respAreaInfoBo4 = new RespAreaInfoBo();
+        respAreaInfoBo4.setfId(5l);
+        respAreaInfoBo4.setfName("北京");
+        respAreaInfoBo4.setfLevel("two");
+        respAreaInfoBos.add(respAreaInfoBo4);
+        List<RespAreaInfoBo> respAreaInfoBos1 = new ArrayList<>();
+        RespAreaInfoBo respAreaInfoBo1 = new RespAreaInfoBo();
+        respAreaInfoBo1.setfId(4l);
+        respAreaInfoBo1.setfName("上海");
+        respAreaInfoBo1.setfLevel("two");
+        respAreaInfoBos1.add(respAreaInfoBo1);
+
+        List<RespAreaInfoBo> respAreaInfoBoList = new ArrayList<>();
+        RespAreaInfoBo respAreaInfoBo2 = new RespAreaInfoBo();
+        respAreaInfoBo2.setfId(1l);
+        respAreaInfoBo2.setfName("华北");
+        respAreaInfoBo2.setfLevel("one");
+        respAreaInfoBo2.setRespAreaInfoBoList(respAreaInfoBos);
+        respAreaInfoBoList.add(respAreaInfoBo2);
+        RespAreaInfoBo respAreaInfoBo3 = new RespAreaInfoBo();
+        respAreaInfoBo3.setfId(3l);
+        respAreaInfoBo3.setfName("华东");
+        respAreaInfoBo3.setfLevel("one");
+        respAreaInfoBo3.setRespAreaInfoBoList(respAreaInfoBos1);
+        respAreaInfoBoList.add(respAreaInfoBo3);
+        ResultBo resultBo = ResultBo.build();
+        resultBo.setResultBody(respAreaInfoBoList);
+
+        //        putUserInfo();
+        //        RespLoginPCBean respLoginPCBean = getUserInfo();
+        //        ResultBo resultBo = ResultBo.build();
+        //        List<RespAreaInfoBo> areaInfoBoList = distributionOrderService.salesAreaList
+        // (respLoginPCBean);
+        //        resultBo.setResultBody(areaInfoBoList);
+        return resultBo;
+    }
+
+    /**
+     * 集散地列表
+     */
+    @GetMapping("transportlist")
+    @ApiOperation(value = "集散地运单列表", response = RespDistributionBo.class)
+    public ResultBo transportList() {
+        List<RespDistributionBo> respDistributionBoList = new ArrayList<>();
+        RespDistributionBo respDistributionBo = new RespDistributionBo();
+        respDistributionBo.setId(1l);
+        respDistributionBo.setfTransportNum("YS-20171229-102012");
+        respDistributionBo.setAreaInfoName("北京丰台");
+        respDistributionBo.setfCarNum("桂CF5890");
+        respDistributionBo.setfDriverName("孟栋");
+        respDistributionBo.setfDriverPhone("15921576966");
+        respDistributionBoList.add(respDistributionBo);
+
+        RespDistributionBo respDistributionBo1 = new RespDistributionBo();
+        respDistributionBo1.setId(2l);
+        respDistributionBo1.setfTransportNum("YS-20171221-231231");
+        respDistributionBo1.setAreaInfoName("天津津南");
+        respDistributionBo1.setfCarNum("桂HG5889");
+        respDistributionBo1.setfDriverName("张欣欣");
+        respDistributionBo1.setfDriverPhone("13127189981");
+        respDistributionBoList.add(respDistributionBo1);
+
+        RespDistributionBo respDistributionBo2 = new RespDistributionBo();
+        respDistributionBo2.setId(3l);
+        respDistributionBo2.setfTransportNum("YS-20171219-431231");
+        respDistributionBo2.setAreaInfoName("上海虹桥");
+        respDistributionBo2.setfCarNum("桂FD7811");
+        respDistributionBo2.setfDriverName("徐晓兵");
+        respDistributionBo2.setfDriverPhone("15921572879");
+        respDistributionBoList.add(respDistributionBo2);
+        ResultBo resultBo = ResultBo.build();
+        resultBo.setResultBody(respDistributionBoList);
+
+        //        putUserInfo();
+        //        RespLoginPCBean respLoginPCBean = getUserInfo();
+        //        ResultBo resultBo = ResultBo.build();
+        //        List<RespDistributionBo> distributionBoList = distributionOrderService
+        // .distributionList(respLoginPCBean);
+        //        resultBo.setResultBody(distributionBoList);
+        return resultBo;
+    }
+
+    /**
+     * 客户列表
+     */
+    @GetMapping("customerlist")
+    @ApiOperation(value = "客户列表", response = RespCustomerBo.class)
+    public ResultBo customerList() {
+
+        List<RespCustomerBo> respCustomerBoList = new ArrayList<>();
+        RespCustomerBo respCustomerBo = new RespCustomerBo();
+        respCustomerBo.setfId(1l);
+        respCustomerBo.setfName("北京新发水果商户");
+        respCustomerBo.setfCode("HB1001");
+        respCustomerBo.setfContact("郭凯");
+        respCustomerBo.setfPhone("18502102211");
+        respCustomerBoList.add(respCustomerBo);
+
+        RespCustomerBo respCustomerBo1 = new RespCustomerBo();
+        respCustomerBo1.setfId(2l);
+        respCustomerBo1.setfName("天津津南水果经销商");
+        respCustomerBo1.setfCode("HB1002");
+        respCustomerBo1.setfContact("张欣欣");
+        respCustomerBo1.setfPhone("13127189981");
+        respCustomerBoList.add(respCustomerBo1);
+
+        RespCustomerBo respCustomerBo2 = new RespCustomerBo();
+        respCustomerBo2.setfId(3l);
+        respCustomerBo2.setfName("上海徐汇水果商户");
+        respCustomerBo2.setfCode("HD2001");
+        respCustomerBo2.setfContact("徐晓兵");
+        respCustomerBo2.setfPhone("15921572879");
+        respCustomerBoList.add(respCustomerBo2);
+
+        ResultBo resultBo = ResultBo.build();
+        resultBo.setResultBody(respCustomerBoList);
+
+        //        putUserInfo();
+        //        RespLoginPCBean respLoginPCBean = getUserInfo();
+        //        ResultBo resultBo = ResultBo.build();
+        //        List<RespCustomerBo> customerBoList = distributionOrderService.customerList
+        // (respLoginPCBean);
+        //        resultBo.setResultBody(customerBoList);
+        return resultBo;
+    }
+
+    /**
+     * 运输单内商品列表信息
+     */
+    @GetMapping("productlist")
+    @ApiOperation(value = "运输单内商品列表信息", response = RespProductBo.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "transportId", value = "运单id", paramType =
+        "query", required = true)})
+    public ResultBo productList(Long transportId) {
+        List<RespProductBo> respProductBoList = new ArrayList<>();
+        RespProductBo respProductBo = new RespProductBo();
+        respProductBo.setTransportOrderDetailId(1l);
+        respProductBo.setfPic("dasdasdsadasd");
+        respProductBo.setfCode("Y2001");
+        respProductBo.setProductName("越南大芒果");
+        respProductBo.setfName("品质：优等");
+        respProductBo.setQuantity("8000");
+        respProductBo.setfPrice("8.00");
+        respProductBo.setUnit("kg");
+        respProductBoList.add(respProductBo);
+
+        RespProductBo respProductBo1 = new RespProductBo();
+        respProductBo1.setTransportOrderDetailId(2l);
+        respProductBo1.setfPic("dasdasdsadasd");
+        respProductBo1.setfCode("Y3001");
+        respProductBo1.setProductName("越南菠萝");
+        respProductBo1.setfName("普通");
+        respProductBo1.setQuantity("5000");
+        respProductBo1.setfPrice("10.00");
+        respProductBo1.setUnit("kg");
+        respProductBoList.add(respProductBo1);
+
+        ResultBo resultBo = ResultBo.build();
+        resultBo.setResultBody(respProductBoList);
+
+        //        ResultBo resultBo = ResultBo.build();
+        //        List<RespProductBo> productBoList = distributionOrderService.productList
+        // (transportId);
+        //        resultBo.setResultBody(productBoList);
+        return resultBo;
+    }
+
+    /**
+     * 操作日志
+     */
+    @GetMapping("notelist")
+    @ApiOperation(value = "操作日志", response = RespOperationLogBo.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "orderId", value = "订单id", paramType = "query",
+        required = true)})
+    public ResultBo noteList(Long orderId) {
+        List<RespOperationLogBo> respOperationLogBoList = new ArrayList<>();
+        RespOperationLogBo respOperationLogBo = new RespOperationLogBo();
+        respOperationLogBo.setCompanyName("东盟水果商会");
+        respOperationLogBo.setfOperator("郭俊杰");
+        respOperationLogBo.setfCreatetime("2018-01-10 09:08");
+        respOperationLogBo.setfOperatingType("createOrder");
+        respOperationLogBo.setfNote("已提交订货单，等待订货单审核");
+        respOperationLogBoList.add(respOperationLogBo);
+
+        RespOperationLogBo respOperationLogBo1 = new RespOperationLogBo();
+        respOperationLogBo1.setCompanyName("东盟水果商会");
+        respOperationLogBo1.setfOperator("李尊");
+        respOperationLogBo1.setfCreatetime("2018-01-11 09:34");
+        respOperationLogBo1.setfOperatingType("updateOrder");
+        respOperationLogBo1.setfNote("订单预交货日期从：空 修改成：2018-01-24 00:00");
+        respOperationLogBoList.add(respOperationLogBo1);
+        ResultBo resultBo = ResultBo.build();
+        resultBo.setResultBody(respOperationLogBoList);
+
+        //        ResultBo resultBo = ResultBo.build();
+        //        List<RespOperationLogBo> operationLogBoList = distributionOrderService
+        // .operationLog(orderId);
+        //        resultBo.setResultBody(operationLogBoList);
+        return resultBo;
+    }
+
+    /**
+     * 添加备注（修改订单页面点击添加备注按钮调用该接口，新增订单页面不调用）
+     */
+    @PostMapping("addremark")
+    @ApiOperation(value = "添加备注（修改订单页面点击添加备注按钮调用该接口，新增订单页面不调用）")
+    @ApiImplicitParams({@ApiImplicitParam(name = "orderId", value = "订单id", paramType = "query",
+        required = true), @ApiImplicitParam(name = "content", value = "备注内容", paramType =
+        "query", required = true)})
+    public ResultBo addRemark(Long orderId, String content) {
+
+        ResultBo resultBo = ResultBo.build();
+
+        //        putUserInfo();
+        //        RespLoginPCBean respLoginPCBean = getUserInfo();
+        //        ResultBo resultBo = ResultBo.build();
+        //        distributionOrderService.addNote(respLoginPCBean, orderId, content);
+        return resultBo;
+    }
+
+    /**
+     * 订单详情
+     */
+    @GetMapping("orderdetails")
+    @ApiOperation(value = "订单详情", response = RespOrderDetailsBo.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "orderId", value = "订单id", paramType = "query",
+        required = true)})
+    public ResultBo orderDetails(Long orderId) {
+
+        RespOrderDetailsBo respOrderDetailsBo = new RespOrderDetailsBo();
+
+        respOrderDetailsBo.setId(1l);
+        respOrderDetailsBo.setfOrderNum("DH-20171101-436781");
+        respOrderDetailsBo.setfSpecial("yes");
+        respOrderDetailsBo.setConsumerName("北京新发水果商户");
+        respOrderDetailsBo.setfOrderCreater("李尊");
+        respOrderDetailsBo.setfCreateTime("2017-11-01 12:31");
+        respOrderDetailsBo.setfOrderAmountPay("12000.00");
+        respOrderDetailsBo.setfPaidMoney("0.00");
+        respOrderDetailsBo.setfPayMethod("prePayPary");
+        respOrderDetailsBo.setfPreAmount("5000.00");
+        respOrderDetailsBo.setfOrderStatus(0);
+        respOrderDetailsBo.setAreaInfoName("天津津南");
+        respOrderDetailsBo.setfCarNum("津BD6105");
+        respOrderDetailsBo.setfDriverName("张志利");
+        respOrderDetailsBo.setfDriverPhone("18502102012");
+
+        List<RespRemarkBo> respRemarkBoList = new ArrayList<>();
+        RespRemarkBo respRemarkBo = new RespRemarkBo();
+        respRemarkBo.setfContent("北京客户急需");
+        respRemarkBo.setOperator("李尊");
+        respRemarkBo.setfCreatetime("2017-11-05 16:47");
+        respRemarkBoList.add(respRemarkBo);
+
+        RespRemarkBo respRemarkBo1 = new RespRemarkBo();
+        respRemarkBo1.setfContent("北京客户急需11111");
+        respRemarkBo1.setOperator("李尊");
+        respRemarkBo1.setfCreatetime("2017-11-05 16:47");
+        respRemarkBoList.add(respRemarkBo1);
+        respOrderDetailsBo.setRemarkBoList(respRemarkBoList);
+        List<RespProductBo> productBoList = new ArrayList<>();
+        respOrderDetailsBo.setProductBoList(productBoList);
+        RespProductBo respProductBo = new RespProductBo();
+        respProductBo.setTransportOrderDetailId(1l);
+        respProductBo.setfPic("dasdasdsadasd");
+        respProductBo.setfCode("Y2001");
+        respProductBo.setProductName("越南大芒果");
+        respProductBo.setfName("品质：优等");
+        respProductBo.setQuantity("8000");
+        respProductBo.setfProductNum("4000");
+        respProductBo.setfPrice("8.00");
+        respProductBo.setUnit("kg");
+        productBoList.add(respProductBo);
+
+        RespProductBo respProductBo1 = new RespProductBo();
+        respProductBo1.setTransportOrderDetailId(2l);
+        respProductBo1.setfPic("dasdasdsadasd");
+        respProductBo1.setfCode("Y3001");
+        respProductBo1.setProductName("越南菠萝");
+        respProductBo1.setfName("普通");
+        respProductBo1.setQuantity("5000");
+        respProductBo1.setfProductNum("2000");
+        respProductBo1.setfPrice("10.00");
+        respProductBo1.setUnit("kg");
+        productBoList.add(respProductBo1);
+
+        ResultBo resultBo = ResultBo.build();
+        resultBo.setResultBody(respOrderDetailsBo);
+
+        //        ResultBo resultBo = ResultBo.build();
+        //        RespOrderDetailsBo orderDetailsBo = distributionOrderService.orderDetails
+        // (orderId);
+        //        resultBo.setResultBody(orderDetailsBo);
+        return resultBo;
+    }
+
+    /**
+     * 收款记录
+     */
+    @GetMapping("paymentrecords")
+    @ApiOperation(value = "收款记录", response = RspPaymentRecordsBo.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "orderId", value = "订单id", paramType = "query",
+        required = true)})
+    public ResultBo paymentRecords(Long orderId) {
+        List<RspPaymentRecordsBo> rspPaymentRecordsBos = new ArrayList<>();
+        RspPaymentRecordsBo rspPaymentRecordsBo = new RspPaymentRecordsBo();
+        rspPaymentRecordsBo.setfPayNum("201710130116208100086165");
+        rspPaymentRecordsBo.setfCreatetime("2017.10.26 00:00:00");
+        rspPaymentRecordsBo.setfAmount("1000.00");
+        rspPaymentRecordsBo.setfPaymethod("bankCard");
+        rspPaymentRecordsBo.setfPayStatus("success");
+        rspPaymentRecordsBo.setfRemark("备注");
+        rspPaymentRecordsBos.add(rspPaymentRecordsBo);
+
+        RspPaymentRecordsBo rspPaymentRecordsBo1 = new RspPaymentRecordsBo();
+        rspPaymentRecordsBo1.setfPayNum("201710130116208100086165");
+        rspPaymentRecordsBo1.setfCreatetime("2017.10.27 00:00:00");
+        rspPaymentRecordsBo1.setfAmount("2000.00");
+        rspPaymentRecordsBo1.setfPaymethod("bankCard");
+        rspPaymentRecordsBo1.setfPayStatus("success");
+        rspPaymentRecordsBo1.setfRemark("备注");
+        rspPaymentRecordsBos.add(rspPaymentRecordsBo1);
+        ResultBo resultBo = ResultBo.build();
+        resultBo.setResultBody(rspPaymentRecordsBos);
+
+        //        ResultBo resultBo = ResultBo.build();
+        //        List<RspPaymentRecordsBo> paymentRecordsBoList = distributionOrderService
+        // .paymentRecords(orderId);
+        //        resultBo.setResultBody(paymentRecordsBoList);
+        return resultBo;
+    }
+
+    /**
+     * 订单审核/作废
+     */
+    @PostMapping("orderrevieworcancellation")
+    @ApiOperation(value = "订单审核/作废")
+    @ApiImplicitParams({@ApiImplicitParam(name = "orderId", value = "订单id", paramType = "query",
+        required = true), @ApiImplicitParam(name = "type", value =
+        "类型（审核-review;"
+            + "作废-cancellation）", paramType = "query", required = true), @ApiImplicitParam(name =
+        "cancellationReason", value = "作废原因（作废时必填）", paramType = "query")})
+    public ResultBo orderReviewOrCancellation(Long orderId, String type, String
+        cancellationReason) {
+        ResultBo resultBo = ResultBo.build();
+
+        //        putUserInfo();
+        //        RespLoginPCBean respLoginPCBean = getUserInfo();
+        //        ResultBo resultBo = ResultBo.build();
+        //        distributionOrderService.orderReviewOrCancellation(respLoginPCBean, orderId,
+        // type, cancellationReason);
+        return resultBo;
+    }
+
+    /**
+     * 添加/修改订单
+     */
+    @PostMapping("ordersaveorupdate")
+    @ApiOperation(value = "添加/修改订单")
+    public ResultBo orderSaveOrUpdate(ReqSaveOrUpdateOrderBo reqSaveOrUpdateOrderBo) {
+        ResultBo resultBo = ResultBo.build();
+
+        //        putUserInfo();
+        //        RespLoginPCBean respLoginPCBean = getUserInfo();
+        //        ResultBo resultBo = ResultBo.build();
+        //        distributionOrderService.orderSaveOrUpdate(respLoginPCBean,
+        // reqSaveOrUpdateOrderBo);
+        return resultBo;
+    }
+
+
+}

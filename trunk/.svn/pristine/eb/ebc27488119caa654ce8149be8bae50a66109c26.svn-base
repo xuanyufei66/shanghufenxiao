@@ -1,0 +1,93 @@
+package com.payease.scfordermis.service.impl;
+
+import com.payease.scfordermis.bean.Status;
+import com.payease.scfordermis.bo.responseBo.QueryCategoryBo;
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.dao.CategoryInfoDao;
+import com.payease.scfordermis.dao.ProductInfoDao;
+import com.payease.scfordermis.entity.TCategoryInfoEntity;
+import com.payease.scfordermis.service.IGoodsService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created by ljp on 2018/1/10.
+ */
+@Service
+public class GoodsServiceImpl implements IGoodsService{
+
+    @Autowired
+    CategoryInfoDao categoryInfoDao;
+    @Autowired
+    ProductInfoDao productInfoDao;
+    @Override
+    public ResultBo categoryAddOrUpdate(Long id,String level,String categoryName,Long categoryParentId) {
+        ResultBo result = ResultBo.build();
+        Long aLong = categoryInfoDao.countTCategoryInfoEntitiesByFNameEquals(categoryName);
+        if (aLong>0){                                                  //判断分类名称是否重复
+            return result.setCodeId(Status.GOODSCATEREPEAT);
+        }
+        TCategoryInfoEntity tCategoryInfoEntity = new TCategoryInfoEntity();
+        tCategoryInfoEntity.setfCompanyId(1L);          //从Session中获取f_company_id
+        tCategoryInfoEntity.setfOperate(1L);            //从Session中获取操作人的id
+        tCategoryInfoEntity.setfLevel(level);
+        tCategoryInfoEntity.setfName(categoryName);
+        tCategoryInfoEntity.setfParentId(categoryParentId);
+        if (null!=id){                                      //编辑（新增没有id）
+            tCategoryInfoEntity.setfUpdateTime(new Date());
+            Date createTime = categoryInfoDao.findOne(id).getfCreateTime();
+            tCategoryInfoEntity.setfCreateTime(createTime);
+            tCategoryInfoEntity.setfId(id);
+        }else {                                             //新增
+            tCategoryInfoEntity.setfUpdateTime(new Date());
+            tCategoryInfoEntity.setfCreateTime(new Date());
+        }
+        categoryInfoDao.save(tCategoryInfoEntity);
+        return result;
+    }
+
+    @Override
+    public ResultBo categoryDetele(Long id) {
+        ResultBo result = ResultBo.build();
+        //判断商品分类下是否有商品
+        TCategoryInfoEntity one = categoryInfoDao.findOne(id);
+        if("1".equals(one.getfLevel())){
+            Long oLong = productInfoDao.countTProductInfoEntitiesByFCategoryIdOneEquals(id);
+            if (oLong>0){
+                return result.setCodeId(Status.GOODSCATEFAIL);
+            }else {
+                categoryInfoDao.delete(id);
+                return result;
+            }
+        }else {
+            Long tLong = productInfoDao.countTProductInfoEntitiesByFCategoryIdTwoEquals(id);
+            if (tLong>0){
+                return result.setCodeId(Status.GOODSCATEFAIL);
+            }else {
+                categoryInfoDao.delete(id);
+                return result;
+            }
+        }
+    }
+
+    @Override
+    public List<QueryCategoryBo> getCategoryList() {
+        List<QueryCategoryBo> list = new ArrayList<>();
+        List<TCategoryInfoEntity> byFLevel = categoryInfoDao.findByFLevelOrderByFUpdateTimeDesc("1");//把所有一级菜单查询来
+        for (int i = 0;i<byFLevel.size();i++){
+            //通过id 找到所属这个一级菜单的二级菜单
+            List<TCategoryInfoEntity> byFParentIdList = categoryInfoDao.findByFParentIdOrderByFUpdateTimeDesc(byFLevel.get(i).getfId());
+            QueryCategoryBo queryCategoryBo = new QueryCategoryBo();
+            queryCategoryBo.setId(byFLevel.get(i).getfId());
+            queryCategoryBo.setName(byFLevel.get(i).getfName());
+            queryCategoryBo.setChildList(byFParentIdList);
+            list.add(queryCategoryBo);
+        }
+        return list;
+    }
+
+}

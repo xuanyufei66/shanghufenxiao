@@ -1,0 +1,63 @@
+package com.payease.scfordermis.service.impl;
+
+import com.payease.scfordermis.bo.*;
+import com.payease.scfordermis.bo.requestBo.ReqTransportAddBo;
+import com.payease.scfordermis.bo.requestBo.ReqTransportBo;
+import com.payease.scfordermis.bo.responseBo.RespOperationLogBo;
+import com.payease.scfordermis.bo.responseBo.RspGoodsBo;
+import com.payease.scfordermis.entity.TTransportOrderEntity;
+import com.payease.scfordermis.service.TransportService;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * Created by YHF on 2018/1/10.
+ */
+@Service
+public class TransportServiceImpl implements TransportService{
+
+    @Override
+    public List<TTransportOrderEntity> transportListSelect(ReqTransportBo reqTransportBo) {
+
+
+
+
+        return null;
+    }
+
+    @Override
+    public int transportSave(ReqTransportAddBo reqTransportAddBo) {
+        return 0;
+    }
+
+    @Override
+    public int transportDelete(String transportNum) {
+        return 0;
+    }
+
+    @Override
+    public TransportBo transportDetail(String transportCode) {
+        return null;
+    }
+
+    @Override
+    public int transportRemark(String transportCode) {
+        return 0;
+    }
+
+    @Override
+    public void load(String transportCode) {
+
+    }
+
+    @Override
+    public List<RespOperationLogBo> noteSelect(String transportCode) {
+        return null;
+    }
+
+    @Override
+    public List<RspGoodsBo> getGoods(String goodsCode) {
+        return null;
+    }
+}

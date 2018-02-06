@@ -1,0 +1,389 @@
+package com.payease.scfordermis.service.impl;
+
+import com.alibaba.fastjson.JSON;
+import com.payease.scfordermis.bean.PageRequest;
+import com.payease.scfordermis.bo.requestBo.ReqDistributionOrderBo;
+import com.payease.scfordermis.bo.requestBo.ReqSaveOrUpdateOrderBo;
+import com.payease.scfordermis.bo.responseBo.*;
+import com.payease.scfordermis.dao.*;
+import com.payease.scfordermis.entity.*;
+import com.payease.scfordermis.service.IDistributionOrderService;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created by lch on 2018/1/15.
+ * <p>
+ * 集散地订单service实现
+ */
+@Service
+public class DistributionOrderServiceImpl implements IDistributionOrderService {
+
+    @Autowired
+    private OrderDao orderDao;
+    @Autowired
+    private ConsumerInfoDao consumerInfoDao;
+    @Autowired
+    private ConsumerLevelDao consumerLevelDao;
+    @Autowired
+    private AreaInfoDao areaInfoDao;
+    @Autowired
+    private TransportOrderDao transportOrderDao;
+    @Autowired
+    private RemarkDao remarkDao;
+    @Autowired
+    private NoteDao noteDao;
+    @Autowired
+    private PaymentHistoryDao paymentHistoryDao;
+    @Autowired
+    private OrderDetailDao orderDetailDao;
+    @Autowired
+    private TransportOrderDetailDao transportOrderDetailDao;
+    @Autowired
+    private ProductInfoDao productInfoDao;
+    @Autowired
+    private ProductFormatDao productFormatDao;
+    @Autowired
+    private UnitInfoDao unitInfoDao;
+    @Autowired
+    private EmployeeInfoDao employeeInfoDao;
+
+    @Override
+    public Page<RespDistributionOrderBo> orderList(RespLoginPCBean respLoginPCBean, ReqDistributionOrderBo reqDistributionOrderBo) {
+
+        //判断入参是否为空，如果不为空，将其作为条件添加
+        Specification specification = (Specification<TOrderEntity>) (root, criteriaQuery, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (StringUtils.isNotBlank(reqDistributionOrderBo.getOrderNum())) {//订单号
+                predicates.add(criteriaBuilder.equal(root.get("fOrderNum"), reqDistributionOrderBo.getOrderNum()));
+            }
+            if (StringUtils.isNotBlank(reqDistributionOrderBo.getBeginTime())) {//下单时间（开始）
+                predicates.add(criteriaBuilder.greaterThan(root.get("fCreatetime"), reqDistributionOrderBo.getBeginTime()));
+            }
+            if (StringUtils.isNotBlank(reqDistributionOrderBo.getEndTime())) {//下单时间（结束）
+                predicates.add(criteriaBuilder.lessThan(root.get("fCreatetime"), reqDistributionOrderBo.getEndTime()));
+            }
+            if (StringUtils.isNotBlank(reqDistributionOrderBo.getConsumerName())) {//客户名称
+                List<TConsumerInfoEntity> tConsumerInfoEntityList = consumerInfoDao.findByFNameLikeAndFCompanyId(reqDistributionOrderBo.getConsumerName(), respLoginPCBean.getfCompanyId());
+                addPredicates(root, criteriaBuilder, predicates, tConsumerInfoEntityList);
+            }
+            if (StringUtils.isNotBlank(reqDistributionOrderBo.getCustomerLevelId())) {//客户等级
+                TConsumerLevelEntity tConsumerLevelEntity = consumerLevelDao.findOne(Long.valueOf(reqDistributionOrderBo.getCustomerLevelId()));
+                List<TConsumerInfoEntity> tConsumerInfoEntityList = consumerInfoDao.findByFLevelId(tConsumerLevelEntity.getfId());
+                addPredicates(root, criteriaBuilder, predicates, tConsumerInfoEntityList);
+            }
+            if (StringUtils.isNotBlank(reqDistributionOrderBo.getTransportInfo())) {//运单信息
+                predicates.add(criteriaBuilder.equal(root.get("subscribeTime"), reqDistributionOrderBo.getTransportInfo()));
+            }
+            if (StringUtils.isNotBlank(reqDistributionOrderBo.getLevel())) {//销售地区
+                predicates.add(criteriaBuilder.equal(root.get("subscribeTime"), reqDistributionOrderBo.getLevel()));
+            }
+            if (StringUtils.isNotBlank(reqDistributionOrderBo.getOrderStatus())) {
+                predicates.add(criteriaBuilder.equal(root.get("subscribeTime"), reqDistributionOrderBo.getOrderStatus()));
+            }
+            if (StringUtils.isNotBlank(reqDistributionOrderBo.getPayStatus())) {
+                predicates.add(criteriaBuilder.equal(root.get("subscribeTime"), reqDistributionOrderBo.getPayStatus()));
+            }
+            if (StringUtils.isNotBlank(reqDistributionOrderBo.getSearchKey())) {
+                predicates.add(criteriaBuilder.like(root.get("nickname"), "%" + reqDistributionOrderBo.getSearchKey() + "%"));
+            }
+            if (StringUtils.isNotBlank(reqDistributionOrderBo.getOrderState())) {
+                predicates.add(criteriaBuilder.equal(root.get("subscribeTime"), reqDistributionOrderBo.getOrderState()));
+            }
+            //将companyId作为条件
+            predicates.add(criteriaBuilder.equal(root.get("fCompanyId"), respLoginPCBean.getfCompanyId()));
+            return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
+        };
+        Sort sort = new Sort(Sort.Direction.DESC, "fCreatetime");
+        //根据条件查询订单
+        Page<TOrderEntity> orderList = this.orderDao.findAll(specification, PageRequest.of(reqDistributionOrderBo.getPage(), reqDistributionOrderBo.getSize(), sort));
+        List<RespDistributionOrderBo> respDistributionOrderBoList = new ArrayList<>();
+        for (TOrderEntity tOrderEntity : orderList.getContent()) {
+            RespDistributionOrderBo respDistributionOrderBo = new RespDistributionOrderBo();
+            BeanUtils.copyProperties(tOrderEntity, respDistributionOrderBo);
+            respDistributionOrderBoList.add(respDistributionOrderBo);
+        }
+        Page<RespDistributionOrderBo> respDistributionOrderBos = new PageImpl<>(respDistributionOrderBoList, PageRequest.of(reqDistributionOrderBo.getPage(), reqDistributionOrderBo.getSize()), orderList.getTotalElements());
+        System.out.println(JSON.toJSONString(respDistributionOrderBos));
+        return respDistributionOrderBos;
+    }
+
+    private void addPredicates(Root<TOrderEntity> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates, List<TConsumerInfoEntity> tConsumerInfoEntityList) {
+        if (tConsumerInfoEntityList.isEmpty()) {
+            predicates.add(criteriaBuilder.equal(root.get("fConsumerId"), 0));
+        } else {
+            Predicate[] predicates1 = {};
+            for (int i = 0; i < tConsumerInfoEntityList.size(); i++) {
+                predicates1[i] = criteriaBuilder.equal(root.get("fConsumerId"), tConsumerInfoEntityList.get(i).getfId());
+            }
+            predicates.add(criteriaBuilder.or(predicates1));
+        }
+    }
+
+
+    @Override
+    public List<RespCustomerLevelBo> customerLevelList(RespLoginPCBean respLoginPCBean) {
+        //根据companyId查询客户等级
+        List<TConsumerLevelEntity> tConsumerLevelEntityList = consumerLevelDao.findByFCompanyId(respLoginPCBean.getfCompanyId());
+        List<RespCustomerLevelBo> respCustomerLevelBoList = new ArrayList<>();
+        for (TConsumerLevelEntity tConsumerLevelEntity : tConsumerLevelEntityList) {
+            RespCustomerLevelBo respCustomerLevelBo = new RespCustomerLevelBo();
+            BeanUtils.copyProperties(tConsumerLevelEntity, respCustomerLevelBo);
+            respCustomerLevelBoList.add(respCustomerLevelBo);
+        }
+        return respCustomerLevelBoList;
+    }
+
+    @Override
+    public List<RespAreaInfoBo> salesAreaList(RespLoginPCBean respLoginPCBean) {
+        //根据companyId查询所有的一级销售地区
+        List<TAreaInfoEntity> tAreaInfoParentList = areaInfoDao.findByFCompanyIdAndFParentId(respLoginPCBean.getfCompanyId(), "0");
+        List<RespAreaInfoBo> respAreaInfoBoList = new ArrayList<>();
+        for (TAreaInfoEntity tAreaInfoEntity : tAreaInfoParentList) {
+            RespAreaInfoBo respAreaInfoBo = new RespAreaInfoBo();
+            BeanUtils.copyProperties(tAreaInfoEntity, respAreaInfoBo);
+            respAreaInfoBoList.add(respAreaInfoBo);
+        }
+        //根据companyId和一级销售地区id查询对应的二级销售地区
+        for (RespAreaInfoBo respAreaInfoBo : respAreaInfoBoList) {
+            List<TAreaInfoEntity> tAreaInfoChildrenList = areaInfoDao.findByFCompanyIdAndFParentId(respLoginPCBean.getfCompanyId(), respAreaInfoBo.getfId().toString());
+            List<RespAreaInfoBo> respAreaInfoBoChildrenList = new ArrayList<>();
+            for (TAreaInfoEntity tAreaInfoEntity : tAreaInfoChildrenList) {
+                RespAreaInfoBo respAreaInfoBo1 = new RespAreaInfoBo();
+                BeanUtils.copyProperties(tAreaInfoEntity, respAreaInfoBo1);
+                respAreaInfoBoChildrenList.add(respAreaInfoBo1);
+            }
+            respAreaInfoBo.setRespAreaInfoBoList(respAreaInfoBoChildrenList);
+        }
+        return respAreaInfoBoList;
+    }
+
+    @Override
+    public List<RespDistributionBo> distributionList(RespLoginPCBean respLoginPCBean) {
+        //根据条件查询订单
+        Specification specification = (Specification<TOrderEntity>) (root, criteriaQuery, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            //fStatus为待装车、待提货的作为条件
+            predicates.add(criteriaBuilder.or(criteriaBuilder.equal(root.get("fStatus"), "ForLoading"), criteriaBuilder.equal(root.get("fStatus"), "ForGoods")));
+            //将companyId作为条件
+            predicates.add(criteriaBuilder.and(criteriaBuilder.equal(root.get("fCompanyId"), respLoginPCBean.getfCompanyId())));
+            return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
+        };
+        //根据条件查询集散地运单
+        List<TTransportOrderEntity> tTransportOrderEntityList = transportOrderDao.findAll(specification);
+        List<RespDistributionBo> respDistributionBoList = new ArrayList<>();
+        for (TTransportOrderEntity tTransportOrderEntity : tTransportOrderEntityList) {
+            RespDistributionBo respDistributionBo = new RespDistributionBo();
+            BeanUtils.copyProperties(tTransportOrderEntity, respDistributionBo);
+            //如果销售地区二级分类不为0，那么根据二级分类id查询出销售地区名称
+            if (tTransportOrderEntity.getfAreaInfoIdTwo() != 0) {
+                respDistributionBo.setAreaInfoName(areaInfoDao.findOne(tTransportOrderEntity.getfAreaInfoIdTwo()).getfName());
+                //如果为0，那么根据一级分类id查询出销售地区名称
+            } else {
+                respDistributionBo.setAreaInfoName(areaInfoDao.findOne(tTransportOrderEntity.getfAreaInfoIdOne()).getfName());
+            }
+            respDistributionBoList.add(respDistributionBo);
+        }
+        return respDistributionBoList;
+    }
+
+    @Override
+    public List<RespCustomerBo> customerList(RespLoginPCBean respLoginPCBean) {
+        //根据companyId查询客户
+        List<TConsumerInfoEntity> tConsumerInfoEntityList = consumerInfoDao.findByFCompanyId(respLoginPCBean.getfCompanyId());
+        List<RespCustomerBo> respCustomerBoList = new ArrayList<>();
+        for (TConsumerInfoEntity tConsumerInfoEntity : tConsumerInfoEntityList) {
+            RespCustomerBo respCustomerBo = new RespCustomerBo();
+            BeanUtils.copyProperties(tConsumerInfoEntity, respCustomerBo);
+            respCustomerBoList.add(respCustomerBo);
+        }
+        return respCustomerBoList;
+    }
+
+    @Override
+    public List<RespProductBo> productList(Long transportId) {
+        List<RespProductBo> respProductBoList = new ArrayList<>();
+        //根据运单id查询运单详情
+        List<TTransportOrderDetailEntity> tTransportOrderDetailEntityList = transportOrderDetailDao.findByFTransportOrderId(transportId);
+        for (TTransportOrderDetailEntity tTransportOrderDetailEntity : tTransportOrderDetailEntityList) {
+            RespProductBo respProductBo = new RespProductBo();
+            respProductBo.setTransportOrderDetailId(tTransportOrderDetailEntity.getId());
+            //根据运单详情中的商品规格id查询出商品的规格
+            TProductFormatEntity tProductFormatEntity = productFormatDao.findOne(tTransportOrderDetailEntity.gettProductFormatId());
+            BeanUtils.copyProperties(tProductFormatEntity, respProductBo);
+            //根据运单详情中的商品信息id查询出商品的信息
+            TProductInfoEntity tProductInfoEntity = productInfoDao.findOne(tTransportOrderDetailEntity.getfProductId());
+            respProductBo.setProductName(tProductInfoEntity.getfName());
+            //根据运单详情中的商品单位id查询出商品的单位
+            TUnitInfoEntity tUnitInfoEntity = unitInfoDao.findOne(tTransportOrderDetailEntity.gettUnitInfoId());
+            respProductBo.setUnit(tUnitInfoEntity.getfName());
+            respProductBo.setQuantity(String.valueOf(tTransportOrderDetailEntity.getfSurplusNumber()));
+            respProductBoList.add(respProductBo);
+        }
+        return respProductBoList;
+    }
+
+    @Override
+    public List<RespOperationLogBo> operationLog(Long orderId) {
+        //根据orderId查询操作日志
+        List<TNoteEntity> tNoteEntityList = noteDao.findByFTransportOrderIdAndFType(orderId, "order");
+        List<RespOperationLogBo> respOperationLogBoList = new ArrayList<>();
+        for (TNoteEntity tNoteEntity : tNoteEntityList) {
+            RespOperationLogBo respOperationLogBo = new RespOperationLogBo();
+            BeanUtils.copyProperties(tNoteEntity, respOperationLogBo);
+            respOperationLogBoList.add(respOperationLogBo);
+        }
+        return respOperationLogBoList;
+    }
+
+    @Override
+    public void addNote(RespLoginPCBean respLoginPCBean, Long orderId, String content) {
+        //新增备注
+        TRemarkEntity tRemarkEntity = new TRemarkEntity();
+        tRemarkEntity.setfContent(content);
+        tRemarkEntity.setfCreatetime(new Date());
+        tRemarkEntity.setfOperaterId(respLoginPCBean.getfId());
+        tRemarkEntity.setfTransportOrderId(orderId);
+        tRemarkEntity.settCompanyId(respLoginPCBean.getfCompanyId());
+        tRemarkEntity.settRemarkcol(respLoginPCBean.getfName());
+        tRemarkEntity.settType("order");
+        remarkDao.save(tRemarkEntity);
+    }
+
+    @Override
+    public RespOrderDetailsBo orderDetails(Long orderId) {
+        //根据orderId查询订单详情
+        RespOrderDetailsBo respOrderDetailsBo = new RespOrderDetailsBo();
+        TOrderEntity tOrderEntity = orderDao.findOne(orderId);
+        //封装返回对象中的订单信息
+        BeanUtils.copyProperties(tOrderEntity, respOrderDetailsBo);
+        respOrderDetailsBo.setConsumerName(consumerInfoDao.findOne(tOrderEntity.getfConsumerId()).getfName());
+        respOrderDetailsBo.setfOrderCreater(employeeInfoDao.findOne(tOrderEntity.getfOrderCreaterId()).getfName());
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        respOrderDetailsBo.setfCreateTime(formatter.format(tOrderEntity.getfCreatetime()));
+        respOrderDetailsBo.setfOrderAmountPay(String.valueOf(tOrderEntity.getfOrderAmountPay()));
+        respOrderDetailsBo.setfPaidMoney(String.valueOf(tOrderEntity.getfPaidMoney()));
+        respOrderDetailsBo.setfPreAmount(String.valueOf(tOrderEntity.getfPreAmount()));
+        List<RespProductBo> respProductBoList = new ArrayList<>();
+        //根据运单id查询运单
+        TTransportOrderEntity tTransportOrderEntity = transportOrderDao.findOne(tOrderEntity.getfTransportOrderId());
+        //封装返回对象中的运单信息
+        //如果销售地区二级分类不为0，那么根据二级分类id查询出销售地区名称
+        if (tTransportOrderEntity.getfAreaInfoIdTwo() != 0) {
+            respOrderDetailsBo.setAreaInfoName(areaInfoDao.findOne(tTransportOrderEntity.getfAreaInfoIdTwo()).getfName());
+            //如果为0，那么根据一级分类id查询出销售地区名称
+        } else {
+            respOrderDetailsBo.setAreaInfoName(areaInfoDao.findOne(tTransportOrderEntity.getfAreaInfoIdOne()).getfName());
+        }
+        respOrderDetailsBo.setfCarNum(tTransportOrderEntity.getfCarNum());
+        respOrderDetailsBo.setfDriverName(tTransportOrderEntity.getfDriverName());
+        respOrderDetailsBo.setfDriverPhone(tTransportOrderEntity.getfDriverPhone());
+        //根据订单详情id查询订单详情
+        List<TOrderDetailEntity> tOrderDetailEntityList = orderDetailDao.findByFOrderId(orderId);
+        for (TOrderDetailEntity tOrderDetailEntity : tOrderDetailEntityList) {
+            //根据运单详情id查询运单详情
+            TTransportOrderDetailEntity tTransportOrderDetailEntity = transportOrderDetailDao.findOne(tOrderDetailEntity.getfTranOrderDetailId());
+            //封装返回对象中的商品内容
+            RespProductBo respProductBo = new RespProductBo();
+            respProductBo.setTransportOrderDetailId(tTransportOrderDetailEntity.getId());
+            //根据运单详情中的商品规格id查询出商品的规格
+            TProductFormatEntity tProductFormatEntity = productFormatDao.findOne(tTransportOrderDetailEntity.gettProductFormatId());
+            BeanUtils.copyProperties(tProductFormatEntity, respProductBo);
+            //根据运单详情中的商品信息id查询出商品的信息
+            TProductInfoEntity tProductInfoEntity = productInfoDao.findOne(tTransportOrderDetailEntity.getfProductId());
+            respProductBo.setProductName(tProductInfoEntity.getfName());
+            //根据运单详情中的商品单位id查询出商品的单位
+            TUnitInfoEntity tUnitInfoEntity = unitInfoDao.findOne(tTransportOrderDetailEntity.gettUnitInfoId());
+            respProductBo.setUnit(tUnitInfoEntity.getfName());
+            respProductBo.setQuantity(String.valueOf(tTransportOrderDetailEntity.getfSurplusNumber()));
+            respProductBo.setfProductNum(String.valueOf(tOrderDetailEntity.getfProductNum()));
+            respProductBoList.add(respProductBo);
+        }
+        //封装返回对象中的备注说明
+        List<TRemarkEntity> remarkEntityList = remarkDao.findByFTransportOrderIdAndTType(tOrderEntity.getId(), "order");
+        List<RespRemarkBo> remarkBoList = new ArrayList<>();
+        for (TRemarkEntity tRemarkEntity : remarkEntityList) {
+            RespRemarkBo respRemarkBo = new RespRemarkBo();
+            respRemarkBo.setOperator(tRemarkEntity.gettRemarkcol());
+            respRemarkBo.setfContent(tRemarkEntity.getfContent());
+            respRemarkBo.setfCreatetime(formatter.format(tRemarkEntity.getfCreatetime()));
+            remarkBoList.add(respRemarkBo);
+        }
+        respOrderDetailsBo.setRemarkBoList(remarkBoList);
+        return respOrderDetailsBo;
+    }
+
+    @Override
+    public List<RspPaymentRecordsBo> paymentRecords(Long orderId) {
+        //根据orderId查询收款记录
+        List<TPaymentHistoryEntity> paymentHistoryEntityList = paymentHistoryDao.findByFOrderId(orderId);
+        List<RspPaymentRecordsBo> rspPaymentRecordsBoList = new ArrayList<>();
+        for (TPaymentHistoryEntity tPaymentHistoryEntity : paymentHistoryEntityList) {
+            RspPaymentRecordsBo rspPaymentRecordsBo = new RspPaymentRecordsBo();
+            BeanUtils.copyProperties(tPaymentHistoryEntity, rspPaymentRecordsBo);
+            rspPaymentRecordsBoList.add(rspPaymentRecordsBo);
+        }
+        return rspPaymentRecordsBoList;
+    }
+
+    @Override
+    public void orderReviewOrCancellation(RespLoginPCBean respLoginPCBean, Long orderId, String type, String cancellationReason) {
+        //根据type判断本次操作是审核还是作废
+        //如果是审核
+        if ("review".equals(type)) {
+            TOrderEntity tOrderEntity = orderDao.findOne(orderId);
+            //根据orderId,改变订单状态为待提货
+            tOrderEntity.setfOrderStatus(1);
+            orderDao.save(tOrderEntity);
+            //增加一条操作日志
+            TNoteEntity tNoteEntity = new TNoteEntity();
+            tNoteEntity.setfCompanyId(respLoginPCBean.getfCompanyId());
+            tNoteEntity.setfCreatetime(new Date());
+            tNoteEntity.setfNote("订单已通过订单审核，待提货。");
+            tNoteEntity.setfOperate(respLoginPCBean.getfId());
+            tNoteEntity.setfOperatingType("reviewOrder");
+            tNoteEntity.setfPartyType("merchants");
+            tNoteEntity.setfTransportOrderId(orderId);
+            tNoteEntity.setfType("order");
+            tNoteEntity.setfOperator(respLoginPCBean.getfName());
+            noteDao.save(tNoteEntity);
+            //如果是作废
+        } else {
+            TOrderEntity tOrderEntity = orderDao.findOne(orderId);
+            //根据orderId,改变订单状态为已作废
+            tOrderEntity.setfOrderStatus(-1);
+            orderDao.save(tOrderEntity);
+            //增加一条操作日志
+            TNoteEntity tNoteEntity = new TNoteEntity();
+            tNoteEntity.setfCompanyId(respLoginPCBean.getfCompanyId());
+            tNoteEntity.setfCreatetime(new Date());
+            tNoteEntity.setfNote(cancellationReason);
+            tNoteEntity.setfOperate(respLoginPCBean.getfId());
+            tNoteEntity.setfOperatingType("cancellationOrder");
+            tNoteEntity.setfPartyType("merchants");
+            tNoteEntity.setfTransportOrderId(orderId);
+            tNoteEntity.setfType("order");
+            tNoteEntity.setfOperator(respLoginPCBean.getfName());
+            noteDao.save(tNoteEntity);
+        }
+    }
+
+    @Override
+    public void orderSaveOrUpdate(RespLoginPCBean respLoginPCBean, ReqSaveOrUpdateOrderBo reqSaveOrUpdateOrderBo) {
+
+    }
+}

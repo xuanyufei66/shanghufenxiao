@@ -1,0 +1,68 @@
+package com.payease.scfordermis.service.impl;
+
+import com.payease.scfordermis.bo.*;
+import com.payease.scfordermis.service.TransportService;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * Created by YHF on 2018/1/10.
+ */
+@Service
+public class TransportServiceImpl implements TransportService{
+    @Override
+    public List<TransportBo> transportListSelect() {
+        return null;
+    }
+
+    @Override
+    public int transportAdd() {
+        return 0;
+    }
+
+    @Override
+    public int transportDelete() {
+        return 0;
+    }
+
+    @Override
+    public int transportUpdate() {
+        return 0;
+    }
+
+    @Override
+    public TransportBo transportDetail() {
+        return null;
+    }
+
+    @Override
+    public int transportInfoUpdate(TransportInfoBo transportInfo) {
+        return 0;
+    }
+
+    @Override
+    public void load() {
+
+    }
+
+    @Override
+    public void transportFinish() {
+
+    }
+
+    @Override
+    public int remarkUpdate(RemarkBo remarkBo) {
+        return 0;
+    }
+
+    @Override
+    public List<NoteBo> noteSelect() {
+        return null;
+    }
+
+    @Override
+    public List<GoodsBo> getGoods() {
+        return null;
+    }
+}

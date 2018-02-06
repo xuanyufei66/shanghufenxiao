@@ -1,0 +1,23 @@
+package com.payease.scfordermis.service;
+
+import com.payease.scfordermis.bo.requestBo.ReqCustomerBean;
+import com.payease.scfordermis.bo.requestBo.ReqMyCustomerTwoBo;
+import com.payease.scfordermis.bo.responseBo.RespCustomerBean;
+import com.payease.scfordermis.entity.TConsumerInfoEntity;
+
+import javax.servlet.http.HttpSession;
+
+/**
+ * Created by admin on 2018/1/10.
+ */
+public interface CustomerService {
+
+    RespCustomerBean selectIndext(ReqCustomerBean reqCustomerBean) throws Exception;
+
+    TConsumerInfoEntity getDetail(long id) throws Exception;
+
+    void isDelete(HttpSession session,long fid) throws Exception;
+
+    int upAndSave(HttpSession session,ReqMyCustomerTwoBo reqMyCustomerTwoBo) throws Exception;
+
+}

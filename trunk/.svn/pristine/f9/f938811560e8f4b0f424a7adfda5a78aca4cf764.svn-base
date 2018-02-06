@@ -1,0 +1,36 @@
+package com.payease.scfordermis.service.impl;
+
+import com.payease.scfordermis.dao.RemarkDao;
+import com.payease.scfordermis.entity.TRemarkEntity;
+import com.payease.scfordermis.service.IAppOrderService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Created by zhangzhili on 2018/1/19.
+ */
+@Service
+public class AppOrderServiceImpl implements IAppOrderService {
+
+    @Autowired
+    RemarkDao remarkDao;
+
+
+    @Override
+    @Transactional
+    public void saveRemark() {
+        TRemarkEntity tRemarkEntity = new TRemarkEntity();
+        tRemarkEntity.settRemarkcol("111");
+        remarkDao.save(tRemarkEntity);
+        tRemarkEntity.setfContent("dsafsdgdfgd");
+    }
+
+    @Override
+    @Transactional
+    public void findRemark() {
+        TRemarkEntity tRemarkEntity = remarkDao.findOne(14L);
+        tRemarkEntity.setfContent("jkhgfdsdfghjkjhgfdsdfghjhgfdsdfgh");
+        tRemarkEntity.settType("665");
+    }
+}

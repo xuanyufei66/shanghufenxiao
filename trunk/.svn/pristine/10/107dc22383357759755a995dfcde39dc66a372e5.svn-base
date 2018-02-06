@@ -1,0 +1,20 @@
+package com.payease.scfordermis.dao;
+
+import com.payease.scfordermis.entity.TConsumerInfoEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+/**
+ * Created by lch on 2018/1/15.
+ *
+ * 客户dao
+ */
+public interface ConsumerInfoDao extends JpaRepository<TConsumerInfoEntity,Long>{
+
+    List<TConsumerInfoEntity> findByFNameLikeAndFCompanyId(String consumerName,Long companyId);
+
+    List<TConsumerInfoEntity> findByFCompanyId(Long companyId);
+
+
+}

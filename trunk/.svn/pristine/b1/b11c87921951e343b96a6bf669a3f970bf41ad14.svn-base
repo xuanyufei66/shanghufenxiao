@@ -1,0 +1,536 @@
+package com.payease.scfordermis.service.impl;
+
+import com.payease.scfordermis.bo.*;
+import com.payease.scfordermis.bo.requestBo.*;
+import com.payease.scfordermis.bo.responseBo.*;
+import com.payease.scfordermis.dao.*;
+import com.payease.scfordermis.entity.*;
+import com.payease.scfordermis.service.TransportService;
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.validator.internal.metadata.aggregated.rule.ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.servlet.http.HttpSession;
+import java.text.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created by YHF on 2018/1/10.
+ */
+@Service
+public class TransportServiceImpl implements TransportService{
+
+    @Autowired
+    TransportOrderDao transportOrderDao;
+    @Autowired
+    CompanyInfoDao companyInfoDao;
+    @Autowired
+    NoteDao noteDao;
+    @Autowired
+    UserDao userDao;
+
+    @Autowired
+    AreaInfoDao areaInfoDao;
+    @Autowired
+    RemarkDao remarkDao;
+    @Autowired
+    TransportOrderDetailDao transportOrderDetailDao;
+    @Autowired
+    OrderDao orderDao;
+    @Autowired
+    OrderDetailDao orderDetailDao;
+    @Autowired
+    ProductInfoDao productInfoDao;
+    @Autowired
+    ProductFormatDao productFormatDao;
+    @Autowired
+    UnitInfoDao unitInfoDao;
+
+    @Override
+    public ResultBo transportListSelect(RespLoginPCBean respLoginPCBean,ReqTransportBo reqTransportBo) {
+        ResultBo resultBo = ResultBo.build();
+        //获取session中的companyId
+        //判断入参是否为空，如果不为空，将其作为条件添加
+        //将companyId作为条件
+        //根据条件查询运单
+        //分页                                     当前页               每页显示条数    按照字段排序
+        Pageable pageable = new PageRequest(reqTransportBo.getPage() - 1, reqTransportBo.getSize(), new Sort(Sort.Direction.DESC, "id"));
+        Page tTransportOrderEntities= transportOrderDao.findAll(
+                new Specification<TTransportOrderEntity>() {
+                    @Override
+                    public Predicate toPredicate(Root<TTransportOrderEntity> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                        List<Predicate> lstPredicates = new ArrayList<Predicate>();
+                        List<Predicate> lstPredicates2 = new ArrayList<Predicate>();
+
+                        if (StringUtils.isNotBlank(String.valueOf(reqTransportBo.getTransInfo()))){
+                                lstPredicates.add(criteriaBuilder.like(root.get("fSearchKey"),"%"+ reqTransportBo.getTransInfo()+"%"));
+
+                        }
+                        if(StringUtils.isNotBlank(String.valueOf(reqTransportBo.getSendAreaOne()))){
+
+                            lstPredicates.add(criteriaBuilder.equal(root.get("fAreaInfoIdOne").as(Long.class),reqTransportBo.getSendAreaOne()));
+                        }
+                        if(StringUtils.isNotBlank(String.valueOf(reqTransportBo.getSendAreaTwo()))){
+
+                            lstPredicates.add(criteriaBuilder.equal(root.get("fAreaInfoIdTwo").as(Long.class),reqTransportBo.getSendAreaTwo()));
+                        }
+                        if(StringUtils.isNotBlank(String.valueOf(reqTransportBo.getTimeFrom()))){
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            try {
+                                Date datefrom = simpleDateFormat.parse(reqTransportBo.getTimeFrom());
+                                lstPredicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("fCreatetime").as(Date.class),datefrom));
+
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                        if(StringUtils.isNotBlank(String.valueOf(reqTransportBo.getTimeTo()))){
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            try {
+                                Date dateto = simpleDateFormat.parse(reqTransportBo.getTimeTo());
+                                lstPredicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("fCreatetime").as(Date.class),dateto));
+
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+
+                        if(reqTransportBo.getTransportStatus().length!=0){
+                            for(String status:reqTransportBo.getTransportStatus()){
+                                lstPredicates.add(criteriaBuilder.or(criteriaBuilder.equal(root.get("fStatus").as(String.class),status)));
+                            }
+                        }
+                        //公司主键id
+                        lstPredicates.add(criteriaBuilder.equal(root.get("fCompanyId"), respLoginPCBean.getfCompanyId()));
+                       return  criteriaBuilder.and(lstPredicates.toArray(new Predicate[lstPredicates.size()]));
+                    }
+                },pageable
+        );
+        resultBo.setResultBody(tTransportOrderEntities);
+      return resultBo;
+    }
+
+    @Override
+    @Transactional
+    public boolean transportSave(RespLoginPCBean respLoginPCBean,ReqTransportAddBo reqTransportAddBo) {
+        TTransportOrderEntity tTransportOrderEntity = new TTransportOrderEntity();
+        List<ReqGoodsBo> reqGoodsBos = reqTransportAddBo.getReqGoodsBos();
+        /**
+         * //更新操作
+         * 只有在运单状态为待装车状态下才能进行修改。
+         * 若该运单下已有订单，则商品列表只能新增，已添加商品不能删除。提示“该运单下已有订单，不能删除该商品
+         */
+        if(StringUtils.isNotBlank(reqTransportAddBo.getTransportOrderId())){
+            //运单更新
+            TTransportOrderEntity tTransportOrderEntity1=transportOrderDao.findOne(Long.valueOf(reqTransportAddBo.getTransportOrderId()));
+           // String trannInfoBefore ="运输车辆："+tTransportOrderEntity1.getfTransportNum()+"司机："+tTransportOrderEntity1.getfDriverName()+"手机号："+tTransportOrderEntity1.getfDriverPhone()+"通关单号："+tTransportOrderEntity1.getfCustomsFormNo();
+            if("ForLoading".equals(tTransportOrderEntity1.getfStatus())) {
+                //获取运输信息
+                //String transInfoAfter = "运输车辆："+reqTransportAddBo.getfTransportNum()+"司机："+reqTransportAddBo.getfDriverName()+"手机号："+reqTransportAddBo.getfDriverPhone()+"通关单号："+reqTransportAddBo.getfCustomsFormNo();
+
+                tTransportOrderEntity1.setfUpdateTime(new Date());//运单更新时间
+                tTransportOrderEntity1.setfOperate(respLoginPCBean.getfId());//操作人
+                tTransportOrderEntity1.setfDriverName(reqTransportAddBo.getfDriverName());//司机
+                tTransportOrderEntity1.setfCompanyId((respLoginPCBean.getfCompanyId()));//公司id
+                tTransportOrderEntity1.setfCarNum(reqTransportAddBo.getfTransportNum());//车牌号
+                tTransportOrderEntity1.setfDriverPhone(reqTransportAddBo.getfDriverPhone()); //司机电话
+                tTransportOrderEntity1.setfCustomsFormNo(reqTransportAddBo.getfCustomsFormNo());//通关单号
+                tTransportOrderEntity1.setfSearchKey(reqTransportAddBo.getTransportOrderNum() + reqTransportAddBo.getfTransportNum() +
+                        reqTransportAddBo.getfDriverName() + reqTransportAddBo.getfDriverPhone());//关键字
+                //遍历商品list ,查询是否有订单记录
+               for(ReqGoodsBo reqGoodsBo:reqTransportAddBo.getReqGoodsBos()) {
+                   if(StringUtils.isNotBlank(reqGoodsBo.getTransportDetailId())){
+                       TTransportOrderDetailEntity tTransportOrderDetailEntity = new TTransportOrderDetailEntity();
+                      // List<TOrderDetailEntity> tOrderDetailEntities=orderDetailDao.findByFTranOrderDetailId(Long.valueOf(reqGoodsBo.getTransportDetailId()));
+                       TTransportOrderDetailEntity tTransportOrderDetailEntity1= transportOrderDetailDao.findOne(Long.valueOf(reqGoodsBo.getTransportDetailId()));
+                       BeanUtils.copyProperties(tTransportOrderDetailEntity1,tTransportOrderDetailEntity);
+
+                       int num = Integer.valueOf(reqGoodsBo.getPlanNum())-tTransportOrderDetailEntity1.getfPlanNumber();
+                       tTransportOrderDetailEntity.setfSurplusNumber(tTransportOrderDetailEntity.getfSurplusNumber()+num);
+                       tTransportOrderDetailEntity.setfPlanNumber(Integer.valueOf(reqGoodsBo.getPlanNum()));
+//
+                       transportOrderDetailDao.save(tTransportOrderDetailEntity);
+                   }else{
+                       TTransportOrderDetailEntity tTransportOrderDetailEntity = new TTransportOrderDetailEntity();
+                       tTransportOrderDetailEntity.setfPlanNumber(Integer.valueOf(reqGoodsBo.getPlanNum()));
+                       tTransportOrderDetailEntity.setfSurplusNumber(Integer.valueOf(reqGoodsBo.getPlanNum()));
+                       tTransportOrderDetailEntity.setfProductId(Long.valueOf(reqGoodsBo.getfProductId()));
+                       tTransportOrderDetailEntity.settProductFormatId(Long.valueOf(reqGoodsBo.getfProductFormatId()));
+                       tTransportOrderDetailEntity.setfCreatetime(new Date());
+                       tTransportOrderDetailEntity.setfOperate(respLoginPCBean.getfId());
+                       tTransportOrderDetailEntity.setfCompanyId(respLoginPCBean.getfCompanyId());
+                       tTransportOrderDetailEntity.setfTransportOrderId(Long.valueOf(reqTransportAddBo.getTransportOrderId()));
+                       tTransportOrderDetailEntity.settUnitInfoId(Long.valueOf(reqGoodsBo.getfUnitId()));
+                       transportOrderDetailDao.save(tTransportOrderDetailEntity);
+                   }
+               }
+                  //  saveTransportDetail(reqGoodsBos,respLoginPCBean);
+                    transportOrderDao.save(tTransportOrderEntity1);
+               //记录日志
+                TNoteEntity tNoteEntity = new TNoteEntity();
+                tNoteEntity.setfCompanyId(respLoginPCBean.getfCompanyId());
+                tNoteEntity.setfCreatetime(new Date());
+                tNoteEntity.setfOperate(respLoginPCBean.getfId());
+                tNoteEntity.setfOperator(respLoginPCBean.getfName());
+                tNoteEntity.setfPartyType("merchants");//商户-merchants\n客户-customers
+                   tNoteEntity.setfNote("已修改运单");
+                   tNoteEntity.setfOperatingType("nupdateTranOrder");
+                noteDao.save(tNoteEntity);
+                return  true;
+            }
+        }else {
+            //运单添加操作
+            tTransportOrderEntity.setfCreatetime(new Date());
+            tTransportOrderEntity.setfCarNum(reqTransportAddBo.getfTransportNum());
+            tTransportOrderEntity.setfUpdateTime(new Date());//运单更新时间
+            tTransportOrderEntity.setfOperate(respLoginPCBean.getfId());//操作人
+            tTransportOrderEntity.setfDriverName(reqTransportAddBo.getfDriverName());//司机
+            tTransportOrderEntity.setfCompanyId((respLoginPCBean.getfCompanyId()));//公司id
+            tTransportOrderEntity.setfCarNum(reqTransportAddBo.getfTransportNum());//车牌号
+            tTransportOrderEntity.setfTransportNum("");//运单编号
+            tTransportOrderEntity.setfStatus("ForLoading");//运单状态
+            tTransportOrderEntity.setfAreaInfoIdOne(Long.valueOf(reqTransportAddBo.getfAreaOne()));
+            if(null==reqTransportAddBo.getfAreaTwo()){
+                tTransportOrderEntity.setfAreaInfoIdTwo(0);
+            }
+
+            tTransportOrderEntity.setfDriverPhone(reqTransportAddBo.getfDriverPhone()); //司机电话
+            tTransportOrderEntity.setfCustomsFormNo(reqTransportAddBo.getfCustomsFormNo());//通关单号
+            tTransportOrderEntity.setfSearchKey(reqTransportAddBo.getTransportOrderNum() + reqTransportAddBo.getfTransportNum() +
+             reqTransportAddBo.getfDriverName() + reqTransportAddBo.getfDriverPhone());//关键字
+            saveTransportDetail(reqGoodsBos,respLoginPCBean);//保存子表detail
+            transportOrderDao.save(tTransportOrderEntity);//保存主表
+            //添加备注
+            TRemarkEntity tRemarkEntity = new TRemarkEntity();
+            tRemarkEntity.setfContent(reqTransportAddBo.getRemark());
+            tRemarkEntity.setfCreatetime(new Date());
+            tRemarkEntity.setfOperaterId(respLoginPCBean.getfId());
+            tRemarkEntity.setfTransportOrderId(Long.valueOf(reqTransportAddBo.getTransportOrderId()));
+            tRemarkEntity.settCompanyId(Long.valueOf(respLoginPCBean.getfCompanyId()));
+            tRemarkEntity.settType("transport");
+            tRemarkEntity.settRemarkcol(respLoginPCBean.getfName());
+            remarkDao.save(tRemarkEntity);
+
+            //记录日志
+            TNoteEntity tNoteEntity = new TNoteEntity();
+            tNoteEntity.setfCompanyId(respLoginPCBean.getfCompanyId());
+            tNoteEntity.setfCreatetime(new Date());
+            tNoteEntity.setfOperate(respLoginPCBean.getfId());
+            tNoteEntity.setfOperator(respLoginPCBean.getfName());
+            tNoteEntity.setfPartyType("merchants");//商户-merchants\n客户-customers
+
+            tNoteEntity.setfNote("已提交运单，待装车确认");
+            tNoteEntity.setfOperatingType("createTranOrder");
+
+            noteDao.save(tNoteEntity);
+            return true;
+        }
+        return false;
+    }
+    //保存运单子表
+    public void saveTransportDetail(List<ReqGoodsBo> reqGoodsBos,RespLoginPCBean respLoginPCBean){
+        List<TTransportOrderDetailEntity> tTransportOrderDetailEntities = new ArrayList<>();
+        for (ReqGoodsBo reqGoodsBo : reqGoodsBos) {
+            TTransportOrderDetailEntity tTransportOrderDetailEntity = new TTransportOrderDetailEntity();
+            tTransportOrderDetailEntity.setfOperate(respLoginPCBean.getfId());
+            tTransportOrderDetailEntity.setfCompanyId(respLoginPCBean.getfCompanyId());
+            tTransportOrderDetailEntity.setfCreatetime(new Date());
+            tTransportOrderDetailEntity.setfProductId(Long.valueOf(reqGoodsBo.getfProductId()));//商品id
+            tTransportOrderDetailEntity.settProductFormatId(Long.valueOf(reqGoodsBo.getfProductFormatId()));//规格id
+            tTransportOrderDetailEntity.setfPlanNumber(Integer.valueOf(reqGoodsBo.getPlanNum()));//计划装车数
+            tTransportOrderDetailEntities.add(tTransportOrderDetailEntity);
+
+        }
+        for(TTransportOrderDetailEntity tTransportOrderDetailEntity:tTransportOrderDetailEntities){
+            transportOrderDetailDao.save(tTransportOrderDetailEntity);
+        }
+    }
+
+    /**
+     * 运单删除
+     * @param respLoginPCBean
+     * @param transportNum
+     * @param transportStatus
+     * @return
+     */
+    @Override
+    public boolean transportDelete(RespLoginPCBean respLoginPCBean,String transportNum,String transportStatus) {
+        if(transportStatus.equals("ForLoading")) {
+            List<TOrderEntity> tOrderEntities = orderDao.findByFTransportOrderId(Long.valueOf(transportNum));
+            if(tOrderEntities.size()!=0) {
+                for (TOrderEntity tOrderEntity : tOrderEntities) {
+                    if ("forcheck".equals(tOrderEntity.getfOrderStatus()) || "forpick".equals(tOrderEntity.getfOrderStatus())) {
+                        return false;
+                    }
+                }
+            }
+            transportOrderDetailDao.deleteByFTransportOrderIdAndFCompanyId(Long.valueOf(transportNum),respLoginPCBean.getfCompanyId());
+           transportOrderDao.delete(Long.valueOf(transportNum));
+            return true;
+
+        }
+        return false;
+    }
+
+    /**
+     * 运单详情
+     * @param respLoginPCBean
+     * @param transportId
+     * @return
+     */
+    @Override
+    public RespTransportDetailBo transportDetail(RespLoginPCBean respLoginPCBean,String transportId) {
+        TTransportOrderEntity tTransportOrderEntity= transportOrderDao.findOne(Long.valueOf(transportId));
+        RespTransportDetailBo respTransportDetailBo = new RespTransportDetailBo();
+        respTransportDetailBo.setTransportStatus(tTransportOrderEntity.getfStatus());//状态
+        respTransportDetailBo.setTransportCode(tTransportOrderEntity.getfTransportNum());//运单号
+        respTransportDetailBo.setCustomsFormNum(tTransportOrderEntity.getfCustomsFormNo());//通关单号
+        respTransportDetailBo.setOperate(respLoginPCBean.getfName());//操作人
+        respTransportDetailBo.setCreateTime(dateformat(tTransportOrderEntity.getfCreatetime()));//操作时间
+        //销售地区查询
+        List<TAreaInfoEntity> areaInfoEntitys=areaInfoDao.findByFCompanyIdAndFParentId(respLoginPCBean.getfCompanyId(),tTransportOrderEntity.getfAreaInfoIdOne());
+        if(0!=areaInfoEntitys.size()){
+            respTransportDetailBo.setSendArea(areaInfoEntitys.get(0).getfName()); //销售地区
+        }
+        //根据运单id  查询详情字表，返回list
+        List<RespTransportDetailGoodsBo> respTransportDetailGoodsBos = new ArrayList<>();
+        List<TTransportOrderDetailEntity> tTransportOrderDetailEntities= transportOrderDetailDao.findByFTransportOrderId(Long.valueOf(transportId));
+        for(TTransportOrderDetailEntity tTransportOrderDetailEntity:tTransportOrderDetailEntities) {
+
+            RespTransportDetailGoodsBo respTransportDetailGoodsBo = new RespTransportDetailGoodsBo();
+            respTransportDetailGoodsBo.setPlanNum(tTransportOrderDetailEntity.getfPlanNumber()+"");//计划装车数
+            respTransportDetailGoodsBo.setSurplusNum(tTransportOrderDetailEntity.getfSurplusNumber()+"");//剩余数
+            respTransportDetailGoodsBo.setHaveNum(tTransportOrderDetailEntity.getfPlanNumber()-tTransportOrderDetailEntity.getfSurplusNumber()+"");//已用数
+                //查询商品信息表
+             TProductInfoEntity productInfoEntity= productInfoDao.findOne(tTransportOrderDetailEntity.getfProductId());
+            respTransportDetailGoodsBo.setfCode(productInfoEntity.getfCode()); //编码
+            respTransportDetailGoodsBo.setfPicUrl(productInfoEntity.getfPicList());//主图
+            respTransportDetailGoodsBo.setfName(productInfoEntity.getfName());//名称
+            //查询规格表
+            TProductFormatEntity tProductFormatEntity=productFormatDao.findOne(tTransportOrderDetailEntity.gettProductFormatId());
+            respTransportDetailGoodsBo.setFormatName(tProductFormatEntity.getfName());//规格名字
+            respTransportDetailGoodsBo.setTransDetailId(tTransportOrderDetailEntity.getId()+"");//订单详情id
+            //查询商品单位名称
+            TUnitInfoEntity tUnitInfoEntity= unitInfoDao.findOne(tTransportOrderDetailEntity.gettUnitInfoId());
+            respTransportDetailGoodsBo.setfUnit(tUnitInfoEntity.getfName());
+            respTransportDetailGoodsBos.add(respTransportDetailGoodsBo);
+        }
+        //=====================运输信息=============================
+        respTransportDetailBo.setfCarNum(tTransportOrderEntity.getfCarNum());
+        respTransportDetailBo.setfDriverName(tTransportOrderEntity.getfDriverName());
+        respTransportDetailBo.setfDriverPhone(tTransportOrderEntity.getfDriverPhone());
+       //======================备注信息==============================
+        List<RespRemarkBo> respRemarkBos = new ArrayList<>();
+        List<TRemarkEntity> tRemarkEntities=remarkDao.findByFTransportOrderIdAndTType(Long.valueOf(transportId),"transport");
+        for(TRemarkEntity tRemarkEntity:tRemarkEntities){
+            RespRemarkBo respRemarkBo = new RespRemarkBo();
+            respRemarkBo.setfContent(tRemarkEntity.getfContent());
+            respRemarkBo.setfCreatetime(dateformat(tRemarkEntity.getfCreatetime()));
+            respRemarkBo.setOperator(tRemarkEntity.gettRemarkcol());//操作者名字
+            respRemarkBos.add(respRemarkBo);
+        }
+
+        respTransportDetailBo.setRemarkContent(respRemarkBos);
+        //=====================日志信息=====条件为运单id 和运单类型============================
+        List<RespOperationLogBo> respOperationLogBos = new ArrayList<>();
+        List<TNoteEntity> tNoteEntities=noteDao.findByFTransportOrderIdAndFType(Long.valueOf(transportId),"transport");
+        for(TNoteEntity tNoteEntity:tNoteEntities){
+            RespOperationLogBo respOperationLogBo = new RespOperationLogBo();
+            respOperationLogBo.setfOperatingType(tNoteEntity.getfOperatingType());
+            respOperationLogBo.setCompanyName(companyInfoDao.findOne(tNoteEntity.getfCompanyId()).getfName());
+            respOperationLogBo.setfCreatetime(dateformat(tNoteEntity.getfCreatetime()));
+            respOperationLogBo.setfNote(tNoteEntity.getfNote());
+            respOperationLogBo.setfOperator(tNoteEntity.getfOperator());
+            respOperationLogBos.add(respOperationLogBo);
+        }
+        respTransportDetailBo.setNoteBos(respOperationLogBos);
+        return respTransportDetailBo;
+    }
+
+    /**
+     * 修改运输信息
+     * @param reqTransportInfoBo
+     * @return
+     */
+    @Override
+    public boolean transportInfoUpdate(RespLoginPCBean respLoginPCBean,ReqTransportInfoBo reqTransportInfoBo) {
+         TTransportOrderEntity tTransportOrderEntity= transportOrderDao.findOne(Long.valueOf(reqTransportInfoBo.getTransportId()));
+         if(reqTransportInfoBo.getTransportStatus().equals("ForLoading")||reqTransportInfoBo.getTransportStatus().equals("ForGoods")){
+             tTransportOrderEntity.setfCarNum(reqTransportInfoBo.getCarNum());
+             tTransportOrderEntity.setfDriverName(reqTransportInfoBo.getDriverName());
+             tTransportOrderEntity.setfDriverPhone(reqTransportInfoBo.getDriverPhone());
+             tTransportOrderEntity.setfOperate(respLoginPCBean.getfId());
+             tTransportOrderEntity.setfUpdateTime(new Date());
+             transportOrderDao.save(tTransportOrderEntity);
+             //添加修改日志
+             String transInfoBefore ="运输车辆："+tTransportOrderEntity.getfTransportNum()+"司机："+tTransportOrderEntity.getfDriverName()+"手机号："+tTransportOrderEntity.getfDriverPhone();
+             String transInfoAfter ="运输车辆："+reqTransportInfoBo.getCarNum()+"司机："+reqTransportInfoBo.getDriverName()+"手机号："+reqTransportInfoBo.getDriverPhone();
+
+             TNoteEntity tNoteEntity = new TNoteEntity();
+             tNoteEntity.setfCreatetime(new Date());
+             tNoteEntity.setfCompanyId(respLoginPCBean.getfCompanyId());
+             tNoteEntity.setfPartyType("merchants");
+             tNoteEntity.setfOperator(respLoginPCBean.getfName());
+             tNoteEntity.setfOperate(respLoginPCBean.getfId());
+             tNoteEntity.setfTransportOrderId(Long.valueOf(reqTransportInfoBo.getTransportId()));
+             tNoteEntity.setfType("transport");
+              tNoteEntity.setfOperatingType("nupdateTranInfo");//修改运输信息
+              tNoteEntity.setfNote("运输信息已修改，由"+transInfoBefore+"改为"+transInfoAfter);
+              noteDao.save(tNoteEntity);
+              return true;
+
+         }
+
+
+
+
+
+        return false;
+    }
+
+    /**
+     * 修改备注信息
+     *
+     * @return
+     */
+    @Override
+    public boolean transportRemarkInfoUpdate(RespLoginPCBean respLoginPCBean,String transportId,String remarkContent) {
+        TRemarkEntity tRemarkEntity = new TRemarkEntity();
+        tRemarkEntity.settType("transport");
+        tRemarkEntity.settRemarkcol(respLoginPCBean.getfName());
+        tRemarkEntity.settCompanyId(respLoginPCBean.getfCompanyId());
+        tRemarkEntity.setfTransportOrderId(Long.valueOf(transportId));
+        tRemarkEntity.setfOperaterId(respLoginPCBean.getfId());
+        tRemarkEntity.setfCreatetime(new Date());
+        tRemarkEntity.setfContent(remarkContent);
+        remarkDao.save(tRemarkEntity);
+
+        return true;
+    }
+
+    /**
+     * 装车/运输完成
+     * 运单状态：'ForLoading-待装车；ForGoods-待提货；HasCompleted-已完成'
+     * @param transportOrderId
+     * @param transportStatus
+     * @return
+     */
+    @Override
+    public boolean load(RespLoginPCBean respLoginPCBean,String transportOrderId,String transportStatus) {
+        TTransportOrderEntity tTransportOrderEntity = new TTransportOrderEntity();
+        if(transportStatus.equals("HasCompleted")){
+            for(TOrderEntity tOrderEntity :orderDao.findByFTransportOrderId(Long.valueOf(transportOrderId))){
+                if(1==tOrderEntity.getfOrderStatus()||2==tOrderEntity.getfOrderStatus()){
+                    return false;
+                }
+            }
+        }
+        tTransportOrderEntity.setId(Long.valueOf(transportOrderId));
+        tTransportOrderEntity.setfStatus(transportStatus);
+        transportOrderDao.save(tTransportOrderEntity);
+
+        //记录日志
+        TNoteEntity tNoteEntity = new TNoteEntity();
+        tNoteEntity.setfCreatetime(new Date());
+        tNoteEntity.setfCompanyId(respLoginPCBean.getfCompanyId());
+        tNoteEntity.setfPartyType("merchants");
+        tNoteEntity.setfOperator(respLoginPCBean.getfName());
+        tNoteEntity.setfOperate(respLoginPCBean.getfId());
+        tNoteEntity.setfTransportOrderId(Long.valueOf(transportOrderId));
+        tNoteEntity.setfType("transport");
+        if(transportStatus.equals("ForGoods")){
+            tNoteEntity.setfOperatingType("nloadingConfirmation");
+            tNoteEntity.setfNote("运单已通过装车确认，待完成");
+        }
+        if(transportStatus.equals("HasCompleted")){
+            tNoteEntity.setfOperatingType("tranComplete");
+            tNoteEntity.setfNote("运单已完成");
+        }
+        noteDao.save(tNoteEntity);
+///nloadingConfirmation-装车确认;\ntranComplete-运输完成
+
+        return true;
+
+    }
+
+    /**
+     * 日志查看
+     * @param transportId
+     * @return
+     */
+    @Override
+    public List<RespOperationLogBo> noteSelect(String transportId) {
+
+
+
+        return null;
+    }
+
+    /**
+     * 修改运单的时候 ，删除商品信息 返回boolean (如果该运单商品有订单则提示false 不能删除，否则返回true 并且删除订单详情里的该条记录)
+     * @param transportdetailid
+     * @return
+     */
+    @Override
+    public boolean deleteGoods(String transportdetailid){
+
+       if(0!= orderDetailDao.findByFTranOrderDetailId(Long.valueOf(transportdetailid)).size()){
+           return false;
+       }else {
+           transportOrderDetailDao.delete(Long.valueOf(transportdetailid));
+       }
+        return true;
+    }
+
+    @Override
+    public List<RespGoodsBo> getGoods(RespLoginPCBean respLoginPCBean) {
+
+        List<RespGoodsBo> respGoodsBos = new ArrayList<>();
+        List<TProductInfoEntity> productInfoEntities = productInfoDao.findByFStatusAndFCompanyId("up",respLoginPCBean.getfCompanyId());
+       for(TProductInfoEntity productInfoEntity: productInfoEntities){
+           TUnitInfoEntity unitInfoEntity=unitInfoDao.findOne(productInfoEntity.getfUnitId());
+            List<TProductFormatEntity> productFormatEntities= productFormatDao.findByFProductId(productInfoEntity.getfId());
+           RespGoodsBo respGoodsBo = new RespGoodsBo();
+           respGoodsBo.setfCode(productInfoEntity.getfCode());
+           respGoodsBo.setfName(productInfoEntity.getfName());
+           respGoodsBo.setfPicUrl(productInfoEntity.getfPicList());
+           respGoodsBo.setfUnit(unitInfoEntity.getfName());
+           respGoodsBo.setfUnitId(unitInfoEntity.getfId()+"");
+           if(productFormatEntities.size()!=0){
+               respGoodsBo.setFormatName(productFormatEntities.get(0).getfName());
+               respGoodsBo.setfProductFormatId(productFormatEntities.get(0).getfId()+"");
+               respGoodsBo.setfProductId(productFormatEntities.get(0).getfProductId()+"");
+           }
+           respGoodsBos.add(respGoodsBo);
+
+       }
+
+        return respGoodsBos;
+    }
+
+    /**
+     * 格式化日期
+     */
+    public String dateformat(Date date){
+       SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String date1 = simpleDateFormat.format(date);
+        return date1;
+    }
+}

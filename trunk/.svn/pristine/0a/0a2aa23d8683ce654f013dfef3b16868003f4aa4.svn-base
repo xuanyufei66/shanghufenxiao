@@ -1,0 +1,32 @@
+package com.payease.scfordermis.bo.responseBo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+/**
+ * @Created By liuxiaoming
+ * @CreateTime 2018/1/10 下午3:27
+ **/
+@ApiModel(value = "员工角色列表",description = "员工角色列表")
+public class RespEmpRoleInfoBean {
+    @ApiModelProperty(value = "员工角色ID",dataType = "long",required = true)
+    private long fId;
+    @ApiModelProperty(value = "角色名称",dataType = "string",required = true)
+    private String fName;
+
+    public long getfId() {
+        return fId;
+    }
+
+    public void setfId(long fId) {
+        this.fId = fId;
+    }
+
+    public String getfName() {
+        return fName;
+    }
+
+    public void setfName(String fName) {
+        this.fName = fName;
+    }
+}

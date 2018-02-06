@@ -1,0 +1,39 @@
+package com.payease.scfordermis.bo.responseBo;
+
+import io.swagger.annotations.ApiModelProperty;
+
+/**
+ * Created by YHF on 2018/1/11.
+ */
+public class RspGoodsBo {
+
+    private String fCode;  //商品编码
+
+    private String fName;  //商品名称
+
+    private String formatName ;//规格名称
+
+    public String getfCode() {
+        return fCode;
+    }
+
+    public void setfCode(String fCode) {
+        this.fCode = fCode;
+    }
+
+    public String getfName() {
+        return fName;
+    }
+
+    public void setfName(String fName) {
+        this.fName = fName;
+    }
+
+    public String getFormatName() {
+        return formatName;
+    }
+
+    public void setFormatName(String formatName) {
+        this.formatName = formatName;
+    }
+}

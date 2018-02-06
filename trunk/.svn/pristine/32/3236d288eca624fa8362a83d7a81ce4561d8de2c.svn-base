@@ -1,0 +1,17 @@
+package com.payease.scfordermis.dao;
+
+import com.payease.scfordermis.entity.TEmployeeRoleEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+/**
+ * @Created By liuxiaoming
+ * @CreateTime 2018/1/15 下午9:51
+ **/
+@Repository
+public interface EmployeeRoleDao extends JpaRepository<TEmployeeRoleEntity,Long> {
+
+    List<TEmployeeRoleEntity> findByFEmployeeId(Long fEmployeeId);
+}

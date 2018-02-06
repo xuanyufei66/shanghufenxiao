@@ -1,0 +1,13 @@
+package com.payease.scfordermis.service;
+
+import com.payease.scfordermis.bo.requestBo.ReqConsumerLevelBean;
+import com.payease.scfordermis.bo.requestBo.ReqEmpCustomerBean;
+
+/**
+ * Created by admin on 2018/1/10.
+ */
+public interface CustomerLevelService {
+    void saveLeve(ReqConsumerLevelBean  reqConsumerLevelBean);
+
+    void LiDelete(int i);
+}

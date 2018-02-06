@@ -1,0 +1,124 @@
+package com.payease.scfordermis.service.impl;
+
+import com.payease.scfordermis.bean.Status;
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.bo.requestBo.ReqAccInfoResetPwdBean;
+import com.payease.scfordermis.bo.requestBo.ReqAccountInfoBean;
+import com.payease.scfordermis.dao.EmployeeInfoDao;
+import com.payease.scfordermis.entity.TEmployeeInfoEntity;
+import com.payease.scfordermis.service.AccountInfoService;
+import com.payease.scfordermis.utils.MD5;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpSession;
+import java.util.Date;
+
+/**
+ * Created by zhoushijie on 2018/1/17.
+ * 账号实现类
+ */
+@Service
+public class AccountInfoServiceImpl implements AccountInfoService{
+    private static final Logger log = LoggerFactory.getLogger(AccountInfoServiceImpl.class);
+    @Autowired
+    EmployeeInfoDao employeeInfoDao;
+
+    /**
+     * 重置密码
+     * @param session
+     * @param reqAccInfoResetPwdBean
+     * @return
+     */
+    @Override
+    public ResultBo savepwd(HttpSession session, ReqAccInfoResetPwdBean reqAccInfoResetPwdBean) throws Exception{
+        ResultBo result = ResultBo.build();
+        try{
+            Long fId =(long)1;//账号id
+            //todo   Long fId
+//        Long fId = (Long) session.getAttribute("fId");
+//        if(session.getAttribute("fId") == null){
+//            return result.fail();
+//        }
+            //检查入参的账号Id与session中获取是否一致
+           if (!reqAccInfoResetPwdBean.getfId().equals(fId)){
+               return result.fail();
+           }
+            //通过fid找到账号id
+            TEmployeeInfoEntity accId = employeeInfoDao.findOne(fId);
+            if (accId == null){return result.fail();}
+
+
+
+            //检查原密码是否为空
+            if (StringUtils.isBlank(reqAccInfoResetPwdBean.getOldPwd())){return result.fail();}
+            //检查新密码是否为空
+            if (StringUtils.isBlank(reqAccInfoResetPwdBean.getNewPwd())){return result.fail();}
+
+            //  入参原密码加密后和数据库中密码不一致  false
+            if (!MD5.encode(reqAccInfoResetPwdBean.getOldPwd()).equals(accId.getfPassword())){return result.fail();}
+            //修改时间
+            accId.setfUpdateTime(new Date());
+            //将数据库中的登录密码修改为新密码
+            accId.setfPassword(MD5.encode(reqAccInfoResetPwdBean.getNewPwd()));
+            employeeInfoDao.save(accId);
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error("AccountSavepwdError",e);
+            result.setCodeId(Status.SAVEPWDERROR);
+            result.setMessage(Status.SAVEPWDERROR.getMessage());
+            throw e;
+        }finally {
+            return result;
+        }
+    }
+
+    /**
+     *修改用户信息
+     * @param session
+     * @return
+     */
+    @Override
+    public ResultBo saveaccinfo(HttpSession session,ReqAccountInfoBean req) throws Exception{
+        //通过id找到一个对象
+        ResultBo result = ResultBo.build();
+        try{
+            Long fId =(long)1;//账号id
+            //todo   Long fId
+//        Long fId = (Long) session.getAttribute("fId");
+//        if(session.getAttribute("fId") == null){
+//            return result.fail();
+//        }
+            //判断入参中的Fid是否与session中相等
+            if (!req.getfId().equals(fId)){
+                return result.fail();
+            }
+
+            //通过fId找到账号id
+            TEmployeeInfoEntity entity = employeeInfoDao.findOne(fId);
+            //名字
+            entity.setfName(req.getfName());
+            //手机
+            entity.setfMobile(req.getfMobile());
+            //邮箱
+            if (StringUtils.isNotBlank(req.getfEmail())){
+                entity.setfEmail(req.getfEmail());
+            }else {
+                entity.setfEmail("");
+            }
+
+            employeeInfoDao.save(entity);
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error("AccountSaveAccInfoError",e);
+            result.setCodeId(Status.SAVEACCINFOERROR);
+            result.setMessage(Status.SAVEACCINFOERROR.getMessage());
+            throw e;
+        }finally {
+            return result;
+        }
+    }
+}

@@ -1,0 +1,12 @@
+package com.payease.scfordermis.service;
+
+/**
+ * Created by zhangzhili on 2018/1/19.
+ */
+public interface IAppOrderService {
+
+
+   public void saveRemark();
+
+   public void findRemark();
+}

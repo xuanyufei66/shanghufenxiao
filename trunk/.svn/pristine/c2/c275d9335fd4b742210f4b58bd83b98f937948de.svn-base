@@ -1,0 +1,83 @@
+package com.payease.scfordermis.bo.responseBo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+/**
+ * @Created By liuxiaoming
+ * @CreateTime 2018/1/11 下午5:11
+ **/
+@ApiModel(value = "获取客户端用户全量信息",description = "获取客户端用户全量信息类")
+public class RespClientInfo {
+
+    @ApiModelProperty(value = "客户名称",dataType = "string")
+    private String fName;
+    @ApiModelProperty(value = "订货账号",dataType = "string")
+    private String fIndentNo;
+    @ApiModelProperty(value = "姓名",dataType = "string")
+    private String fContact;
+    @ApiModelProperty(value = "联系电话",dataType = "string")
+    private String fPhone;
+    @ApiModelProperty(value = "职位",dataType = "string")
+    private String fPosition;
+    @ApiModelProperty(value = "Email",dataType = "string")
+    private String fEmail;
+    @ApiModelProperty(value = "QQ",dataType = "string")
+    private String fQq;
+
+    public String getfName() {
+        return fName;
+    }
+
+    public void setfName(String fName) {
+        this.fName = fName;
+    }
+
+    public String getfIndentNo() {
+        return fIndentNo;
+    }
+
+    public void setfIndentNo(String fIndentNo) {
+        this.fIndentNo = fIndentNo;
+    }
+
+    public String getfContact() {
+        return fContact;
+    }
+
+    public void setfContact(String fContact) {
+        this.fContact = fContact;
+    }
+
+    public String getfPhone() {
+        return fPhone;
+    }
+
+    public void setfPhone(String fPhone) {
+        this.fPhone = fPhone;
+    }
+
+    public String getfPosition() {
+        return fPosition;
+    }
+
+    public void setfPosition(String fPosition) {
+        this.fPosition = fPosition;
+    }
+
+    public String getfEmail() {
+        return fEmail;
+    }
+
+    public void setfEmail(String fEmail) {
+        this.fEmail = fEmail;
+    }
+
+    public String getfQq() {
+        return fQq;
+    }
+
+    public void setfQq(String fQq) {
+        this.fQq = fQq;
+    }
+}

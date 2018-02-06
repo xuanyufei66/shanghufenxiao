@@ -1,0 +1,44 @@
+package com.payease.scfordermis.bo.responseBo;
+
+import com.payease.scfordermis.entity.TCategoryInfoEntity;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import java.util.List;
+
+/**
+ * Created by ljp on 2018/1/10.
+ */
+@ApiModel(value = "商品分类",description = "查询商品分类返回的类")
+public class QueryCategoryBo {
+    @ApiModelProperty(value = "分类id")
+    private long id;
+    @ApiModelProperty(value = "分类名称",dataType = "string",required = true)
+    private String name;
+    private List<TCategoryInfoEntity> childList;
+
+    public long getId() {
+        return id;
+    }
+
+    public List<TCategoryInfoEntity> getChildList() {
+        return childList;
+    }
+
+    public void setChildList(List<TCategoryInfoEntity> childList) {
+        this.childList = childList;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
+}

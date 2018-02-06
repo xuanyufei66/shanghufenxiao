@@ -1,0 +1,96 @@
+package com.payease.scfordermis.controller.app.customer;
+
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.bo.responseBo.PageResponseCommBean;
+import com.payease.scfordermis.bo.responseBo.RespMsgBean;
+import com.payease.scfordermis.bo.responseBo.RespMsgUnReadBean;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * @Created By liuxiaoming
+ * @CreateTime 2018/1/10 下午4:59
+ **/
+@RestController
+@RequestMapping("app/customer/message")
+@Api(tags = {"客户端（app）-消息-刘晓明"})
+public class AppCustomerMsgController {
+    @GetMapping(value = "unReadMsg")
+    @ApiOperation(value = "未读消息个数",response = RespMsgUnReadBean.class)
+    public ResultBo authdetail(String token) {
+        ResultBo result = ResultBo.build();
+
+        List<RespMsgUnReadBean> list = new ArrayList<>();
+        RespMsgUnReadBean resp1 = new RespMsgUnReadBean();
+        resp1.setUnReadMsgNum(2);
+        resp1.setMsgtype("order");
+
+        RespMsgUnReadBean resp2 = new RespMsgUnReadBean();
+        resp2.setUnReadMsgNum(2);
+        resp2.setMsgtype("order");
+
+        list.add(resp1);
+        list.add(resp2);
+        result.setResultBody(list);
+        return result;
+    }
+
+    //todo 消息状态修改接口  入参 页面跳转
+    @PostMapping(value = "updMsgStatus")
+    @ApiOperation(value = "消息状态修改",response = ResultBo.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "msgId",value = "消息ID： 若传all：全部已读",paramType = "query",required = true)
+    })
+    public ResultBo updMsgStatus(String token, Long msgId) {
+        ResultBo result = ResultBo.build();
+        return result;
+    }
+
+    //todo 加分页
+    @GetMapping(value = "msgList")
+    @ApiOperation(value = "消息列表",response = RespMsgBean.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "msgtype",value = "消息类型",paramType = "query",required = true)
+    })
+    public ResultBo msgList(String token,String msgtype) {
+        ResultBo result = ResultBo.build();
+        PageResponseCommBean resp = new PageResponseCommBean();
+        List<RespMsgBean> list = new ArrayList<>();
+
+
+        RespMsgBean bean1 = new RespMsgBean();
+        RespMsgBean bean2 = new RespMsgBean();
+
+        bean1.setOrderId(Long.valueOf(1));
+        bean1.setOrderNo("11111111111");
+        bean1.setOrderStatus("complete");
+        bean1.setMsgDesc("您的订单已提货，订单号 "+bean1.getOrderNo());
+        bean1.setMsgTime(new Date().toString());
+
+        bean2.setOrderId(Long.valueOf(2));
+        bean2.setOrderNo("22222222222");
+        bean2.setOrderStatus("complete");
+        bean2.setMsgDesc("您的订单已提交，订单号 "+bean1.getOrderNo());
+        bean2.setMsgTime(new Date().toString());
+
+        list.add(bean1);
+        list.add(bean2);
+
+        resp.setContent(list);
+
+        result.setResultBody(resp);
+        return result;
+    }
+
+
+}

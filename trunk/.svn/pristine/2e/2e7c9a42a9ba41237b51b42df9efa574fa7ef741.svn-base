@@ -1,0 +1,42 @@
+package com.payease.scfordermis.bo.requestBo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+/**
+ * @Created By liuxiaoming
+ * @CreateTime 2018/1/11 下午3:50
+ **/
+@ApiModel(value = "部门设置新增修改入参",description = "描述部门设置新增修改入参")
+public class ReqSaveDepSetBean {
+    @ApiModelProperty(value = "主键ID（新增：ID为null 修改：ID不为null）",dataType = "long")
+    private Long fId;
+    @ApiModelProperty(value = "上级部门ID（新增父节点：ID为null 新增子节点：ID不为null）",dataType = "long")
+    private Long fParentId;
+    @ApiModelProperty(value = "部门名称",dataType = "string",required = true)
+    private String depName;
+
+    public Long getfId() {
+        return fId;
+    }
+
+    public void setfId(Long fId) {
+        this.fId = fId;
+    }
+
+    public Long getfParentId() {
+        return fParentId;
+    }
+
+    public void setfParentId(Long fParentId) {
+        this.fParentId = fParentId;
+    }
+
+    public String getDepName() {
+        return depName;
+    }
+
+    public void setDepName(String depName) {
+        this.depName = depName;
+    }
+}

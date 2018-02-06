@@ -1,0 +1,48 @@
+package com.payease.scfordermis.bo.responseBo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+import java.util.List;
+
+/**
+ * Created by lch on 2018/1/10.
+ *
+ * 销售地区返回对象
+ */
+@ApiModel(value = "销售地区",description = "销售地区下拉框")
+public class RespAreaInfoBo {
+
+    @ApiModelProperty(value = "id",dataType = "long")
+    private Long id;
+
+    @ApiModelProperty(value = "销售地区",dataType = "string")
+    private String name;
+
+    @ApiModelProperty(value = "子地区（有子节点时才有值）",dataType = "list")
+    private List<RespAreaInfoBo> respAreaInfoBoList;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<RespAreaInfoBo> getRespAreaInfoBoList() {
+        return respAreaInfoBoList;
+    }
+
+    public void setRespAreaInfoBoList(List<RespAreaInfoBo> respAreaInfoBoList) {
+        this.respAreaInfoBoList = respAreaInfoBoList;
+    }
+}

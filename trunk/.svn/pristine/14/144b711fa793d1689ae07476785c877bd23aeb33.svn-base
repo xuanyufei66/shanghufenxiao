@@ -1,0 +1,163 @@
+package com.payease.scfordermis.controller;
+
+import com.payease.scfordermis.bo.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpSession;
+import java.util.*;
+
+/**
+ * Created by ljp on 2018/1/9.
+ */
+@RestController
+@RequestMapping("/goods")
+@Api(tags = {"商品管理"})
+public class GoodsManageController {
+    private static final Logger log = LoggerFactory.getLogger(GoodsManageController.class);
+
+    /**
+     * 商品分类
+    **/
+    @PostMapping(value = "categoryaddorupdate")
+    @ApiOperation(value = "商品分类添加与修改接口")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "level",value = "商品分类级别",paramType = "query"),
+            @ApiImplicitParam(name = "categoryName",value = "分类名称",paramType = "query"),
+            @ApiImplicitParam(name = "categoryParentId",value = "商品分类的父id",paramType = "query")
+    })
+    public ResultBo categoryAddOrUpdate(String level,String categoryName) {
+        ResultBo result = ResultBo.build();
+        return result;
+    }
+
+    @DeleteMapping(value = "categorydetele")
+    @ApiOperation(value = "商品分类删除接口")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id",value = "分类id",paramType = "query")
+    })
+    public ResultBo categoryDetele(String id) {
+        ResultBo result = ResultBo.build();
+        return result;
+    }
+
+    @GetMapping(value = "categorylist")
+    @ApiOperation(value = "商品分类列表")
+    public ResultBo getCategoryList() {
+        ResultBo result = ResultBo.build();
+
+        List<QueryCategoryBo> listParent = new ArrayList<>();
+        List<QueryCategoryBo> listChild = new ArrayList<>();
+
+        QueryCategoryBo categoryBoParent = new QueryCategoryBo();
+        categoryBoParent.setId(1);
+        categoryBoParent.setName("水果生鲜");
+
+        QueryCategoryBo categoryBoChild = new QueryCategoryBo();
+        categoryBoChild.setId(2);
+        categoryBoChild.setName("越南水果");
+        listChild.add(categoryBoChild);
+
+        QueryCategoryBo categoryBoChild1 = new QueryCategoryBo();
+        categoryBoChild1.setId(3);
+        categoryBoChild1.setName("天津水果");
+        listChild.add(categoryBoChild1);
+        categoryBoParent.setChildList(listChild);
+        listParent.add(categoryBoParent);
+
+        result.setResultBody(listParent);
+        return result;
+    }
+
+    /**
+     * 商品管理
+     */
+    @GetMapping(value = "goodslist")
+    @ApiOperation(value = "商品列表",response = GoodsManageBo.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "category",value = "分类",paramType = "query"),
+            @ApiImplicitParam(name = "searchCondition",value = "商品名称/编码/关键字/规格",paramType = "query",dataType = "string")
+    })
+    public ResultBo getGoodsList(HttpSession session, Integer category,String searchCondition) {
+        ResultBo result = ResultBo.build();
+        GoodsManageBo goodsManageBo = new GoodsManageBo();
+        goodsManageBo.setGoodsId(1L);
+        goodsManageBo.setPicMain("www.baidu.com/shuiguo");
+        goodsManageBo.setPicAll("www.googe.com,www.qq.com,www.sina.com");
+        goodsManageBo.setGoodsName("越南金山榴莲");
+        goodsManageBo.setGoodsNo("Y1001");
+        goodsManageBo.setFormatName("A果，B果，C果");
+        goodsManageBo.setUnitName("KG");
+        goodsManageBo.setPrice("8.00");
+        goodsManageBo.setStatus("1200");
+        goodsManageBo.setCategoryName("越南水果");
+        goodsManageBo.setLabel("新品、推荐、热销");
+
+        GoodsManageBo goodsManageBo1 = new GoodsManageBo();
+        goodsManageBo.setGoodsId(2L);
+        goodsManageBo1.setPicMain("www.baidu.com/shuiguo");
+        goodsManageBo1.setPicAll("www.googe.com,www.qq.com,www.sina.com");
+        goodsManageBo1.setGoodsName("越南大芒果");
+        goodsManageBo1.setGoodsNo("Y2001");
+        goodsManageBo1.setFormatName("优等，普通");
+        goodsManageBo1.setUnitName("KG");
+        goodsManageBo1.setPrice("7.00");
+        goodsManageBo1.setStatus("2000");
+        goodsManageBo1.setCategoryName("越南水果");
+        goodsManageBo1.setLabel("新品");
+
+        List<GoodsManageBo> goodsManageBoList = new ArrayList<>();
+        goodsManageBoList.add(goodsManageBo);
+        goodsManageBoList.add(goodsManageBo1);
+        result.setResultBody(goodsManageBoList);
+        return result;
+    }
+    @PostMapping(value = "goodsaddorupdate")
+    @ApiOperation(value = "添加修改商品信息接口")
+    public ResultBo getGoodsAddOrUpdate(HttpSession session,GoodAddOrUpdateBo goodAddOrUpdateBo1) {
+        ResultBo result = ResultBo.build();
+
+        List<ProductFormatBo> formatList = new ArrayList<>();
+        ProductFormatBo productFormatBo = new ProductFormatBo();
+        productFormatBo.setPicMain("www.baidu.com");
+        productFormatBo.setFormatName("普通");
+        productFormatBo.setGoodsNo("P02012542");
+        productFormatBo.setGoodsPrice("100.00");
+        ProductFormatBo productFormatBo1 = new ProductFormatBo();
+        productFormatBo1.setPicMain("www.tianjin.com");
+        productFormatBo1.setFormatName("优等");
+        productFormatBo1.setGoodsNo("P0200000");
+        productFormatBo1.setGoodsPrice("100.00");
+        formatList.add(productFormatBo);
+        formatList.add(productFormatBo1);
+
+        GoodAddOrUpdateBo goodAddOrUpdateBo = new GoodAddOrUpdateBo();
+        goodAddOrUpdateBo.setGoodsName("越南菠萝");
+        goodAddOrUpdateBo.setfCategoryIdOne(1L);
+        goodAddOrUpdateBo.setfCategoryIdTwo(1L);
+        goodAddOrUpdateBo.setfSort("1");
+        goodAddOrUpdateBo.setfUnitId(1L);
+        goodAddOrUpdateBo.setfSearchKey("菠萝");
+        goodAddOrUpdateBo.setfStatus("up");
+        goodAddOrUpdateBo.setGoodsLabel("新品，推荐，热卖");
+        goodAddOrUpdateBo.setFormatList(formatList);
+        goodAddOrUpdateBo.setfPicList("www.baidu.com,www.tianjin.com");
+        goodAddOrUpdateBo.setfDesp("水果，新鲜的水果。");
+        return result;
+    }
+    @DeleteMapping(value = "goodsdelete")
+    @ApiOperation(value = "删除商品")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "goodsId",value = "商品id",paramType = "query"),
+    })
+    public ResultBo getGoodDelete(String goodsId) {
+        ResultBo result = ResultBo.build();
+        return result;
+    }
+
+}

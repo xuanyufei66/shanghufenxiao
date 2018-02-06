@@ -1,0 +1,12 @@
+package com.payease.scfordermis.dao;
+
+import com.payease.scfordermis.entity.TProductFormatEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface ProductFormatDao extends JpaRepository<TProductFormatEntity,Long> {
+    List<TProductFormatEntity> findByFProductId(Long productId);
+    List<TProductFormatEntity> findByFProductIdAndFCompanyId(Long productId,Long companyId);
+
+}

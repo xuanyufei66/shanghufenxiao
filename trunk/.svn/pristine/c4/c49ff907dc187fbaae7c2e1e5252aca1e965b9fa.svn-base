@@ -1,0 +1,23 @@
+package com.payease.scfordermis.dao;
+
+import com.payease.scfordermis.entity.TEmployeeInfoEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+
+@Repository
+public interface EmployeeInfoDao extends PagingAndSortingRepository<TEmployeeInfoEntity,Long> {
+
+    Page<TEmployeeInfoEntity> findAll(Specification<TEmployeeInfoEntity> specification, Pageable pageable);
+
+    //根据名字和密码
+    List<TEmployeeInfoEntity> findByFAccountAndFPassword(String fAccount, String fPassword);
+
+
+
+}

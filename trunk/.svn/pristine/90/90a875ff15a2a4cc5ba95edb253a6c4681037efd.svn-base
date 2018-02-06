@@ -1,0 +1,23 @@
+package com.payease.scfordermis.service.impl;
+
+import com.payease.scfordermis.bo.requestBo.ReqConsumerLevelBean;
+import com.payease.scfordermis.bo.requestBo.ReqEmpCustomerBean;
+import com.payease.scfordermis.service.CustomerLevelService;
+import com.payease.scfordermis.service.CustomerService;
+import org.springframework.stereotype.Service;
+
+/**
+ * Created by admin on 2018/1/10.
+ */
+@Service
+public class CustomerLevelServiceImpl implements CustomerLevelService{
+    @Override
+    public  void  saveLeve(ReqConsumerLevelBean  reqConsumerLevelBean){
+
+    }
+
+    @Override
+    public  void LiDelete(int id){
+
+    }
+}

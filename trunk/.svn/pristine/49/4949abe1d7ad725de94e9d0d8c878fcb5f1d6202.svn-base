@@ -1,0 +1,477 @@
+package com.payease.scfordermis.service.impl;
+
+import com.payease.scfordermis.bean.Status;
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.bo.requestBo.PageBean;
+import com.payease.scfordermis.bo.requestBo.ReqEmpAccNumBean;
+import com.payease.scfordermis.bo.requestBo.ReqEmpSaveBean;
+import com.payease.scfordermis.bo.responseBo.PageResponseCommBean;
+import com.payease.scfordermis.bo.responseBo.RespEmpDetailBean;
+import com.payease.scfordermis.bo.responseBo.RespEmpRoleInfoBean;
+import com.payease.scfordermis.bo.responseBo.RespLoginPCBean;
+import com.payease.scfordermis.dao.DepartmentInfoDao;
+import com.payease.scfordermis.dao.EmployeeInfoDao;
+import com.payease.scfordermis.dao.EmployeeRoleDao;
+import com.payease.scfordermis.dao.RoleInfoDao;
+import com.payease.scfordermis.entity.TEmployeeInfoEntity;
+import com.payease.scfordermis.entity.TEmployeeRoleEntity;
+import com.payease.scfordermis.entity.TRoleInfoEntity;
+import com.payease.scfordermis.service.EmpAccNumService;
+import com.payease.scfordermis.service.ICommPageHqlService;
+import com.payease.scfordermis.utils.MD5;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * 首页-设置-员工账号
+ * @Created By liuxiaoming
+ * @CreateTime 2018/1/15 下午1:55
+ **/
+@Service
+public class EmpAccNumServiceImpl implements EmpAccNumService {
+
+    private static final Logger log = LoggerFactory.getLogger(EmpAccNumServiceImpl.class);
+
+    @Autowired
+    EmployeeInfoDao employeeInfoDao;
+    @Autowired
+    DepartmentInfoDao departmentInfoDao;
+    @Autowired
+    private ICommPageHqlService commPageHqlService;
+    @Autowired
+    private RoleInfoDao roleInfoDao;
+    @Autowired
+    private EmployeeRoleDao employeeRoleDao;
+    /**
+     * 员工列表查询
+     * @param
+     * @return
+     */
+    @Override
+    public ResultBo getEmpAccNumList(HttpSession session ,ReqEmpAccNumBean req) throws Exception{
+
+        ResultBo result = ResultBo.build();
+        try{
+            if(req == null){return result.queryError();}
+//        long fCompanyId = (long)1;
+        //从session中取 Long fCompanyId
+            RespLoginPCBean sessionInfo = (RespLoginPCBean)session.getAttribute("userInfo");
+        if(sessionInfo== null || sessionInfo.getfCompanyId() == null){ return result.timeOut();}
+        Long fCompanyId = sessionInfo.getfCompanyId();
+        String sql = this.sqlBuf(req,"sql", fCompanyId);
+        String sqlCount = this.sqlBuf(req,"sqlCount", fCompanyId);
+
+        PageBean bean = new PageBean();
+        bean.setSize(req.getSize());
+        bean.setPage(req.getPage());
+        PageResponseCommBean cbean = commPageHqlService.getPage(sql,sqlCount,bean);
+        result.setResultBody(cbean);
+    }catch (Exception e){
+        e.printStackTrace();
+        result.fail();
+        log.error("EmpAccNumService - - getEmpAccNumList :",e);
+        throw e;
+    }
+        return result;
+    }
+
+
+
+    //sql语句的拼接    type sql  sqlCount
+    public String sqlBuf(ReqEmpAccNumBean reqEmpAccNumBean,String type,long fCompanyId) throws Exception{
+        StringBuffer buf = new StringBuffer();
+        if(type.equals("sql")){
+            buf.append("SELECT new map(emp.fId as fId , dep.fName as depName , emp.fAccount as fAccount , emp.fStatus as fStatus, emp.fName as empName , emp.fMobile as fMobile, emp.fEmail as fEmail, emp.fPosition as fPosition) FROM TEmployeeInfoEntity emp , TDepartmentInfoEntity dep WHERE 1=1");
+        }else if(type.equals("sqlCount")){
+            buf.append("SELECT count(*) FROM TEmployeeInfoEntity emp , TDepartmentInfoEntity dep WHERE 1=1");
+        }
+
+        buf.append(" AND dep.fId = emp.fDepartIdTwo");
+        //部门-1  全查
+        //部门非-1
+        //      看 父ID 0 根节点
+        //                子节点
+        if (reqEmpAccNumBean.getDepartmentId()!= null && reqEmpAccNumBean.getDepartmentId() != 0){
+            if(reqEmpAccNumBean.getDepartmentId() != -1){
+                if(reqEmpAccNumBean.getDepParentId() != null && reqEmpAccNumBean.getDepParentId() == 0) {
+                    //fDepartIdOne  departmentId
+                    buf.append(" AND emp.fDepartIdOne ='").append(reqEmpAccNumBean.getDepartmentId()).append("'");
+                }else{
+                    //fDepartIdTwo  departmentId
+                    buf.append(" AND emp.fDepartIdTwo ='").append(reqEmpAccNumBean.getDepartmentId()).append("'");
+                }
+            }
+        }
+        if (StringUtils.isNotBlank(reqEmpAccNumBean.getOther())) {
+            //fSearchKey    "%"+ other +"%"
+            buf.append(" AND emp.fSearchKey LIKE '%").append(reqEmpAccNumBean.getOther()).append("%'");
+        }
+        buf.append(" AND emp.fCompanyId ='").append(fCompanyId).append("'");
+        buf.append(" AND emp.fIsDelete <> 'yes'");
+        buf.append(" ORDER BY emp.fUpdateTime DESC");
+        return buf.toString();
+    }
+
+    /**
+     * 员工详情接口
+     */
+    @Override
+    public ResultBo empDetail(Long employeeInfoId) throws Exception{
+        ResultBo result = ResultBo.build();
+        try{
+        if(employeeInfoId == null){return result.queryError();}
+        TEmployeeInfoEntity one = employeeInfoDao.findOne(employeeInfoId);
+        if(one == null){
+            log.error("EmpAccNumService - - empDetail :"+ Status.GETEMPINFO.getMessage());
+            return result.setCodeId(Status.GETEMPINFO);
+        }
+        RespEmpDetailBean resp = new RespEmpDetailBean();
+            //序号
+        resp.setfId(one.getfId());
+            //登录账号
+        resp.setfAccount(one.getfAccount());
+            //账号状态:  open-开通 close-禁用
+        resp.setfStatus(one.getfStatus());
+            //姓名
+        resp.setfName(one.getfName());
+            //手机
+        resp.setfMobile(one.getfMobile());
+            //邮箱
+        if(one.getfEmail() != null){
+            resp.setfEmail(one.getfEmail());
+        }else{
+            resp.setfEmail("");
+        }
+            //QQ
+        if(one.getfQq() != null){
+            resp.setfQq(one.getfQq());
+        }else{
+            resp.setfQq("");
+        }
+            //所属部门
+        resp.setfDepartIdTwo(String.valueOf(one.getfDepartIdTwo()));
+            //职位
+        if(one.getfPosition() != null){
+            resp.setfPosition(one.getfPosition());
+        }else{
+            resp.setfPosition("");
+        }
+        result.setResultBody(resp);
+    }catch (Exception e){
+        e.printStackTrace();
+        result.fail();
+        log.error("EmpAccNumService - - empDetail :",e);
+        throw e;
+    }
+        return result;
+    }
+
+    /**
+     * 添加修改接口
+     *
+     * 新增：
+     *    1.ID非必填
+     *    2.判断 登录账号是否存在
+     *
+     * 修改：
+     *    1.ID必填
+     *    2.通过员工ID查找员工角色关系表   删除原有的信息 插入新的数据
+     * 注：
+     * 要注意保存：`f_search_key` varchar(300) COLLATE utf8_bin NOT NULL COMMENT '检索关键字',
+     * f_search_key = 姓名 + 账号 + 手机 + 职位
+     *  @ApiModelProperty(value = "员工ID (新增：ID非必填；修改：ID必填)",dataType = "long")
+     */
+    @Override
+    public ResultBo save(HttpSession session,ReqEmpSaveBean req) throws Exception{
+        ResultBo result = ResultBo.build();
+
+        try{
+            if(req == null){return result.queryError();}
+            RespLoginPCBean sessionInfo = (RespLoginPCBean)session.getAttribute("userInfo");
+            if(sessionInfo== null || sessionInfo.getfCompanyId() == null || sessionInfo.getfId() == null){
+                return result.timeOut();
+            }
+
+        //  Long fCompanyId
+            Long fCompanyId = sessionInfo.getfCompanyId(); //Long.valueOf("1");
+        //  Long sessionId
+            Long sessionId = sessionInfo.getfId();//Long.valueOf("1");
+
+        //保存、修改 员工信息表
+        result = this.saveEmpInfo(req,fCompanyId, sessionId);
+        if(!Objects.equals(Status.SUCCESS.getCodeId(), result.getCodeId())){
+            return result;
+        }
+
+        //保存、修改 员工角色关系表
+        boolean b1 = this.saveEr(req, fCompanyId, sessionId);
+        if(!b1){
+            log.error("EmpAccNumService - - save :" + Status.SAVEEMPFAIL.getMessage());
+            return result.setCodeId(Status.SAVEEMPFAIL);
+        }
+    }catch (Exception e){
+        e.printStackTrace();
+        result.fail();
+        log.error("EmpAccNumService - - save :",e);
+        throw e;
+    }
+        return result;
+    }
+
+    //===============保存、修改 员工信息表=================
+    public ResultBo saveEmpInfo(ReqEmpSaveBean req,Long fCompanyId,Long sessionId) throws Exception{
+        ResultBo result = ResultBo.build();
+        TEmployeeInfoEntity empInfo = new TEmployeeInfoEntity();
+        if(req.getFid() != null){
+            //修改 单一查询fid
+            empInfo = employeeInfoDao.findOne(req.getFid());
+        }else{
+            //新增 判断 登录账号是否存在
+            Integer in = employeeInfoDao.countByFAccountAndFCompanyId(req.getfAccount(),fCompanyId);
+            if(in>0){
+                //用户名已存在
+                log.error("EmpAccNumService - - save :"+Status.ACCOUNTREPEAT.getMessage());
+                result.setCodeId(Status.ACCOUNTREPEAT);
+                return result;
+            }
+            //登录账号
+            empInfo.setfAccount(req.getfAccount());
+            empInfo.setfPassword(MD5.encode(req.getfPassword()));
+            empInfo.setfIsDelete("no");
+            empInfo.setfCreateTime(new Date());
+        }
+
+        //账号状态:  open-开通 close-禁用
+        empInfo.setfStatus(req.getfStatus());
+        //姓名
+        empInfo.setfName(req.getfName());
+        //手机
+        empInfo.setfMobile(req.getfMobile());
+        //邮箱
+        if(StringUtils.isNotBlank(req.getfEmail())){
+            empInfo.setfEmail(req.getfEmail());
+        }
+        //QQ
+        if(StringUtils.isNotBlank(req.getfQq())){
+            empInfo.setfQq(req.getfQq());
+        }
+        //所属部门
+        empInfo.setfDepartIdTwo(req.getfDepartIdTwo());
+        //职位
+        if(StringUtils.isNotBlank(req.getfPosition())){
+            empInfo.setfPosition(req.getfPosition());
+        }
+        //检索关键字 f_search_key = 姓名 + 账号 + 手机 + 职位
+        empInfo.setfSearchKey(req.getfName() + req.getfAccount() + req.getfMobile()+ (StringUtils.isNotBlank(req.getfPosition())?req.getfPosition():"")   );
+
+        //公司ID
+        empInfo.setfCompanyId(fCompanyId);
+        //操作人
+        empInfo.setfOperate(sessionId);
+        //修改时间
+        empInfo.setfUpdateTime(new Date());
+        //保存、修改 员工信息表
+        employeeInfoDao.save(empInfo);
+
+        return result;
+    }
+
+    //===============保存、修改 员工角色关系表==============
+    public boolean saveEr(ReqEmpSaveBean req,Long fCompanyId,Long sessionId) throws Exception{
+        //"员工ID (新增：ID非必填；修改：ID必填)
+        Long empId = null;
+        if(req.getFid() != null){
+            //修改  请求入参中的 员工ID
+            // 通过员工ID查找员工角色关系表   删除原有的信息 插入新的数据
+            List<TEmployeeRoleEntity> list = employeeRoleDao.findByFEmployeeIdAndFCompanyId(req.getFid(),fCompanyId);
+            employeeRoleDao.deleteInBatch(list);
+            empId = req.getFid();
+        }else{
+            //新增 先新增 通过账号查员工ID
+            List<TEmployeeInfoEntity> byFAccount = employeeInfoDao.findByFAccountAndFCompanyId(req.getfAccount(),fCompanyId);
+            if(byFAccount == null || byFAccount.size() == 0){
+                return false;
+            }else{
+                TEmployeeInfoEntity newEmp = byFAccount.get(0);
+                empId = newEmp.getfId();
+            }
+
+        }
+
+        //批量新增
+        //权限设置集合
+        if(StringUtils.isNotBlank(req.getRoleIds())) {
+            String[] arr = req.getRoleIds().split(",");
+            for (String str : arr){
+                TEmployeeRoleEntity er = new TEmployeeRoleEntity();
+                er.setfEmployeeId(empId);//员工id
+                er.setfRoleId(Long.valueOf(str));//角色id
+                er.setfCreateTime(new Date());//创建时间
+                er.setfUpdateTime(new Date());//修改时间
+                er.setfOperare(sessionId);//操作人
+                er.setfCompanyId(fCompanyId);//公司ID
+                employeeRoleDao.save(er);
+            }
+        }
+        return true;
+    }
+    /**
+     * 删除接口 逻辑删除
+     * 注：
+     *   1.`f_is_delete` varchar(10) COLLATE utf8_bin NOT NULL DEFAULT 'no' COMMENT 'yes-删除 no-未删除',
+     *   2. 修改操作人
+     *   3. 通过请求入参的 员工ID 删除原有的员工角色关系表中的数据
+     */
+    @Override
+    public ResultBo deleteEmpAccNumById(HttpSession session,Long id) throws Exception{
+
+        ResultBo result = ResultBo.build();
+        try{
+            if(id == null){return result.queryError();}
+            RespLoginPCBean sessionInfo = (RespLoginPCBean)session.getAttribute("userInfo");
+            if(sessionInfo== null || sessionInfo.getfCompanyId() == null || sessionInfo.getfId() == null){
+                return result.timeOut();
+            }
+
+            //  Long fCompanyId
+            Long fCompanyId = sessionInfo.getfCompanyId(); //Long.valueOf("1");
+            //  Long sessionId
+            Long sessionId = sessionInfo.getfId();//Long.valueOf("1");
+
+        TEmployeeInfoEntity one = employeeInfoDao.findOne(id);
+        if(one == null){
+            //未找到该员工信息
+            log.error("EmpAccNumService - - deleteEmpAccNumById :"+Status.CONSUMERISNULL.getMessage());
+            return result.setCodeId(Status.CONSUMERISNULL);
+        }
+        if(one.getfStatus().equals("open")){
+            //账号 已启用状态不能执行删除
+            log.error("EmpAccNumService - - deleteEmpAccNumById :"+Status.EMPSTATUSERROR.getMessage());
+            return result.setCodeId(Status.EMPSTATUSERROR);
+        }
+        one.setfIsDelete("yes");
+        one.setfOperate(sessionId);
+        one.setfUpdateTime(new Date());
+        employeeInfoDao.save(one);
+        //通过请求入参的 员工ID 删除原有的员工角色关系表
+
+        employeeRoleDao.delete(employeeRoleDao.findByFEmployeeIdAndFCompanyId(id,fCompanyId));
+    }catch (Exception e){
+        e.printStackTrace();
+        result.fail();
+        log.error("EmpAccNumService - - deleteEmpAccNumById :",e);
+        throw e;
+    }
+        return result;
+    }
+
+
+    /**
+     * 角色列表接口（对应页面中的权限列表）
+     * employeeInfoId ,value = "员工ID: 新增页面：非必填   修改页面、查看详情页面：必填"
+     *  isCheck 是否选中 1：选中 0：未选中 新增页面：全部未选中  修改页面、查看详情页面：根据员工角色关系表来做选中
+     */
+    public ResultBo authList(HttpSession session ,Long employeeInfoId) throws Exception{
+        ResultBo result = ResultBo.build();
+
+        try{
+
+            RespLoginPCBean sessionInfo = (RespLoginPCBean)session.getAttribute("userInfo");
+            if(sessionInfo== null || sessionInfo.getfCompanyId() == null){
+                return result.timeOut();
+            }
+            // Long fCompanyId
+        long fCompanyId = sessionInfo.getfCompanyId();//(long)1;
+        List<RespEmpRoleInfoBean> respList = new ArrayList<>();
+        List<TRoleInfoEntity> list = roleInfoDao.findByFCompanyId(fCompanyId);
+        if(employeeInfoId == null){
+            //新增页面
+            for (TRoleInfoEntity entity : list){
+                RespEmpRoleInfoBean resp = new RespEmpRoleInfoBean();
+                resp.setfId(entity.getfId());
+                resp.setfName(entity.getfName());
+                resp.setIsCheck(0);
+                respList.add(resp);
+            }
+        }else{
+            //修改页面、查看详情页面
+            respList = this.empIdIsNotNull(list,fCompanyId, employeeInfoId);
+        }
+        result.setResultBody(respList);
+
+    }catch (Exception e){
+        e.printStackTrace();
+        result.fail();
+        log.error("EmpAccNumService - - authList :",e);
+        throw e;
+    }
+        return result;
+    }
+
+
+
+    //角色列表：修改详情页面
+    public List<RespEmpRoleInfoBean> empIdIsNotNull(List<TRoleInfoEntity> list,long fCompanyId,Long employeeInfoId) throws Exception{
+        //根据员工ID 查找 员工角色关系中的角色ID
+        List<RespEmpRoleInfoBean> respList = new ArrayList<>();
+        List<TEmployeeRoleEntity> erList = employeeRoleDao.findByFEmployeeIdAndFCompanyId(employeeInfoId,fCompanyId);
+        for (TRoleInfoEntity entity : list){
+            RespEmpRoleInfoBean resp = new RespEmpRoleInfoBean();
+            resp.setfId(entity.getfId());
+            resp.setfName(entity.getfName());
+
+            resp.setIsCheck(0);
+            for (TEmployeeRoleEntity erEntity : erList){
+                if(erEntity.getfRoleId() == entity.getfId()) {
+                    resp.setIsCheck(1);
+                }
+            }
+
+            respList.add(resp);
+        }
+        return respList;
+    }
+
+    /**
+     * 重置密码
+     */
+    @Override
+    public ResultBo resetPwd(HttpSession session, Long employeeInfoId,String fPassword) throws Exception{
+        ResultBo result = ResultBo.build();
+        try{
+            if(StringUtils.isBlank(fPassword) || employeeInfoId == null){ return result.queryError(); }
+            RespLoginPCBean sessionInfo = (RespLoginPCBean)session.getAttribute("userInfo");
+            if(sessionInfo== null || sessionInfo.getfId() == null){
+                return result.timeOut();
+            }
+            //  Long sessionId
+            Long sessionId = sessionInfo.getfId();//Long.valueOf("1");
+
+        TEmployeeInfoEntity one = employeeInfoDao.findOne(employeeInfoId);
+        if(one == null){
+            log.error("EmpAccNumService - - resetPwd :"+Status.GETEMPINFO.getMessage());
+            return result.setCodeId(Status.GETEMPINFO);
+        }
+        one.setfPassword(MD5.encode(fPassword));
+        one.setfOperate(sessionId);
+        one.setfUpdateTime(new Date());
+        employeeInfoDao.save(one);
+    }catch (Exception e){
+        e.printStackTrace();
+        result.fail();
+        log.error("EmpAccNumService - - resetPwd :",e);
+        throw e;
+    }
+        return result;
+    }
+
+}

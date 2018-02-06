@@ -1,0 +1,142 @@
+package com.payease.scfordermis.service.impl;
+
+import com.payease.scfordermis.bo.*;
+import com.payease.scfordermis.bo.requestBo.ReqDistributionOrderBo;
+import com.payease.scfordermis.bo.requestBo.ReqTransportAddBo;
+import com.payease.scfordermis.bo.requestBo.ReqTransportBo;
+import com.payease.scfordermis.bo.responseBo.RespOperationLogBo;
+import com.payease.scfordermis.bo.responseBo.RespGoodsBo;
+import com.payease.scfordermis.dao.TransportOrderDao;
+import com.payease.scfordermis.entity.TTransportOrderEntity;
+import com.payease.scfordermis.service.TransportService;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.servlet.http.HttpSession;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created by YHF on 2018/1/10.
+ */
+@Service
+public class TransportServiceImpl implements TransportService{
+
+    @Autowired
+    TransportOrderDao transportOrderDao;
+
+    @Override
+    public ResultBo transportListSelect(HttpSession httpSession,ReqTransportBo reqTransportBo) {
+        ResultBo resultBo = ResultBo.build();
+        //获取session中的companyId
+        //判断入参是否为空，如果不为空，将其作为条件添加
+        //将companyId作为条件
+        //根据条件查询运单
+        //分页                                     当前页               每页显示条数    按照字段排序
+        Pageable pageable = new PageRequest(reqTransportBo.getPage() - 1, reqTransportBo.getSize(), new Sort(Sort.Direction.DESC, "id"));
+        Page tTransportOrderEntities= transportOrderDao.findAll(
+                new Specification<TTransportOrderEntity>() {
+                    @Override
+                    public Predicate toPredicate(Root<TTransportOrderEntity> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                        List<Predicate> lstPredicates = new ArrayList<Predicate>();
+                        List<Predicate> lstPredicates2 = new ArrayList<Predicate>();
+
+                        if (StringUtils.isNotBlank(String.valueOf(reqTransportBo.getTransInfo()))){
+                                lstPredicates.add(criteriaBuilder.like(root.get("fSearchKey"),"%"+ reqTransportBo.getTransInfo()+"%"));
+
+                        }
+                        if(StringUtils.isNotBlank(String.valueOf(reqTransportBo.getSendAreaOne()))){
+
+                            lstPredicates.add(criteriaBuilder.equal(root.get("fAreaInfoIdOne").as(Long.class),reqTransportBo.getSendAreaOne()));
+                        }
+                        if(StringUtils.isNotBlank(String.valueOf(reqTransportBo.getSendAreaTwo()))){
+
+                            lstPredicates.add(criteriaBuilder.equal(root.get("fAreaInfoIdTwo").as(Long.class),reqTransportBo.getSendAreaTwo()));
+                        }
+                        if(StringUtils.isNotBlank(String.valueOf(reqTransportBo.getTimeFrom()))){
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            try {
+                                Date datefrom = simpleDateFormat.parse(reqTransportBo.getTimeFrom());
+                                lstPredicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("fCreatetime").as(Date.class),datefrom));
+
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                        if(StringUtils.isNotBlank(String.valueOf(reqTransportBo.getTimeTo()))){
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            try {
+                                Date dateto = simpleDateFormat.parse(reqTransportBo.getTimeTo());
+                                lstPredicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("fCreatetime").as(Date.class),dateto));
+
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                        if(reqTransportBo.getTransportStatus().length!=0){
+                            for(String status:reqTransportBo.getTransportStatus()){
+                                lstPredicates.add(criteriaBuilder.or(criteriaBuilder.equal(root.get("fStatus").as(String.class),status)));
+                            }
+                        }
+                        //公司主键id
+                        lstPredicates.add(criteriaBuilder.equal(root.get("fCompanyId"), httpSession.getAttribute("companyId")));
+                       return  criteriaBuilder.and(lstPredicates.toArray(new Predicate[lstPredicates.size()]));
+                    }
+                },pageable
+        );
+        resultBo.setResultBody(tTransportOrderEntities);
+      return resultBo;
+    }
+
+    @Override
+    public int transportSave(ReqTransportAddBo reqTransportAddBo) {
+        return 0;
+    }
+
+    @Override
+    public int transportDelete(String transportNum) {
+        return 0;
+    }
+
+    @Override
+    public TransportBo transportDetail(String transportCode) {
+        return null;
+    }
+
+    @Override
+    public int transportRemark(String transportCode) {
+        return 0;
+    }
+
+    @Override
+    public void load(String transportCode) {
+
+    }
+
+    @Override
+    public List<RespOperationLogBo> noteSelect(String transportCode) {
+        return null;
+    }
+
+    @Override
+    public List<RespGoodsBo> getGoods(String goodsCode) {
+        return null;
+    }
+
+}

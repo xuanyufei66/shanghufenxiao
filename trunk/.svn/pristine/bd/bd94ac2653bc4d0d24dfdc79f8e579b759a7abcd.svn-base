@@ -1,0 +1,18 @@
+package com.payease.scfordermis.dao;
+
+import com.payease.scfordermis.entity.TConsumerInfoEntity;
+import com.payease.scfordermis.entity.TConsumerLevelEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+
+/**
+ * Created by admin on 2018/1/16.
+ */
+public interface CustomerDao extends JpaRepository<TConsumerInfoEntity, Long> {
+
+    List<TConsumerInfoEntity> findByFName(String fName);
+
+}

@@ -1,0 +1,63 @@
+package com.payease.scfordermis.bo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+import java.util.Date;
+
+/**
+ * Created by YHF on 2018/1/10.
+ */
+@ApiModel(value = "日志操作实体类",description = "日志操作实体类")
+public class NoteBo {
+    @ApiModelProperty(value = "公司名称")
+    private String  fCompanyName;//公司名称
+    @ApiModelProperty(value = "操作人")
+    private String fOperator; //操作人
+    @ApiModelProperty(value = "时间")
+    private String fCreatetime; //时间
+    @ApiModelProperty(value = "操作类别")
+    private String fOeratingType;//操作类别
+    @ApiModelProperty(value = "日志内容")
+    private String fNote;//日志内容
+
+    public String getfCompanyName() {
+        return fCompanyName;
+    }
+
+    public void setfCompanyName(String fCompanyName) {
+        this.fCompanyName = fCompanyName;
+    }
+
+    public String getfOperator() {
+        return fOperator;
+    }
+
+    public void setfOperator(String fOperator) {
+        this.fOperator = fOperator;
+    }
+
+    public String getfCreatetime() {
+        return fCreatetime;
+    }
+
+    public void setfCreatetime(String fCreatetime) {
+        this.fCreatetime = fCreatetime;
+    }
+
+    public String getfOeratingType() {
+        return fOeratingType;
+    }
+
+    public void setfOeratingType(String fOeratingType) {
+        this.fOeratingType = fOeratingType;
+    }
+
+    public String getfNote() {
+        return fNote;
+    }
+
+    public void setfNote(String fNote) {
+        this.fNote = fNote;
+    }
+}

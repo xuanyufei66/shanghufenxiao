@@ -1,0 +1,37 @@
+package com.payease.scfordermis.bean;
+
+/**
+ * Created by zhangzhili on 2018/1/5.
+ * 返回状态码自定义类
+ * ps：注意codeId值是 int 类型 状态码别太长
+ */
+public enum Status {
+
+    SUCCESS(0, "OK"), FAIL(1, "fail"),
+    GOODSCATEFAIL(1001,"该商品分类下已有商品，请修改商品所属分类后再进行删除操作！"),GOODSCATEREPEAT(1002,"分类名称不能重复"),GOODUNITREOEAT(1003,"计量单位名称不能重复"),GOODUNITFAIL(1004,"已有商品使用该计量单位，不能删除");
+
+    private Integer codeId;
+    private String message;
+
+    Status(Integer codeId, String message) {
+        this.codeId = codeId;
+        this.message = message;
+    }
+
+
+    public Integer getCodeId() {
+        return codeId;
+    }
+
+    public void setCodeId(Integer codeId) {
+        this.codeId = codeId;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+}

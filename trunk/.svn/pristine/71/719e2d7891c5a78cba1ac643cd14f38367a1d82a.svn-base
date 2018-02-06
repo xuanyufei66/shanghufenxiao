@@ -1,0 +1,29 @@
+package com.payease.scfordermis.service;
+
+import com.payease.scfordermis.bo.*;
+import com.payease.scfordermis.bo.requestBo.ReqTransportAddBo;
+import com.payease.scfordermis.bo.requestBo.ReqTransportBo;
+import com.payease.scfordermis.bo.responseBo.RespOperationLogBo;
+import com.payease.scfordermis.bo.responseBo.RespGoodsBo;
+import com.payease.scfordermis.entity.TTransportOrderEntity;
+import org.springframework.data.domain.Page;
+
+import javax.servlet.http.HttpSession;
+import java.util.List;
+
+/**
+ * Created by YHF on 2018/1/10.
+ */
+public interface TransportService {
+
+    ResultBo transportListSelect(HttpSession httpSession, ReqTransportBo reqTransportBo); //运单列表
+    int transportSave(ReqTransportAddBo reqTransportAddBo);  //添加
+    int transportDelete(String  transportNum);//删除
+    TransportBo transportDetail(String transportCode);//详情
+    int transportRemark(String transportCode);  //备注信息 运输信息修改
+    void load(String transportCode); //装车按钮状态改变接口／与运输完成一个接口
+    List<RespOperationLogBo> noteSelect(String transportCode);//日志操作
+    List<RespGoodsBo> getGoods(String goodsCode);//商品列表查询  每个商品的规格都是列表项，入参为商品编码/商品名称
+
+
+}

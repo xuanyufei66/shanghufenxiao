@@ -1,0 +1,236 @@
+package com.payease.scfordermis.controller;
+
+import com.payease.scfordermis.bo.NoteBo;
+import com.payease.scfordermis.bo.ResultBo;
+import com.payease.scfordermis.bo.requestBo.ReqGoodsBo;
+import com.payease.scfordermis.bo.requestBo.ReqTransportAddBo;
+import com.payease.scfordermis.bo.requestBo.ReqTransportBo;
+import com.payease.scfordermis.bo.responseBo.RspTransportBo;
+import com.payease.scfordermis.bo.responseBo.RspTransportDetailBo;
+import com.payease.scfordermis.entity.TTransportOrderEntity;
+import com.payease.scfordermis.service.TransportService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created by YHF on 2018/1/11.
+ */
+
+@RestController
+@RequestMapping("/transport")
+@Api(tags = {"运单类"})
+public class TransportController {
+    private static final Logger log = LoggerFactory.getLogger(TransportController.class);
+    @Autowired
+    private TransportService userService;
+    /**
+     * 运单列表
+     */
+    @GetMapping(value = "list")
+    @ApiOperation(value = "获取运单列表")
+    public ResultBo tranportList(ReqTransportBo reqTransportBo){
+        ResultBo resultBo = ResultBo.build();
+        List<TTransportOrderEntity> tTransportOrderEntities = new ArrayList<>();
+        TTransportOrderEntity  tTransportOrderEntity  =new TTransportOrderEntity();
+        tTransportOrderEntity.setfAreaInfoIdOne(0);
+        tTransportOrderEntity.setfAreaInfoIdTwo(1);
+        tTransportOrderEntity.setfCarNum("1111");
+        tTransportOrderEntity.setfCompanyId(3);
+        tTransportOrderEntity.setfDriverName("张三");
+        tTransportOrderEntity.setfOperate(001);
+        tTransportOrderEntity.setfTransportNum("00000000001");
+        tTransportOrderEntity.setfCreatetime(new Date());
+        tTransportOrderEntity.setfStatus("待装车");
+        tTransportOrderEntities.add(tTransportOrderEntity);
+     resultBo.setMessage("ok");
+     resultBo.setResultBody(tTransportOrderEntities);
+     return  resultBo;
+    }
+
+    /**
+     * 运单新增
+     *
+     */
+    @GetMapping(value = "save")
+    @ApiOperation(value = "新增修改运单列表")
+    public ResultBo tranportSave(ReqTransportAddBo reqTransportAddBo){
+        ResultBo resultBo = ResultBo.build();
+
+        resultBo.setMessage("ok");
+        return  resultBo;
+    }
+    /**
+     * 运单删除
+     *
+     */
+    @GetMapping(value = "delete")
+    @ApiOperation(value = "运输状态为待装车时修改运单列表（销售地区不能修改）")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "transportNum",value = "入参为运单编号运输状态为待装车时修改运单列表（销售地区不能修改）",paramType = "query")
+    })
+    public ResultBo tranportDelete(String  transportNum){
+        ResultBo resultBo = ResultBo.build();
+
+        resultBo.setMessage("ok");
+        return  resultBo;
+    }
+
+    /**
+     * 选择商品列表  每个规格都是列表项
+     *参数为商品名称或商品编码
+     */
+    @GetMapping(value = "goodslist")
+    @ApiOperation(value = "选择商品列表  每个规格都是列表项")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "goodsCode",value = "入参为商品编码或商品名称",paramType = "query")
+    })
+    public ResultBo goodsList(String goodsCode){
+        ResultBo resultBo =ResultBo.build();
+        List<ReqGoodsBo> reqGoodsBos = new ArrayList<>();
+        ReqGoodsBo reqGoodsBo = new ReqGoodsBo();
+        reqGoodsBo.setfCode("g000001");
+        reqGoodsBo.setfName("泰国榴莲");
+        reqGoodsBo.setFormatName("品质：优");
+        reqGoodsBos.add(reqGoodsBo);
+        resultBo.setResultBody(reqGoodsBos);
+
+
+        resultBo.setMessage("ok");
+
+        return  resultBo;
+    }
+
+    /**
+     * 运单详情
+     * @param transportCode
+     */
+    @GetMapping(value = "detail")
+    @ApiOperation(value = "运单详情")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "transportCode",value = "入参为运单编号",paramType = "query",required = true)
+    })
+    public ResultBo transportDetail(String transportCode){
+        List<NoteBo> noteBos = new ArrayList<>();
+        NoteBo noteBo = new NoteBo();
+        noteBo.setfCompanyName("东盟商会");
+        noteBo.setfCreatetime("2017-11-06 09:34");
+        noteBo.setfNote("将司机从 李尊 修改为 郭俊杰");
+        noteBo.setfOeratingType("修改运货单");
+        noteBo.setfOperator("郭俊杰");
+        noteBos.add(noteBo);
+
+        List<RspTransportBo> rspTransportBos = new ArrayList<>();
+        RspTransportBo rspTransportBo = new RspTransportBo();
+        rspTransportBo.setfTransportNum("YS-20171101-436781");
+        rspTransportBo.setfStatus("待装车");
+        rspTransportBo.setfAreaInfoIdTwo("北京");
+        rspTransportBo.setfCreatetime("2017-11-06 09:34");
+        rspTransportBo.setfCustomsFormNo("000100000001");
+        rspTransportBo.setfOperate("李尊");
+        rspTransportBo.setPicUrl("baidu.com");
+        rspTransportBo.setGoodsCode("p0001");
+        rspTransportBo.setGoodsName("榴莲");
+        rspTransportBo.setFormatName("品质：优等");
+        rspTransportBo.setUnit("千克");
+        rspTransportBo.setPlanNum(1000);
+        rspTransportBo.setSurplusNum(1000);
+        rspTransportBo.setNum(0);
+        rspTransportBos.add(rspTransportBo);
+
+        ResultBo resultBo = ResultBo.build();
+        RspTransportDetailBo  rspTransportDetailBo = new RspTransportDetailBo();
+        rspTransportDetailBo.setfCarNum("津e61234");
+        rspTransportDetailBo.setfDriverName("杨洋洋");
+        rspTransportDetailBo.setfDriverPhone("18222902050");
+        rspTransportDetailBo.setRemarkContent("要大的不要小的");
+        rspTransportDetailBo.setNoteBos(noteBos);
+        rspTransportDetailBo.setRspTransportBos(rspTransportBos);
+
+        resultBo.setMessage("ok");
+        resultBo.setResultBody(rspTransportDetailBo);
+        return resultBo;
+    }
+
+    /**
+     * 修改备注信息 运输信息接口
+     *
+     */
+    @GetMapping(value = "remarkupdate")
+    @ApiOperation(value = "修改备注 、运输信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "transportCode",value = "入参为运单编号",paramType = "query",required = true)
+    })
+    public ResultBo transportRemark(String transportCode){
+
+        ResultBo resultBo = ResultBo.build();
+
+        resultBo.setMessage("ok");
+
+
+        return resultBo;
+
+
+
+    }
+
+    /**
+     * 操作日志list
+     *
+     */
+    @GetMapping(value = "notelist")
+    @ApiOperation(value = "日志查看")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "transportCode",value = "入参为运单编号",paramType = "query",required = true)
+    })
+    public ResultBo note(String transportCode){
+        List<NoteBo> noteBos = new ArrayList<>();
+        NoteBo noteBo = new NoteBo();
+        noteBo.setfCompanyName("东盟商会");
+        noteBo.setfCreatetime("2017-11-06 09:34");
+        noteBo.setfNote("将司机从 李尊 修改为 郭俊杰");
+        noteBo.setfOeratingType("修改运货单");
+        noteBo.setfOperator("郭俊杰");
+        noteBos.add(noteBo);
+
+        ResultBo resultBo = ResultBo.build();
+        resultBo.setMessage("ok");
+        resultBo.setResultBody(noteBos);
+        return resultBo;
+
+    }
+
+    /**
+     *
+     * 装车按钮状态改变接口／与运输完成一个接口
+     */
+    @GetMapping(value = "load")
+    @ApiOperation(value = "装车按钮状态改变接口／与运输完成一个接口")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "transportCode",value = "入参为运单编号",paramType = "query",required = true)
+    })
+    public ResultBo load(String transportCode){
+        ResultBo resultBo = ResultBo.build();
+
+        resultBo.setMessage("ok");
+        return resultBo;
+    }
+
+
+    public static void main(String[] args) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+       String date = simpleDateFormat.format(new Date());
+        System.out.println(date);
+    }
+}

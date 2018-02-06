@@ -1,0 +1,9 @@
+package com.payease.scfordermis.bo.responseBo;
+
+/**
+ * Created by YHF on 2018/1/11.
+ */
+public class RspGoodsBo {
+    private  String goodsName; //商品名称
+
+}

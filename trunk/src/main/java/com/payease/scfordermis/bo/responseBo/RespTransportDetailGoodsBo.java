@@ -1,0 +1,102 @@
+package com.payease.scfordermis.bo.responseBo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+/**
+ * Created by YHF on 2018/1/12.
+ */
+@ApiModel(value = "运单详情商品实体类",description = "运单详情商品实体类")
+public class RespTransportDetailGoodsBo {
+    @ApiModelProperty(value = "商品编码")
+    private String fCode;  //商品编码
+    @ApiModelProperty(value = "商品名称")
+    private String fName;  //商品名称
+    @ApiModelProperty(value = "规格")
+    private String formatName ;//规格名称
+
+    @ApiModelProperty(value = "商品图片url")
+    private String fPicUrl;
+    @ApiModelProperty(value = "单位")
+    private String fUnit;
+    @ApiModelProperty(value = "计划装车数")
+    private String planNum;
+    @ApiModelProperty(value = "可用数")
+    private String surplusNum;
+    @ApiModelProperty(value = "已用数")
+    private String haveNum;
+    @ApiModelProperty(value = "运单详情id")
+    private String transDetailId;
+
+    public String getTransDetailId() {
+        return transDetailId;
+    }
+
+    public void setTransDetailId(String transDetailId) {
+        this.transDetailId = transDetailId;
+    }
+
+    public String getfCode() {
+        return fCode;
+    }
+
+    public void setfCode(String fCode) {
+        this.fCode = fCode;
+    }
+
+    public String getfName() {
+        return fName;
+    }
+
+    public void setfName(String fName) {
+        this.fName = fName;
+    }
+
+    public String getFormatName() {
+        return formatName;
+    }
+
+    public void setFormatName(String formatName) {
+        this.formatName = formatName;
+    }
+
+    public String getfPicUrl() {
+        return fPicUrl;
+    }
+
+    public void setfPicUrl(String fPicUrl) {
+        this.fPicUrl = fPicUrl;
+    }
+
+    public String getfUnit() {
+        return fUnit;
+    }
+
+    public void setfUnit(String fUnit) {
+        this.fUnit = fUnit;
+    }
+
+    public String getPlanNum() {
+        return planNum;
+    }
+
+    public void setPlanNum(String planNum) {
+        this.planNum = planNum;
+    }
+
+    public String getSurplusNum() {
+        return surplusNum;
+    }
+
+    public void setSurplusNum(String surplusNum) {
+        this.surplusNum = surplusNum;
+    }
+
+    public String getHaveNum() {
+        return haveNum;
+    }
+
+    public void setHaveNum(String haveNum) {
+        this.haveNum = haveNum;
+    }
+}

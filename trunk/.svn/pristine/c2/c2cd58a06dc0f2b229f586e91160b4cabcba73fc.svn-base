@@ -1,0 +1,12 @@
+package com.payease.scfordermis.dao;
+
+import com.payease.scfordermis.entity.TTransportOrderDetailEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+/**
+ * 运单产品信息
+ */
+public interface TransportOrderDetailDao extends JpaRepository<TTransportOrderDetailEntity,Long>{
+    //用于判断该商品规格是否发生运单
+    Long countByFProductId(Long productId);
+}

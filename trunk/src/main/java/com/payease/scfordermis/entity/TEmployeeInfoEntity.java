@@ -1,0 +1,233 @@
+package com.payease.scfordermis.entity;
+
+import javax.persistence.*;
+import java.util.Date;
+import java.util.Objects;
+
+/**
+ * @Author : zhangwen
+ * @Data : 2018/1/10
+ * @Description :
+ */
+@Entity
+@Table(name = "t_employee_info")
+public class TEmployeeInfoEntity {
+    private long fId;
+    private long fDepartIdOne;
+    private long fDepartIdTwo;
+    private String fAccount;
+    private String fPassword;
+    private String fStatus;
+    private String fName;
+    private String fMobile;
+    private String fEmail;
+    private String fQq;
+    private String fPosition;
+    private String fIsDelete;
+    private String fSearchKey;
+    private Date fCreateTime;
+    private Date fUpdateTime;
+    private Long fOperate;
+    private long fCompanyId;
+
+    @Id
+    @Column(name = "f_id", nullable = false)
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    public long getfId() {
+        return fId;
+    }
+
+    public void setfId(long fId) {
+        this.fId = fId;
+    }
+
+    @Basic
+    @Column(name = "f_depart_id_one", nullable = false)
+    public long getfDepartIdOne() {
+        return fDepartIdOne;
+    }
+
+    public void setfDepartIdOne(long fDepartIdOne) {
+        this.fDepartIdOne = fDepartIdOne;
+    }
+
+    @Basic
+    @Column(name = "f_depart_id_two", nullable = false)
+    public long getfDepartIdTwo() {
+        return fDepartIdTwo;
+    }
+
+    public void setfDepartIdTwo(long fDepartIdTwo) {
+        this.fDepartIdTwo = fDepartIdTwo;
+    }
+
+    @Basic
+    @Column(name = "f_account", nullable = false, length = 20)
+    public String getfAccount() {
+        return fAccount;
+    }
+
+    public void setfAccount(String fAccount) {
+        this.fAccount = fAccount;
+    }
+
+    @Basic
+    @Column(name = "f_password", nullable = false, length = 50)
+    public String getfPassword() {
+        return fPassword;
+    }
+
+    public void setfPassword(String fPassword) {
+        this.fPassword = fPassword;
+    }
+
+    @Basic
+    @Column(name = "f_status", nullable = false, length = 10)
+    public String getfStatus() {
+        return fStatus;
+    }
+
+    public void setfStatus(String fStatus) {
+        this.fStatus = fStatus;
+    }
+
+    @Basic
+    @Column(name = "f_name", nullable = false, length = 20)
+    public String getfName() {
+        return fName;
+    }
+
+    public void setfName(String fName) {
+        this.fName = fName;
+    }
+
+    @Basic
+    @Column(name = "f_mobile", nullable = false, length = 20)
+    public String getfMobile() {
+        return fMobile;
+    }
+
+    public void setfMobile(String fMobile) {
+        this.fMobile = fMobile;
+    }
+
+    @Basic
+    @Column(name = "f_email", nullable = true, length = 20)
+    public String getfEmail() {
+        return fEmail;
+    }
+
+    public void setfEmail(String fEmail) {
+        this.fEmail = fEmail;
+    }
+
+    @Basic
+    @Column(name = "f_qq", nullable = true, length = 20)
+    public String getfQq() {
+        return fQq;
+    }
+
+    public void setfQq(String fQq) {
+        this.fQq = fQq;
+    }
+
+    @Basic
+    @Column(name = "f_position", nullable = true, length = 50)
+    public String getfPosition() {
+        return fPosition;
+    }
+
+    public void setfPosition(String fPosition) {
+        this.fPosition = fPosition;
+    }
+
+    @Basic
+    @Column(name = "f_is_delete", nullable = false, length = 10)
+    public String getfIsDelete() {
+        return fIsDelete;
+    }
+
+    public void setfIsDelete(String fIsDelete) {
+        this.fIsDelete = fIsDelete;
+    }
+
+    @Basic
+    @Column(name = "f_search_key", nullable = false, length = 300)
+    public String getfSearchKey() {
+        return fSearchKey;
+    }
+
+    public void setfSearchKey(String fSearchKey) {
+        this.fSearchKey = fSearchKey;
+    }
+
+    @Basic
+    @Column(name = "f_create_time", nullable = false)
+    public Date getfCreateTime() {
+        return fCreateTime;
+    }
+
+    public void setfCreateTime(Date fCreateTime) {
+        this.fCreateTime = fCreateTime;
+    }
+
+    @Basic
+    @Column(name = "f_update_time", nullable = true)
+    public Date getfUpdateTime() {
+        return fUpdateTime;
+    }
+
+    public void setfUpdateTime(Date fUpdateTime) {
+        this.fUpdateTime = fUpdateTime;
+    }
+
+    @Basic
+    @Column(name = "f_operate", nullable = true)
+    public Long getfOperate() {
+        return fOperate;
+    }
+
+    public void setfOperate(Long fOperate) {
+        this.fOperate = fOperate;
+    }
+
+    @Basic
+    @Column(name = "f_company_id", nullable = false)
+    public long getfCompanyId() {
+        return fCompanyId;
+    }
+
+    public void setfCompanyId(long fCompanyId) {
+        this.fCompanyId = fCompanyId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TEmployeeInfoEntity that = (TEmployeeInfoEntity) o;
+        return fId == that.fId &&
+                fDepartIdOne == that.fDepartIdOne &&
+                fDepartIdTwo == that.fDepartIdTwo &&
+                fCompanyId == that.fCompanyId &&
+                Objects.equals(fAccount, that.fAccount) &&
+                Objects.equals(fPassword, that.fPassword) &&
+                Objects.equals(fStatus, that.fStatus) &&
+                Objects.equals(fName, that.fName) &&
+                Objects.equals(fMobile, that.fMobile) &&
+                Objects.equals(fEmail, that.fEmail) &&
+                Objects.equals(fQq, that.fQq) &&
+                Objects.equals(fPosition, that.fPosition) &&
+                Objects.equals(fIsDelete, that.fIsDelete) &&
+                Objects.equals(fSearchKey, that.fSearchKey) &&
+                Objects.equals(fCreateTime, that.fCreateTime) &&
+                Objects.equals(fUpdateTime, that.fUpdateTime) &&
+                Objects.equals(fOperate, that.fOperate);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(fId, fDepartIdOne, fDepartIdTwo, fAccount, fPassword, fStatus, fName, fMobile, fEmail, fQq, fPosition, fIsDelete, fSearchKey, fCreateTime, fUpdateTime, fOperate, fCompanyId);
+    }
+}
